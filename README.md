@@ -65,20 +65,11 @@ Acesse no navegador: `http://localhost:3000`.
 
 ## ✉️ Configuração do Formulário de Contato (Formspree)
 
-O formulário está preparado para envio assíncrono (sem recarregar a página). Para receber as mensagens diretamente no seu e-mail:
-
-1. Acesse [formspree.io](https://formspree.io) e crie uma conta gratuita.
-2. Crie um novo formulário com o nome desejado (ex.: *Contato Portfólio*).
-3. Copie o seu ID gerado (ex.: `xbjvwkpq`).
-4. Abra o arquivo `index.html` e localize a linha do formulário:
-   ```html
-   <form id="contactForm" action="https://formspree.io/f/SEU_ID_AQUI" method="POST" ...>
-   ```
-5. Substitua `SEU_ID_AQUI` pelo seu código do Formspree:
-   ```html
-   <form id="contactForm" action="https://formspree.io/f/xbjvwkpq" method="POST" ...>
-   ```
-Pronto! Toda mensagem enviada através do formulário cairá na sua caixa de entrada e disparará o aviso Toast de confirmação na tela.
+O formulário já está configurado e integrado com o endpoint:
+```html
+<form id="contactForm" action="https://formspree.io/f/xeaqrrnr" method="POST" ...>
+```
+O envio ocorre de forma assíncrona (AJAX/Fetch), apresentando um spinner de carregamento no botão, limpando os campos e disparando o componente Toast com mensagem de confirmação de envio sem recarregar a página. Caso deseje alterar para outro endpoint no futuro, basta atualizar o atributo `action` no arquivo `index.html`.
 
 ---
 
