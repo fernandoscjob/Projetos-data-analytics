@@ -1,10 +1,10 @@
-# 📊 Portfólio Profissional de Dados & Business Intelligence
+# 📊 Portfólio Profissional | Analista de Dados & Especialista em BI
 
 ![Status](https://img.shields.io/badge/Status-Produção-emerald?style=for-the-badge)
 ![Tema](https://img.shields.io/badge/Tema-Dark_Modern_(Linear/Vercel)-090a0f?style=for-the-badge)
 ![Tech](https://img.shields.io/badge/Stack-HTML5_•_TailwindCSS_•_Chart.js_•_Vanilla_JS-sky?style=for-the-badge)
 
-Portfólio técnico de **Fernando Cavalcante** — Analista de Dados Sênior & Especialista em Business Intelligence, com foco em tomada de decisão executiva, redução de custos operacionais, modelagem dimensional e governança analítica.
+Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | Especialista em BI, com foco em tomada de decisão executiva, redução de custos operacionais, modelagem dimensional e governança analítica.
 
 ---
 
@@ -24,6 +24,7 @@ Portfólio técnico de **Fernando Cavalcante** — Analista de Dados Sênior & E
   - *Visão 1*: Custo Real vs Meta (Linha comparativa de inflexão).
   - *Visão 2*: Volume Operacional & Acurácia de SLA (Barras e Eixo Secundário).
   - *Visão 3*: **Matriz Heatmap de Cohort & Churn** com alternância em tempo real entre *Taxa de Retenção (%)* e *Taxa de Churn (%)* com tooltips interativos por célula.
+- **Trajetória Profissional & Formação Acadêmica**: Timeline corporativa estruturada com experiências como *Analista de Dados / Consultor de BI* e atuação na MEDGRUPO (Looker Studio, SQL, automações n8n), além de formação em Análise e Desenvolvimento de Sistemas.
 - **Formulário de Contato Integrado**: Pronto para o **Formspree** via envio assíncrono (AJAX/Fetch) com feedback via componente *Toast* sem recarregar a página.
 - **Links Reais & Download de CV**: Conexão direta com WhatsApp, LinkedIn, GitHub e download nativo do arquivo `curriculo-fernando.pdf`.
 
