@@ -69,6 +69,7 @@
       <!-- Desktop Navigation Links -->
       <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
         <a href="#sobre" class="hover:text-sky-400 transition-colors">Sobre</a>
+        <a href="#solucoes" class="hover:text-sky-400 transition-colors">Soluções</a>
         <a href="#metricas" class="hover:text-sky-400 transition-colors">Impacto</a>
         <a href="#stack" class="hover:text-sky-400 transition-colors">Stack</a>
         <a href="#projetos" class="hover:text-sky-400 transition-colors">Projetos</a>
@@ -100,6 +101,7 @@
     <!-- Mobile Drawer Menu -->
     <div id="mobileMenu" class="hidden md:hidden glass-panel border-b border-neutral-800 px-6 py-5 space-y-4">
       <a href="#sobre" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Sobre</a>
+      <a href="#solucoes" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Soluções</a>
       <a href="#metricas" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Métricas de Impacto</a>
       <a href="#stack" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Stack Técnica</a>
       <a href="#projetos" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Projetos em Destaque</a>
@@ -315,7 +317,119 @@
 
 
     <!-- =========================================================================
-         4. STACK TÉCNICA (GRID MINIMALISTA DE BADGES)
+         4. PILARES DE SOLUÇÕES & GERAÇÃO DE VALOR
+         ========================================================================= -->
+    <section id="solucoes" class="py-24 border-t border-neutral-800/80 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Cabeçalho da Seção -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div>
+            <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Capacidades Analíticas</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2">
+              Como transformo dados em resultado financeiro
+            </h2>
+          </div>
+          <p class="text-sm text-neutral-400 max-w-md">
+            Abordagem consultiva ponta a ponta: da auditoria de bases transacionais à camada de inteligência executiva com governança garantida.
+          </p>
+        </div>
+
+        <!-- Grid de 4 Pilares -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Card 01 -->
+          <div class="glass-panel p-8 rounded-3xl border border-neutral-800/90 hover:border-sky-500/40 transition-all duration-300 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="text-xs font-mono text-neutral-500 group-hover:text-sky-400 transition-colors">/ 01</span>
+                <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-3 group-hover:text-sky-300 transition-colors">
+                Auditoria & Otimização de Custos
+              </h3>
+              <p class="text-xs text-neutral-400 leading-relaxed mb-6">
+                Identificação de divergências contratuais, sobretaxas e vazamento de margem por meio de conciliações analíticas complexas em SQL.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-neutral-800/80 text-[11px] font-mono text-emerald-400">
+              Case: Redução de 40% em fretes
+            </div>
+          </div>
+
+          <!-- Card 02 -->
+          <div class="glass-panel p-8 rounded-3xl border border-neutral-800/90 hover:border-indigo-500/40 transition-all duration-300 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="text-xs font-mono text-neutral-500 group-hover:text-indigo-400 transition-colors">/ 02</span>
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                </div>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-3 group-hover:text-indigo-300 transition-colors">
+                Camada Semântica & SSOT
+              </h3>
+              <p class="text-xs text-neutral-400 leading-relaxed mb-6">
+                Padronização de regras de negócio e modelagem dimensional (Kimball/dbt) eliminando discrepâncias de relatórios entre áreas corporativas.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-neutral-800/80 text-[11px] font-mono text-indigo-300">
+              Governança: Zero divergência de métricas
+            </div>
+          </div>
+
+          <!-- Card 03 -->
+          <div class="glass-panel p-8 rounded-3xl border border-neutral-800/90 hover:border-cyan-500/40 transition-all duration-300 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="text-xs font-mono text-neutral-500 group-hover:text-cyan-400 transition-colors">/ 03</span>
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
+                BI & Cockpits C-Level
+              </h3>
+              <p class="text-xs text-neutral-400 leading-relaxed mb-6">
+                Desenvolvimento de painéis executivos com DAX avançado e Looker Studio para acompanhamento em tempo real de KPIs e metas (OKRs).
+              </p>
+            </div>
+            <div class="pt-4 border-t border-neutral-800/80 text-[11px] font-mono text-cyan-400">
+              Escala: +30 painéis em produção
+            </div>
+          </div>
+
+          <!-- Card 04 -->
+          <div class="glass-panel p-8 rounded-3xl border border-neutral-800/90 hover:border-violet-500/40 transition-all duration-300 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="text-xs font-mono text-neutral-500 group-hover:text-violet-400 transition-colors">/ 04</span>
+                <div class="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-3 group-hover:text-violet-300 transition-colors">
+                Pipelines & Alertas Proativos
+              </h3>
+              <p class="text-xs text-neutral-400 leading-relaxed mb-6">
+                Orquestração de dados assíncronos no n8n e scripts Python para ingestão de APIs, testes de qualidade e disparo de anomalias operacionais.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-neutral-800/80 text-[11px] font-mono text-violet-400">
+              Eficiência: -18h manuais/semana
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         5. STACK TÉCNICA (GRID MINIMALISTA DE BADGES)
          ========================================================================= -->
     <section id="stack" class="py-24 relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
