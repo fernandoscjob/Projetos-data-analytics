@@ -56,13 +56,14 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
       <!-- Brand Logo com Foto de Perfil -->
-      <a href="#" class="flex items-center gap-3 group">
+      <a href="#" class="flex items-center gap-3 group flex-shrink-0">
         <div class="relative w-10 h-10 rounded-xl overflow-hidden border border-sky-500/40 shadow-[0_0_15px_rgba(56,189,248,0.25)] group-hover:scale-105 transition-transform flex-shrink-0">
           <img src="profile.jpg" alt="Fernando" class="w-full h-full object-cover">
         </div>
-        <div class="flex flex-col">
+        <div class="flex items-center gap-2">
           <span class="font-bold text-slate-100 tracking-tight text-base group-hover:text-sky-400 transition-colors">Fernando</span>
-          <span class="text-[11px] font-mono text-slate-400 whitespace-nowrap">Analista de Dados & BI</span>
+          <span class="hidden sm:inline text-neutral-600 font-mono text-xs">/</span>
+          <span class="hidden sm:inline text-[11px] font-mono text-slate-400 whitespace-nowrap">Analista de Dados & BI</span>
         </div>
       </a>
 
@@ -240,12 +241,17 @@
     <!-- =========================================================================
          3. BARRA DE MÉTRICAS DE IMPACTO (QUICK WINS)
          ========================================================================= -->
-    <section id="metricas" class="py-14 border-y border-neutral-800/80 relative">
+    <section id="metricas" class="py-20 border-y border-neutral-800/80 relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="mb-8 text-center sm:text-left">
+        <div class="text-center max-w-3xl mx-auto mb-16">
           <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Resultados de Negócio</span>
-          <h2 class="text-xl font-bold text-white tracking-tight">Impacto Quantificável em Produção</h2>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2 mb-4">
+            Impacto Quantificável em Produção
+          </h2>
+          <p class="text-sm text-neutral-400 leading-relaxed max-w-2xl mx-auto">
+            Métricas reais consolidadas de redução de custos operacionais, governança analítica e alta taxa de adoção executiva.
+          </p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
@@ -476,12 +482,12 @@
     <section id="stack" class="py-24 relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="text-center max-w-2xl mx-auto mb-16">
+        <div class="text-center max-w-3xl mx-auto mb-16">
           <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Arsenal Tecnológico</span>
-          <h2 class="text-3xl font-extrabold text-white tracking-tight mt-2 mb-4">
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2 mb-4">
             Stack Técnica Especializada
           </h2>
-          <p class="text-sm text-neutral-400">
+          <p class="text-sm text-neutral-400 leading-relaxed max-w-2xl mx-auto">
             Ferramentas aplicadas na prática para modelagem, ingestão, análise preditiva e camadas visuais de decisão corporativa.
           </p>
         </div>
@@ -579,25 +585,23 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Header da Seção -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div>
-            <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Cases de Sucesso</span>
-            <h2 class="text-3xl font-extrabold text-white tracking-tight mt-2">
-              Projetos de Alto Impacto
-            </h2>
-            <p class="text-sm text-neutral-400 mt-2 max-w-xl">
-              Estudos de caso reais detalhando problema de negócio, arquitetura analítica e retorno sobre investimento gerado.
-            </p>
-          </div>
+        <div class="text-center max-w-3xl mx-auto mb-8">
+          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Cases de Sucesso</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2 mb-4">
+            Projetos de Alto Impacto
+          </h2>
+          <p class="text-sm text-neutral-400 leading-relaxed max-w-2xl mx-auto">
+            Estudos de caso reais detalhando problema de negócio, arquitetura analítica e retorno sobre investimento gerado.
+          </p>
+        </div>
 
-          <!-- Filtros de Categoria -->
-          <div class="flex flex-wrap gap-2">
-            <button class="filter-btn active" data-filter="all">Todos</button>
-            <button class="filter-btn" data-filter="cohort">Cohort & Churn</button>
-            <button class="filter-btn" data-filter="custo">Otimização de Custos</button>
-            <button class="filter-btn" data-filter="bi">BI & Governança</button>
-            <button class="filter-btn" data-filter="automacao">Engenharia & Pipelines</button>
-          </div>
+        <!-- Filtros de Categoria -->
+        <div class="flex flex-wrap justify-center gap-2 mb-12">
+          <button class="filter-btn active" data-filter="all">Todos</button>
+          <button class="filter-btn" data-filter="cohort">Cohort & Churn</button>
+          <button class="filter-btn" data-filter="custo">Otimização de Custos</button>
+          <button class="filter-btn" data-filter="bi">BI & Governança</button>
+          <button class="filter-btn" data-filter="automacao">Engenharia & Pipelines</button>
         </div>
 
         <!-- Grid de Cards de Projetos (Grid 2x2 Responsivo) -->
@@ -815,12 +819,12 @@
     <section id="demo" class="py-24 relative bg-grid-pattern">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="text-center max-w-2xl mx-auto mb-12">
+        <div class="text-center max-w-3xl mx-auto mb-16">
           <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Laboratório Analítico</span>
-          <h2 class="text-3xl font-extrabold text-white tracking-tight mt-2 mb-4">
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2 mb-4">
             Simulação Interativa de Decisão
           </h2>
-          <p class="text-sm text-neutral-400">
+          <p class="text-sm text-neutral-400 leading-relaxed max-w-2xl mx-auto">
             Experimente o mini-dashboard abaixo com dados reais simulados da otimização logística. Alterne os modos de visão e analise a inflexão dos resultados.
           </p>
         </div>
@@ -960,14 +964,11 @@
         
         <!-- Header da Seção -->
         <div class="text-center max-w-3xl mx-auto mb-16">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-xs font-mono text-sky-400 mb-3">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            <span>CARREIRA & FORMAÇÃO</span>
-          </div>
-          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-1 mb-4">
+          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Carreira & Formação</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2 mb-4">
             Trajetória Profissional & Acadêmica
           </h2>
-          <p class="text-sm sm:text-base text-neutral-400 leading-relaxed">
+          <p class="text-sm text-neutral-400 leading-relaxed max-w-2xl mx-auto">
             Histórico consolidado em Business Intelligence corporativo, modelagem analítica e consultoria com alto retorno financeiro (ROI).
           </p>
         </div>
@@ -1260,12 +1261,12 @@
     <section id="contato" class="py-24 border-t border-neutral-800/80 relative">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="text-center max-w-2xl mx-auto mb-16">
+        <div class="text-center max-w-3xl mx-auto mb-16">
           <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Vamos Conversar?</span>
-          <h2 class="text-3xl font-extrabold text-white tracking-tight mt-2 mb-4">
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2 mb-4">
             Construa Decisões Orientadas a Dados
           </h2>
-          <p class="text-sm text-neutral-400">
+          <p class="text-sm text-neutral-400 leading-relaxed max-w-2xl mx-auto">
             Interessado em otimizar custos operacionais, unificar métricas corporativas ou criar pipelines de automação analítica? Envie uma mensagem.
           </p>
         </div>
