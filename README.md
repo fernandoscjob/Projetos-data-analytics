@@ -14,7 +14,7 @@ Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | 
 - **Identidade Pessoal & Foto de Perfil**: Foto profissional integrada no Header, Hero Section de duas colunas com tags flutuantes de impacto (`-40% Custos Frete`, `99.8% SLA Dados`) e seção de contato.
 - **Barra de Métricas de Impacto (Quick Wins)**: Contadores animados via `IntersectionObserver` apresentando números de ROI, volume e automação.
 - **Pilares de Soluções & Geração de Valor (#solucoes)**: Grid consultivo de 4 frentes estratégicas (Auditoria & Otimização de Custos, Camada Semântica & SSOT, BI & Cockpits C-Level e Pipelines & Alertas Proativos).
-- **Stack Técnica Categorizada**: Badges interativos divididos em *Linguagens & Core*, *Business Intelligence* (incluindo **Looker (LookML)**, Power BI e DAX), *Pipelines & Automação* (n8n, dbt) e *Modelagem Dimensional (Kimball)*.
+- **Stack Técnica Categorizada**: Badges interativos distribuídos em *Modelagem & Engenharia* (SQL Avançado, Kimball, Star Schema, SSOT, dbt), *BI & Camada Executiva* (Looker LookML, Power BI, DAX Avançado, Cockpits C-Level), *Automação & Pipelines* (Python, n8n, Alertas Proativos, Airflow) e *Negócio & Governança* (Auditoria Contratual, Cohort Analytics, BPMN Bizagi).
 - **4 Cases de Sucesso com Modal Aprofundado**:
   1. **Auditoria Contratual de Fretes & Otimização de Custos** (SQL + Looker + Python).
   2. **Modelagem de Cohort, Retenção & Prevenção de Churn** (SQL Window Functions + dbt).
