@@ -928,23 +928,51 @@ function initContactActions() {
   const copyBtn = document.getElementById('copyEmailBtn');
   const toast = document.getElementById('toast');
   const toastMessage = document.getElementById('toastMessage');
+  const toastIcon = document.getElementById('toastIcon');
   const emailAddress = "fernandoc.job@gmail.com";
 
-  function showToast(msg) {
+  let toastTimeout = null;
+
+  function showToast(msg, type = 'success') {
     if (!toast) return;
     if (toastMessage) toastMessage.textContent = msg;
+
+    // Reset classes e adiciona estilo correspondente ao tipo
+    toast.className = '';
     toast.classList.add('show');
-    setTimeout(() => {
+
+    if (type === 'error') {
+      toast.classList.add('toast-error');
+      if (toastIcon) {
+        toastIcon.className = 'w-5 h-5 text-rose-400 flex-shrink-0';
+        toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+      }
+    } else if (type === 'info') {
+      toast.classList.add('toast-info');
+      if (toastIcon) {
+        toastIcon.className = 'w-5 h-5 text-sky-400 flex-shrink-0';
+        toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+      }
+    } else {
+      toast.classList.add('toast-success');
+      if (toastIcon) {
+        toastIcon.className = 'w-5 h-5 text-emerald-400 flex-shrink-0';
+        toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />';
+      }
+    }
+
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
       toast.classList.remove('show');
-    }, 3500);
+    }, 4000);
   }
 
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
       navigator.clipboard.writeText(emailAddress).then(() => {
-        showToast('E-mail copiado para a área de transferência!');
+        showToast('E-mail copiado para a área de transferência!', 'success');
       }).catch(() => {
-        showToast(`E-mail: ${emailAddress}`);
+        showToast(`E-mail: ${emailAddress}`, 'info');
       });
     });
   }
@@ -952,8 +980,6 @@ function initContactActions() {
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
       const nameInput = document.getElementById('contactName');
       const emailInput = document.getElementById('contactEmail');
       const messageInput = document.getElementById('contactMessage');
@@ -961,11 +987,32 @@ function initContactActions() {
       const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
 
       if (!nameInput.value.trim() || !emailInput.value.trim() || !messageInput.value.trim()) {
-        showToast('Por favor, preencha todos os campos obrigatórios.');
+        e.preventDefault();
+        showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
         return;
       }
 
-      // Estado de carregamento no botão
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(emailInput.value.trim())) {
+        e.preventDefault();
+        showToast('Por favor, insira um e-mail com formato válido.', 'error');
+        return;
+      }
+
+      // Se executado diretamente via arquivo local (protocolo file:///),
+      // navegadores bloqueiam requisições fetch por política de CORS (Origin: null).
+      // Nesse caso, permitimos o envio nativo do formulário HTML que funciona 100% no Formspree!
+      if (window.location.protocol === 'file:') {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>Enviando formulário...</span>';
+        }
+        return true;
+      }
+
+      // Em ambiente com servidor HTTP/HTTPS (GitHub Pages, Vercel, localhost, etc.), usa AJAX:
+      e.preventDefault();
+
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `
@@ -988,24 +1035,26 @@ function initContactActions() {
         });
 
         if (response.ok) {
-          showToast('Mensagem enviada com sucesso! Responderei em breve.');
+          showToast('Mensagem enviada com sucesso! Responderei em breve.', 'success');
           contactForm.reset();
         } else {
-          // Trata respostas do Formspree
           const data = await response.json().catch(() => ({}));
           if (data && data.errors && data.errors.length) {
             const errorText = data.errors.map(err => err.message).join(', ');
-            showToast(`Formspree: ${errorText}`);
+            showToast(`Formspree: ${errorText}`, 'error');
           } else {
-            showToast('Mensagem recebida! Caso precise de resposta urgente, use o WhatsApp.');
-            contactForm.reset();
+            showToast('Conectando via envio direto...', 'info');
+            setTimeout(() => {
+              contactForm.submit();
+            }, 600);
           }
         }
       } catch (error) {
-        // Fallback gracioso para testes locais antes de configurar o ID real no Formspree
-        console.warn('Formspree submit:', error);
-        showToast('Mensagem enviada com sucesso! (Modo de demonstração)');
-        contactForm.reset();
+        console.warn('Erro na requisição AJAX ao Formspree, acionando fallback nativo:', error);
+        showToast('Enviando via conexão segura de formulário...', 'info');
+        setTimeout(() => {
+          contactForm.submit();
+        }, 600);
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;

@@ -333,6 +333,21 @@ body {
   opacity: 1;
 }
 
+#toast.toast-error {
+  border-color: rgba(244, 63, 94, 0.4);
+  background: #1a1016;
+}
+
+#toast.toast-success {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: #0d1a17;
+}
+
+#toast.toast-info {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: #0f172a;
+}
+
 /* Animação de Entrada para Cards */
 .project-card {
   transition: transform 0.3s ease, opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;

@@ -862,6 +862,10 @@
           <div class="lg:col-span-3">
             <form id="contactForm" action="https://formspree.io/f/xeaqrrnr" method="POST" class="glass-panel p-8 rounded-3xl border border-neutral-800 space-y-5">
               
+              <!-- Campos auxiliares recomendados pelo Formspree -->
+              <input type="hidden" name="_subject" value="Nova mensagem via Portfólio de Dados">
+              <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label for="contactName" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Seu Nome *</label>
@@ -959,7 +963,7 @@
        TOAST NOTIFICATION
        ========================================================================= -->
   <div id="toast" role="alert" aria-live="polite">
-    <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    <svg id="toastIcon" class="w-5 h-5 text-sky-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
     <span id="toastMessage">Ação concluída com sucesso!</span>
   </div>
 
