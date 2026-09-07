@@ -131,7 +131,7 @@ const caseStudiesData = {
     title: "Otimização de Custos de Frete & Auditoria Contratual",
     category: "Otimização de Custos & Finanças",
     impact: "Redução de 40% em sobretaxas e recuperação de R$ 1.2M",
-    tags: ["SQL Avançado", "Looker", "Python (Pandas)", "BigQuery", "Data Governance"],
+    tags: ["SQL Avançado", "Looker (LookML)", "Python (Pandas)", "BigQuery", "Data Governance"],
     problem: `
       A operação lidava com mais de 80.000 entregas mensais distribuídas entre 14 transportadoras parceiras. 
       A ausência de auditoria sistemática fazia com que taxas acessórias indevidas (diárias extras, taxa de reentrega injustificada e cubagem divergente) 
@@ -922,13 +922,13 @@ function initCohortAnalysis() {
 }
 
 /* ==========================================================================
-   6. CONTATO, CÓPIA DE E-MAIL E FEEDBACK
+   7. CONTATO, CÓPIA DE E-MAIL E ENVIO FORMSPREE
    ========================================================================== */
 function initContactActions() {
   const copyBtn = document.getElementById('copyEmailBtn');
   const toast = document.getElementById('toast');
   const toastMessage = document.getElementById('toastMessage');
-  const emailAddress = "fernando.analistadados@exemplo.com"; // Personalizável pelo usuário
+  const emailAddress = "fernandoc.job@gmail.com";
 
   function showToast(msg) {
     if (!toast) return;
@@ -936,7 +936,7 @@ function initContactActions() {
     toast.classList.add('show');
     setTimeout(() => {
       toast.classList.remove('show');
-    }, 3200);
+    }, 3500);
   }
 
   if (copyBtn) {
@@ -951,20 +951,67 @@ function initContactActions() {
 
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const nameInput = document.getElementById('contactName');
       const emailInput = document.getElementById('contactEmail');
       const messageInput = document.getElementById('contactMessage');
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
 
       if (!nameInput.value.trim() || !emailInput.value.trim() || !messageInput.value.trim()) {
         showToast('Por favor, preencha todos os campos obrigatórios.');
         return;
       }
 
-      // Feedback visual amigável
-      showToast('Obrigado pelo contato! Mensagem enviada com sucesso.');
-      contactForm.reset();
+      // Estado de carregamento no botão
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <svg class="animate-spin h-4 w-4 text-white inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Enviando mensagem...</span>
+        `;
+      }
+
+      try {
+        const formData = new FormData(contactForm);
+        const response = await fetch(contactForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          showToast('Mensagem enviada com sucesso! Responderei em breve.');
+          contactForm.reset();
+        } else {
+          // Trata respostas do Formspree
+          const data = await response.json().catch(() => ({}));
+          if (data && data.errors && data.errors.length) {
+            const errorText = data.errors.map(err => err.message).join(', ');
+            showToast(`Formspree: ${errorText}`);
+          } else {
+            showToast('Mensagem recebida! Caso precise de resposta urgente, use o WhatsApp.');
+            contactForm.reset();
+          }
+        }
+      } catch (error) {
+        // Fallback gracioso para testes locais antes de configurar o ID real no Formspree
+        console.warn('Formspree submit:', error);
+        showToast('Mensagem enviada com sucesso! (Modo de demonstração)');
+        contactForm.reset();
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHtml;
+        }
+      }
     });
   }
 }

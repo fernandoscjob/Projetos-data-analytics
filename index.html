@@ -126,10 +126,13 @@
           <!-- Coluna Esquerda: Texto, Headline e CTAs -->
           <div class="flex-1 text-center lg:text-left">
             
-            <!-- Status Pill -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-neutral-800 mb-8 backdrop-blur-md">
-              <span class="status-dot"></span>
-              <span class="text-xs font-mono text-neutral-300">Analista de Dados Sênior & Business Intelligence</span>
+            <!-- Status Pill & Tech Tag -->
+            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 mb-8">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-neutral-800 backdrop-blur-md">
+                <span class="status-dot"></span>
+                <span class="text-xs font-mono text-neutral-300">Analista de Dados Sênior & Business Intelligence</span>
+              </div>
+              <span class="tech-badge text-xs !py-1 !px-3 text-sky-300 border-sky-500/30 bg-sky-500/10">Looker (LookML)</span>
             </div>
 
             <!-- Headline Principal -->
@@ -154,8 +157,8 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
               </a>
 
-              <!-- Botão de Download de CV com link dinâmico/placeholder -->
-              <a href="#contato" id="downloadCvBtn" class="btn-secondary group">
+              <!-- Botão de Download de CV com arquivo local -->
+              <a href="curriculo-fernando.pdf" download="curriculo-fernando.pdf" id="downloadCvBtn" class="btn-secondary group">
                 <svg class="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <span>Baixar CV Completo</span>
               </a>
@@ -163,11 +166,11 @@
               <!-- Social Links -->
               <div class="flex items-center gap-2.5 sm:ml-4 border-t sm:border-t-0 sm:border-l border-neutral-800 pt-4 sm:pt-0 sm:pl-5">
                 <!-- LinkedIn -->
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="Perfil no LinkedIn" class="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-sky-400 hover:border-sky-500/40 transition-all">
+                <a href="https://www.linkedin.com/in/fernando-cavalcante-a478191b1/" target="_blank" rel="noopener noreferrer" aria-label="Perfil no LinkedIn" class="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-sky-400 hover:border-sky-500/40 transition-all">
                   <svg class="w-5 h-5 fill-currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.2a1.66 1.66 0 0 0-1.66 1.66 1.66 1.66 0 0 0 1.66 1.66 1.66 1.66 0 0 0 1.66-1.66A1.66 1.66 0 0 0 7.83 6.2z"/></svg>
                 </a>
                 <!-- GitHub -->
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="Perfil no GitHub" class="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 transition-all">
+                <a href="https://github.com/fernandoscjob/Projetos-data-analytics" target="_blank" rel="noopener noreferrer" aria-label="Perfil no GitHub" class="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 transition-all">
                   <svg class="w-5 h-5 fill-currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
                 </a>
               </div>
@@ -355,7 +358,7 @@
               <h3 class="text-sm font-bold text-white uppercase tracking-wider">Business Intelligence</h3>
             </div>
             <div class="flex flex-wrap gap-2">
-              <span class="tech-badge">Looker</span>
+              <span class="tech-badge">Looker (LookML)</span>
               <span class="tech-badge">Power BI</span>
               <span class="tech-badge">DAX Avançado</span>
               <span class="tech-badge">Looker Studio</span>
@@ -462,7 +465,7 @@
                   <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Metodologia / Stack:</span>
                   <div class="flex flex-wrap gap-1.5 pt-1">
                     <span class="tech-badge text-[11px] !py-0.5 !px-2">SQL Avançado</span>
-                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Looker</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Looker (LookML)</span>
                     <span class="tech-badge text-[11px] !py-0.5 !px-2">Python</span>
                     <span class="tech-badge text-[11px] !py-0.5 !px-2">BigQuery</span>
                   </div>
@@ -820,34 +823,34 @@
             <!-- Card Copiar Email com 1 Clique -->
             <div class="glass-panel p-5 rounded-2xl border border-neutral-800">
               <span class="text-xs font-mono text-neutral-400 block mb-1">E-mail Corporativo</span>
-              <p class="text-sm font-semibold text-white mb-3">fernando.analistadados@exemplo.com</p>
+              <p class="text-sm font-semibold text-white mb-3">fernandoc.job@gmail.com</p>
               <button id="copyEmailBtn" class="btn-secondary w-full text-xs !py-2 flex items-center justify-center gap-2">
                 <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
                 <span>Copiar E-mail</span>
               </button>
             </div>
 
-            <!-- Card WhatsApp / Telegram -->
+            <!-- Card WhatsApp com Mensagem Pré-definida -->
             <div class="glass-panel p-5 rounded-2xl border border-neutral-800">
               <span class="text-xs font-mono text-neutral-400 block mb-1">WhatsApp & Contato Direto</span>
-              <p class="text-sm font-semibold text-white mb-3">+55 (11) 99999-9999</p>
-              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" class="btn-secondary w-full text-xs !py-2 flex items-center justify-center gap-2 text-emerald-400 hover:text-emerald-300">
+              <p class="text-sm font-semibold text-white mb-3">+55 (21) 96924-1760</p>
+              <a href="https://wa.me/5521969241760?text=Ol%C3%A1%20Fernando,%20vi%20seu%20portf%C3%B3lio." target="_blank" rel="noopener noreferrer" class="btn-secondary w-full text-xs !py-2 flex items-center justify-center gap-2 text-emerald-400 hover:text-emerald-300">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                 <span>Conversar no WhatsApp</span>
               </a>
             </div>
 
-            <!-- Redes Sociais -->
+            <!-- Redes Sociais com Links Reais -->
             <div class="glass-panel p-5 rounded-2xl border border-neutral-800 flex items-center justify-between">
               <div>
                 <span class="text-xs font-mono text-neutral-400 block">Conexões Profissionais</span>
                 <span class="text-sm font-semibold text-white">LinkedIn & GitHub</span>
               </div>
               <div class="flex items-center gap-2">
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-neutral-900 text-neutral-400 hover:text-sky-400 hover:bg-neutral-800 transition-colors">
+                <a href="https://www.linkedin.com/in/fernando-cavalcante-a478191b1/" target="_blank" rel="noopener noreferrer" aria-label="Perfil no LinkedIn" class="p-2 rounded-lg bg-neutral-900 text-neutral-400 hover:text-sky-400 hover:bg-neutral-800 transition-colors">
                   <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.2a1.66 1.66 0 0 0-1.66 1.66 1.66 1.66 0 0 0 1.66 1.66 1.66 1.66 0 0 0 1.66-1.66A1.66 1.66 0 0 0 7.83 6.2z"/></svg>
                 </a>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-neutral-900 text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors">
+                <a href="https://github.com/fernandoscjob/Projetos-data-analytics" target="_blank" rel="noopener noreferrer" aria-label="Perfil no GitHub" class="p-2 rounded-lg bg-neutral-900 text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors">
                   <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
                 </a>
               </div>
@@ -855,27 +858,28 @@
 
           </div>
 
-          <!-- Formulário Estático Funcional (3 Colunas) -->
+          <!-- Formulário Estático Funcional integrado ao Formspree (3 Colunas) -->
           <div class="lg:col-span-3">
-            <form id="contactForm" class="glass-panel p-8 rounded-3xl border border-neutral-800 space-y-5">
+            <form id="contactForm" action="https://formspree.io/f/SEU_ID_AQUI" method="POST" class="glass-panel p-8 rounded-3xl border border-neutral-800 space-y-5">
               
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label for="contactName" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Seu Nome *</label>
-                  <input type="text" id="contactName" required placeholder="Ex: Ana Silva" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors">
+                  <input type="text" id="contactName" name="name" required placeholder="Ex: Ana Silva" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors">
                 </div>
                 <div>
                   <label for="contactEmail" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Seu E-mail Corporativo *</label>
-                  <input type="email" id="contactEmail" required placeholder="ana@empresa.com" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors">
+                  <input type="email" id="contactEmail" name="email" required placeholder="ana@empresa.com" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors">
                 </div>
               </div>
 
               <div>
                 <label for="contactSubject" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Objetivo do Projeto</label>
-                <select id="contactSubject" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white focus:outline-none focus:border-sky-500 transition-colors">
+                <select id="contactSubject" name="subject" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white focus:outline-none focus:border-sky-500 transition-colors">
                   <option value="otimizacao">Otimização de Custos & Auditoria de Fretes</option>
                   <option value="bi">Construção de Dashboards & Camada Semântica</option>
                   <option value="automacao">Automação de Pipelines & Alertas (n8n/Python)</option>
+                  <option value="cohort">Análise de Cohort, Retenção & Churn</option>
                   <option value="contratacao">Oportunidade de Contratação / Posição Sênior</option>
                   <option value="outro">Outro assunto</option>
                 </select>
@@ -883,10 +887,10 @@
 
               <div>
                 <label for="contactMessage" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Mensagem *</label>
-                <textarea id="contactMessage" rows="4" required placeholder="Conte brevemente sobre o contexto ou oportunidade..." class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors"></textarea>
+                <textarea id="contactMessage" name="message" rows="4" required placeholder="Conte brevemente sobre o contexto ou oportunidade..." class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors"></textarea>
               </div>
 
-              <button type="submit" class="btn-primary w-full text-sm !py-3">
+              <button type="submit" id="contactSubmitBtn" class="btn-primary w-full text-sm !py-3">
                 <span>Enviar Mensagem</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </button>
