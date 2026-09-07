@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fernando | Especialista em BI & Analytics</title>
+  <meta name="description" content="Portfólio técnico de Fernando - Analista de Dados & BI Sênior. Foco em redução de custos operacionais, modelagem dimensional e governança analítica.">
+  
+  <!-- Favicon SVG moderno -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23090a0f%22/><text y=%2265%22 x=%2250%22 text-anchor=%22middle%22 font-size=%2250%22 font-family=%22monospace%22 font-weight=%22bold%22 fill=%22%2338bdf8%22>&lt;D/&gt;</text></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              dark: '#090a0f',
+              surface: '#0f121d',
+              card: '#121520',
+              accent: '#38bdf8',
+              glow: '#6366f1',
+              emerald: '#10b981',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Estilos Customizados & Glassmorphism -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-[#090a0f] text-slate-100 antialiased selection:bg-sky-500/30 selection:text-sky-200">
+
+  <!-- =========================================================================
+       1. HEADER & NAVBAR
+       ========================================================================= -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass-nav transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo com Foto de Perfil -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="relative w-10 h-10 rounded-xl overflow-hidden border border-sky-500/40 shadow-[0_0_15px_rgba(56,189,248,0.25)] group-hover:scale-105 transition-transform flex-shrink-0">
+          <img src="profile.jpg" alt="Fernando" class="w-full h-full object-cover">
+        </div>
+        <div class="flex flex-col">
+          <span class="font-bold text-slate-100 tracking-tight text-base group-hover:text-sky-400 transition-colors">Fernando</span>
+          <span class="text-[11px] font-mono text-slate-400">BI & Data Analytics</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#sobre" class="hover:text-sky-400 transition-colors">Sobre</a>
+        <a href="#metricas" class="hover:text-sky-400 transition-colors">Impacto</a>
+        <a href="#stack" class="hover:text-sky-400 transition-colors">Stack</a>
+        <a href="#projetos" class="hover:text-sky-400 transition-colors">Projetos</a>
+        <a href="#demo" class="hover:text-sky-400 transition-colors flex items-center gap-1.5">
+          <span>Demo</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-sky-500/15 text-sky-400 border border-sky-500/20">Interativo</span>
+        </a>
+        <a href="#contato" class="hover:text-sky-400 transition-colors">Contato</a>
+      </nav>
+
+      <!-- CTA & Status Badge -->
+      <div class="hidden lg:flex items-center gap-4">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-medium text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Disponível para Projetos</span>
+        </div>
+        <a href="#contato" class="btn-primary text-xs !py-2.5 !px-4">Falar Comigo</a>
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <button id="mobileMenuBtn" aria-label="Abrir Menu" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-neutral-800/60 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobileMenu" class="hidden md:hidden glass-panel border-b border-neutral-800 px-6 py-5 space-y-4">
+      <a href="#sobre" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Sobre</a>
+      <a href="#metricas" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Métricas de Impacto</a>
+      <a href="#stack" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Stack Técnica</a>
+      <a href="#projetos" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Projetos em Destaque</a>
+      <a href="#demo" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Mini Demonstração</a>
+      <a href="#contato" class="mobile-nav-link block text-sm font-medium text-slate-300 hover:text-sky-400">Contato</a>
+      <div class="pt-2">
+        <a href="#contato" class="btn-primary w-full text-center text-sm py-2.5">Falar Comigo</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- =========================================================================
+         2. HERO SECTION COM FOTO DE PERFIL EM DESTAQUE
+         ========================================================================= -->
+    <section id="sobre" class="relative pt-36 pb-20 md:pt-44 md:pb-28 overflow-hidden bg-grid-pattern">
+      <!-- Glow ambient background blobs -->
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div class="absolute top-1/3 right-10 w-[400px] h-[300px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <div class="flex flex-col-reverse lg:flex-row items-center justify-between gap-12 lg:gap-16">
+          
+          <!-- Coluna Esquerda: Texto, Headline e CTAs -->
+          <div class="flex-1 text-center lg:text-left">
+            
+            <!-- Status Pill -->
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-neutral-800 mb-8 backdrop-blur-md">
+              <span class="status-dot"></span>
+              <span class="text-xs font-mono text-neutral-300">Analista de Dados Sênior & Business Intelligence</span>
+            </div>
+
+            <!-- Headline Principal -->
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] mb-6">
+              Transformando dados complexos em <br class="hidden sm:inline">
+              <span class="gradient-accent">tomada de decisão</span> e <br class="hidden sm:inline">
+              <span class="gradient-text">redução de custos operacionais.</span>
+            </h1>
+
+            <!-- Pitch de Valor -->
+            <p class="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-10">
+              Especialista em unir <span class="text-neutral-200 font-medium">Modelagem Dimensional</span>, 
+              <span class="text-neutral-200 font-medium">Engenharia de Métricas</span> e 
+              <span class="text-neutral-200 font-medium">Automação de Pipelines</span>. Da estruturação 
+              do Data Warehouse ao cockpit executivo focado em ROI, previsibilidade e governança analítica.
+            </p>
+
+            <!-- CTA Action Group -->
+            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-12">
+              <a href="#projetos" class="btn-primary">
+                <span>Ver Projetos em Destaque</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </a>
+
+              <!-- Botão de Download de CV com link dinâmico/placeholder -->
+              <a href="#contato" id="downloadCvBtn" class="btn-secondary group">
+                <svg class="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Baixar CV Completo</span>
+              </a>
+
+              <!-- Social Links -->
+              <div class="flex items-center gap-2.5 sm:ml-4 border-t sm:border-t-0 sm:border-l border-neutral-800 pt-4 sm:pt-0 sm:pl-5">
+                <!-- LinkedIn -->
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="Perfil no LinkedIn" class="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-sky-400 hover:border-sky-500/40 transition-all">
+                  <svg class="w-5 h-5 fill-currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.2a1.66 1.66 0 0 0-1.66 1.66 1.66 1.66 0 0 0 1.66 1.66 1.66 1.66 0 0 0 1.66-1.66A1.66 1.66 0 0 0 7.83 6.2z"/></svg>
+                </a>
+                <!-- GitHub -->
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="Perfil no GitHub" class="p-2.5 rounded-lg bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 transition-all">
+                  <svg class="w-5 h-5 fill-currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Mini Key Facts Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-neutral-800/80 text-xs font-mono text-neutral-400">
+              <div class="flex items-center gap-2.5 justify-center lg:justify-start">
+                <span class="text-sky-400">✔</span>
+                <span>Auditoria Contratual & Conciliação SQL</span>
+              </div>
+              <div class="flex items-center gap-2.5 justify-center lg:justify-start">
+                <span class="text-sky-400">✔</span>
+                <span>Camada Semântica dbt & Governança BI</span>
+              </div>
+              <div class="flex items-center gap-2.5 justify-center lg:justify-start">
+                <span class="text-sky-400">✔</span>
+                <span>Pipelines Produtivos em Python e n8n</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Coluna Direita: Card Visual de Perfil com Efeito Neon Glass -->
+          <div class="relative flex-shrink-0 w-64 sm:w-72 lg:w-80 group">
+            <!-- Glow Gradiente de Fundo -->
+            <div class="absolute -inset-1.5 bg-gradient-to-tr from-sky-500/30 via-indigo-500/30 to-emerald-500/20 rounded-3xl blur-2xl opacity-75 group-hover:opacity-100 transition duration-500"></div>
+            
+            <!-- Moldura Glassmorphism -->
+            <div class="relative rounded-3xl overflow-hidden glass-panel border border-neutral-700/60 p-2.5 shadow-2xl">
+              <img src="profile.jpg" alt="Foto de Fernando - Analista de Dados & BI" class="w-full aspect-square object-cover rounded-2xl grayscale-[10%] group-hover:grayscale-0 transition-all duration-500">
+              
+              <!-- Barra Inferior na Foto -->
+              <div class="absolute bottom-4 left-4 right-4 p-3 rounded-xl bg-neutral-900/90 backdrop-blur-md border border-neutral-800 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span class="font-medium text-white">Fernando</span>
+                </div>
+                <span class="text-[11px] font-mono text-sky-400">Analytics Specialist</span>
+              </div>
+            </div>
+
+            <!-- Tag Flutuante Superior: ROI / Frete -->
+            <div class="hidden sm:flex absolute -top-4 -left-6 items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neutral-900/95 border border-neutral-800 shadow-xl text-[11px] font-mono text-emerald-300 backdrop-blur-md">
+              <span>🎯</span>
+              <span>-40% Custos Frete</span>
+            </div>
+
+            <!-- Tag Flutuante Inferior: SLA -->
+            <div class="hidden sm:flex absolute -bottom-3 -right-5 items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neutral-900/95 border border-neutral-800 shadow-xl text-[11px] font-mono text-cyan-300 backdrop-blur-md">
+              <span>⚡</span>
+              <span>99.8% SLA Dados</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         3. BARRA DE MÉTRICAS DE IMPACTO (QUICK WINS)
+         ========================================================================= -->
+    <section id="metricas" class="py-14 border-y border-neutral-800/80 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="mb-8 text-center sm:text-left">
+          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Resultados de Negócio</span>
+          <h2 class="text-xl font-bold text-white tracking-tight">Impacto Quantificável em Produção</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Metric 1 -->
+          <div class="glass-panel card-glow p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-neutral-400">Logística & Finanças</span>
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+              </div>
+            </div>
+            <div class="text-3xl sm:text-4xl font-extrabold font-mono text-emerald-400 mb-2 tracking-tight">
+              <span data-target-value="40" data-prefix="-" data-suffix="%">-0%</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-200 mb-1">Custos Logísticos de Frete</p>
+            <p class="text-xs text-neutral-400 leading-relaxed">Renegociação contratual orientada a dados e auditoria contínua de taxas acessórias.</p>
+          </div>
+
+          <!-- Metric 2 -->
+          <div class="glass-panel card-glow p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-neutral-400">Adoção Executiva</span>
+              <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              </div>
+            </div>
+            <div class="text-3xl sm:text-4xl font-extrabold font-mono text-sky-400 mb-2 tracking-tight">
+              <span data-target-value="30" data-prefix="+" data-suffix="">+0</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-200 mb-1">Dashboards em Produção</p>
+            <p class="text-xs text-neutral-400 leading-relaxed">Cockpits analíticos corporativos com alta taxa de engajamento e atualização diária.</p>
+          </div>
+
+          <!-- Metric 3 -->
+          <div class="glass-panel card-glow p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-neutral-400">Engenharia & Automação</span>
+              <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+            </div>
+            <div class="text-3xl sm:text-4xl font-extrabold font-mono text-indigo-400 mb-2 tracking-tight">
+              <span data-target-value="100" data-suffix="%">0%</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-200 mb-1">Rotinas Automatizadas</p>
+            <p class="text-xs text-neutral-400 leading-relaxed">Substituição de processos operacionais manuais por orquestrações no n8n e scripts Python.</p>
+          </div>
+
+          <!-- Metric 4 -->
+          <div class="glass-panel card-glow p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-neutral-400">Volume & Governança</span>
+              <div class="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+              </div>
+            </div>
+            <div class="text-3xl sm:text-4xl font-extrabold font-mono text-violet-400 mb-2 tracking-tight">
+              <span data-target-value="15" data-prefix="+" data-suffix="M">+0M</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-200 mb-1">Linhas Processadas / Dia</p>
+            <p class="text-xs text-neutral-400 leading-relaxed">Modelagem dimensional em Data Warehouse garantindo SLA e integridade analítica.</p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         4. STACK TÉCNICA (GRID MINIMALISTA DE BADGES)
+         ========================================================================= -->
+    <section id="stack" class="py-24 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Arsenal Tecnológico</span>
+          <h2 class="text-3xl font-extrabold text-white tracking-tight mt-2 mb-4">
+            Stack Técnica Especializada
+          </h2>
+          <p class="text-sm text-neutral-400">
+            Ferramentas aplicadas na prática para modelagem, ingestão, análise preditiva e camadas visuais de decisão corporativa.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Categoria 1: Linguagens & Análise -->
+          <div class="glass-panel p-6 rounded-2xl border border-neutral-800/90">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+              </div>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider">Linguagens & Core</h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="tech-badge">SQL Avançado</span>
+              <span class="tech-badge">Python</span>
+              <span class="tech-badge">Pandas</span>
+              <span class="tech-badge">Polars</span>
+              <span class="tech-badge">PostgreSQL</span>
+              <span class="tech-badge">BigQuery</span>
+              <span class="tech-badge">Snowflake</span>
+            </div>
+          </div>
+
+          <!-- Categoria 2: BI & Visualização -->
+          <div class="glass-panel p-6 rounded-2xl border border-neutral-800/90">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider">Business Intelligence</h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="tech-badge">Looker</span>
+              <span class="tech-badge">Power BI</span>
+              <span class="tech-badge">DAX Avançado</span>
+              <span class="tech-badge">Looker Studio</span>
+              <span class="tech-badge">Metabase</span>
+              <span class="tech-badge">Data Storytelling</span>
+            </div>
+          </div>
+
+          <!-- Categoria 3: Engenharia & Pipelines -->
+          <div class="glass-panel p-6 rounded-2xl border border-neutral-800/90">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+              </div>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider">Pipelines & Automação</h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="tech-badge">n8n</span>
+              <span class="tech-badge">dbt (Data Build Tool)</span>
+              <span class="tech-badge">Apache Airflow</span>
+              <span class="tech-badge">APIs REST / Webhooks</span>
+              <span class="tech-badge">Git & GitHub</span>
+              <span class="tech-badge">Docker Básico</span>
+            </div>
+          </div>
+
+          <!-- Categoria 4: Modelagem & Governança -->
+          <div class="glass-panel p-6 rounded-2xl border border-neutral-800/90">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </div>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider">Estratégia & Dados</h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="tech-badge">Star Schema (Kimball)</span>
+              <span class="tech-badge">Camada Semântica</span>
+              <span class="tech-badge">Governança de Dados</span>
+              <span class="tech-badge">Data Quality / Testes</span>
+              <span class="tech-badge">Cálculo de ROI</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         5. PROJETOS EM DESTAQUE (CARDS COM ABAS E MODAL)
+         ========================================================================= -->
+    <section id="projetos" class="py-24 border-t border-neutral-800/80 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header da Seção -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div>
+            <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Cases de Sucesso</span>
+            <h2 class="text-3xl font-extrabold text-white tracking-tight mt-2">
+              Projetos de Alto Impacto
+            </h2>
+            <p class="text-sm text-neutral-400 mt-2 max-w-xl">
+              Estudos de caso reais detalhando problema de negócio, arquitetura analítica e retorno sobre investimento gerado.
+            </p>
+          </div>
+
+          <!-- Filtros de Categoria -->
+          <div class="flex flex-wrap gap-2">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="cohort">Cohort & Churn</button>
+            <button class="filter-btn" data-filter="custo">Otimização de Custos</button>
+            <button class="filter-btn" data-filter="bi">BI & Governança</button>
+            <button class="filter-btn" data-filter="automacao">Engenharia & Pipelines</button>
+          </div>
+        </div>
+
+        <!-- Grid de Cards de Projetos (Grid 2x2 Responsivo) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          <!-- Card 1: Otimização Logística -->
+          <article class="project-card glass-panel card-glow rounded-2xl overflow-hidden flex flex-col justify-between border border-neutral-800" data-category="custo">
+            <div>
+              <div class="p-6 pb-4 border-b border-neutral-800/60 flex items-center justify-between">
+                <span class="text-xs font-mono text-sky-400 px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/20">Logística & Finanças</span>
+                <span class="text-xs font-mono text-emerald-400 flex items-center gap-1">
+                  <span>-40% Frete</span>
+                </span>
+              </div>
+
+              <div class="p-6 space-y-4">
+                <h3 class="text-xl font-bold text-white hover:text-sky-400 transition-colors">
+                  Auditoria Contratual de Fretes & Otimização de Custos
+                </h3>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Problema de Negócio:</span>
+                  <p class="text-xs text-neutral-300 leading-relaxed">
+                    Divergências recorrentes de faturamento em 14 transportadoras parceiras e cobrança indevida de taxas acessórias gerando estouro orçamentário.
+                  </p>
+                </div>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Metodologia / Stack:</span>
+                  <div class="flex flex-wrap gap-1.5 pt-1">
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">SQL Avançado</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Looker</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Python</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">BigQuery</span>
+                  </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <span class="text-[11px] font-mono text-emerald-400 uppercase tracking-wider font-semibold block mb-0.5">Resultado Obtido:</span>
+                  <p class="text-xs text-emerald-200 font-medium">
+                    Redução de 40% em sobretaxas de frete e recuperação de R$ 1.2M em faturas retroativas contestadas.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 pt-0 flex items-center gap-3">
+              <button class="btn-primary flex-1 text-xs !py-2.5" data-case-study="logistica">
+                Ver Estudo de Caso
+              </button>
+              <a href="#demo" class="btn-secondary text-xs !py-2.5 !px-3" title="Visualizar na Demo Interativa">
+                <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 2: Análise de Cohort e Churn (NOVO) -->
+          <article class="project-card glass-panel card-glow rounded-2xl overflow-hidden flex flex-col justify-between border border-neutral-800" data-category="cohort">
+            <div>
+              <div class="p-6 pb-4 border-b border-neutral-800/60 flex items-center justify-between">
+                <span class="text-xs font-mono text-cyan-400 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20">SaaS & Vendas</span>
+                <span class="text-xs font-mono text-emerald-400 flex items-center gap-1">
+                  <span>-25% Churn</span>
+                </span>
+              </div>
+
+              <div class="p-6 space-y-4">
+                <h3 class="text-xl font-bold text-white hover:text-cyan-400 transition-colors">
+                  Modelagem de Cohort, Retenção & Prevenção de Churn
+                </h3>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Problema de Negócio:</span>
+                  <p class="text-xs text-neutral-300 leading-relaxed">
+                    Evasão silenciosa de 28% da base nos primeiros 60 dias de compra/assinatura, reduzindo o LTV médio e elevando o tempo de recuperação de CAC.
+                  </p>
+                </div>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Metodologia / Stack:</span>
+                  <div class="flex flex-wrap gap-1.5 pt-1">
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">SQL Window Functions</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Python (Cohort Matrix)</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Power BI</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">dbt</span>
+                  </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                  <span class="text-[11px] font-mono text-cyan-400 uppercase tracking-wider font-semibold block mb-0.5">Resultado Obtido:</span>
+                  <p class="text-xs text-cyan-200 font-medium">
+                    Aumento de 18 p.p. na retenção de D90, redução de 25% no churn involuntário e R$ 640k preservados em ARR.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 pt-0 flex items-center gap-3">
+              <button class="btn-primary flex-1 text-xs !py-2.5" data-case-study="cohort">
+                Ver Estudo de Caso
+              </button>
+              <a href="#demo" class="btn-secondary text-xs !py-2.5 !px-3" title="Testar Cohort na Demo">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 3: Engenharia de Métricas & BI -->
+          <article class="project-card glass-panel card-glow rounded-2xl overflow-hidden flex flex-col justify-between border border-neutral-800" data-category="bi">
+            <div>
+              <div class="p-6 pb-4 border-b border-neutral-800/60 flex items-center justify-between">
+                <span class="text-xs font-mono text-indigo-400 px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20">BI & Governança</span>
+                <span class="text-xs font-mono text-indigo-300">14 KPIs Unificados</span>
+              </div>
+
+              <div class="p-6 space-y-4">
+                <h3 class="text-xl font-bold text-white hover:text-indigo-400 transition-colors">
+                  Camada Semântica & Cockpit Executivo de Planejamento
+                </h3>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Problema de Negócio:</span>
+                  <p class="text-xs text-neutral-300 leading-relaxed">
+                    Múltiplas fontes de verdade com métricas divergentes entre Vendas e Finanças, atrasando o fechamento mensal e gerando desalinhamento no C-Level.
+                  </p>
+                </div>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Metodologia / Stack:</span>
+                  <div class="flex flex-wrap gap-1.5 pt-1">
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Power BI</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">dbt</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Modelagem Kimball</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">DAX</span>
+                  </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20">
+                  <span class="text-[11px] font-mono text-sky-400 uppercase tracking-wider font-semibold block mb-0.5">Resultado Obtido:</span>
+                  <p class="text-xs text-sky-200 font-medium">
+                    Unificação de métricas corporativas, tempo de relatório reduzido de 5 dias para D-0 e adoção por mais de 120 gestores.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 pt-0 flex items-center gap-3">
+              <button class="btn-primary flex-1 text-xs !py-2.5" data-case-study="bi">
+                Ver Estudo de Caso
+              </button>
+              <a href="#contato" class="btn-secondary text-xs !py-2.5 !px-3" title="Solicitar Demonstração">
+                <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 4: Automação n8n & Python -->
+          <article class="project-card glass-panel card-glow rounded-2xl overflow-hidden flex flex-col justify-between border border-neutral-800" data-category="automacao">
+            <div>
+              <div class="p-6 pb-4 border-b border-neutral-800/60 flex items-center justify-between">
+                <span class="text-xs font-mono text-emerald-400 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">Engenharia & Automação</span>
+                <span class="text-xs font-mono text-sky-300">-18h / Semana</span>
+              </div>
+
+              <div class="p-6 space-y-4">
+                <h3 class="text-xl font-bold text-white hover:text-emerald-400 transition-colors">
+                  Orquestração de Pipelines e Alertas Proativos de Anomalias
+                </h3>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Problema de Negócio:</span>
+                  <p class="text-xs text-neutral-300 leading-relaxed">
+                    Processamento manual de relatórios diários de parceiros e falhas operacionais detectadas tardiamente através de reclamações de clientes.
+                  </p>
+                </div>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Metodologia / Stack:</span>
+                  <div class="flex flex-wrap gap-1.5 pt-1">
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">n8n Workflows</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Python</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">PostgreSQL</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Slack Webhooks</span>
+                  </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-violet-500/10 border border-violet-500/20">
+                  <span class="text-[11px] font-mono text-violet-400 uppercase tracking-wider font-semibold block mb-0.5">Resultado Obtido:</span>
+                  <p class="text-xs text-violet-200 font-medium">
+                    100% dos relatórios automatizados, economia de 18h semanais da equipe e detecção de anomalias em menos de 5 minutos.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 pt-0 flex items-center gap-3">
+              <button class="btn-primary flex-1 text-xs !py-2.5" data-case-study="automacao">
+                Ver Estudo de Caso
+              </button>
+              <a href="#contato" class="btn-secondary text-xs !py-2.5 !px-3" title="Conversar sobre Pipelines">
+                <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+              </a>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         6. MINI DEMONSTRAÇÃO INTERATIVA (CHART.JS)
+         ========================================================================= -->
+    <section id="demo" class="py-24 relative bg-grid-pattern">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Laboratório Analítico</span>
+          <h2 class="text-3xl font-extrabold text-white tracking-tight mt-2 mb-4">
+            Simulação Interativa de Decisão
+          </h2>
+          <p class="text-sm text-neutral-400">
+            Experimente o mini-dashboard abaixo com dados reais simulados da otimização logística. Alterne os modos de visão e analise a inflexão dos resultados.
+          </p>
+        </div>
+
+        <!-- Card do Cockpit Interativo -->
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-neutral-800/90 shadow-2xl relative">
+          
+          <!-- Controles do Gráfico -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-neutral-800/80 mb-6">
+            
+            <!-- Visão Selector Buttons -->
+            <div class="flex flex-wrap items-center gap-2 p-1 rounded-xl bg-neutral-900/90 border border-neutral-800">
+              <button id="chartViewCost" class="px-3.5 py-2 rounded-lg text-xs font-medium bg-sky-500/20 text-sky-300 border border-sky-500/40 transition-all flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                <span>Custo Real vs Meta</span>
+              </button>
+              <button id="chartViewVolume" class="px-3.5 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white border border-transparent transition-all flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                <span>Volume & SLA Operacional</span>
+              </button>
+              <button id="chartViewCohort" class="px-3.5 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white border border-transparent transition-all flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                <span>Análise Cohort & Churn</span>
+              </button>
+            </div>
+
+            <!-- Chips de KPIs Dinâmicos -->
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <div id="chipKpi1" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300">
+                Economia Acumulada: <strong class="text-emerald-400 font-mono">R$ 840.000</strong>
+              </div>
+              <div id="chipKpi2" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300">
+                Redução Médio Ponderada: <strong class="text-sky-400 font-mono">-41.2%</strong>
+              </div>
+            </div>
+
+            <!-- Granularidade / Filtro de Período (para Gráficos) -->
+            <div id="periodFiltersWrapper" class="flex items-center gap-1.5 p-1 rounded-lg bg-neutral-900 border border-neutral-800 text-xs self-start md:self-auto">
+              <button data-period="6m" class="px-2.5 py-1 rounded bg-neutral-800 text-white font-medium">6 Meses</button>
+              <button data-period="12m" class="px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium">12 Meses</button>
+            </div>
+
+          </div>
+
+          <!-- Container do Gráfico (Chart.js) -->
+          <div id="chartContainer" class="relative w-full h-[320px] sm:h-[400px]">
+            <canvas id="demoChart"></canvas>
+          </div>
+
+          <!-- Container da Matriz Heatmap de Cohort (NOVO) -->
+          <div id="cohortContainer" class="hidden w-full space-y-4">
+            
+            <!-- Barra Superior do Cohort: Alternador de Métrica e Legenda -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-neutral-800/60">
+              <div class="flex items-center gap-2 p-1 rounded-xl bg-neutral-900 border border-neutral-800">
+                <button id="cohortMetricRetention" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition-all">
+                  Taxa de Retenção (%)
+                </button>
+                <button id="cohortMetricChurn" class="px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-400 hover:text-white border border-transparent transition-all">
+                  Taxa de Churn (%)
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 text-[11px] font-mono text-neutral-400">
+                <span class="text-neutral-500">Gradiente:</span>
+                <span id="cohortLegendLow" class="px-2 py-0.5 rounded bg-neutral-800 text-neutral-400">Menor</span>
+                <span>→</span>
+                <span id="cohortLegendHigh" class="px-2 py-0.5 rounded bg-emerald-500/30 text-emerald-300 font-bold">Maior</span>
+              </div>
+            </div>
+
+            <!-- Tabela Matriz de Cohort Responsiva -->
+            <div class="cohort-container">
+              <table class="cohort-table" id="cohortTable">
+                <thead>
+                  <tr>
+                    <th class="text-left">Safra</th>
+                    <th>Novos Clientes</th>
+                    <th>Receita Safra</th>
+                    <th>M0</th>
+                    <th>M1</th>
+                    <th>M2</th>
+                    <th>M3</th>
+                    <th>M4</th>
+                    <th>M5</th>
+                    <th>M6</th>
+                  </tr>
+                </thead>
+                <tbody id="cohortTableBody">
+                  <!-- Renderizado dinamicamente pelo main.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Painel Informativo da Célula Ativa / Insights -->
+            <div id="cohortDetailPanel" class="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <span id="cohortInsightTitle" class="font-semibold text-white block">Insight da Safra Selecionada</span>
+                  <span id="cohortInsightDesc" class="text-neutral-400">Passe o mouse sobre qualquer célula da matriz para inspecionar clientes ativos e MRR retido.</span>
+                </div>
+              </div>
+              <div id="cohortActiveMetric" class="font-mono text-cyan-400 text-sm font-bold sm:text-right">
+                Passe o mouse
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Rodapé do Cockpit Analítico -->
+          <div class="mt-6 pt-5 border-t border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-400 gap-3">
+            <div id="demoFooterPipeline" class="flex items-center gap-2 font-mono">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>Pipeline: Modelagem SQL + Conciliação em Python + Validação Looker</span>
+            </div>
+            <span id="demoFooterNote" class="text-neutral-500">Ponto de virada implementado no Mês de Março (Q1)</span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         7. CONTATO E FOOTER
+         ========================================================================= -->
+    <section id="contato" class="py-24 border-t border-neutral-800/80 relative">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Vamos Conversar?</span>
+          <h2 class="text-3xl font-extrabold text-white tracking-tight mt-2 mb-4">
+            Construa Decisões Orientadas a Dados
+          </h2>
+          <p class="text-sm text-neutral-400">
+            Interessado em otimizar custos operacionais, unificar métricas corporativas ou criar pipelines de automação analítica? Envie uma mensagem.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-10">
+          
+          <!-- Canais Rápidos de Contato (2 Colunas) -->
+          <div class="lg:col-span-2 space-y-4">
+            
+            <!-- Card de Apresentação com Avatar -->
+            <div class="glass-panel p-5 rounded-2xl border border-neutral-800 flex items-center gap-4">
+              <div class="relative w-14 h-14 rounded-xl overflow-hidden border border-sky-500/40 flex-shrink-0 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                <img src="profile.jpg" alt="Fernando" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <span class="font-bold text-white text-base block">Fernando</span>
+                <span class="text-xs text-neutral-400 font-mono">BI & Data Analytics Sênior</span>
+                <span class="text-[11px] text-emerald-400 flex items-center gap-1.5 mt-1 font-medium">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>Disponível para novos projetos</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Card Copiar Email com 1 Clique -->
+            <div class="glass-panel p-5 rounded-2xl border border-neutral-800">
+              <span class="text-xs font-mono text-neutral-400 block mb-1">E-mail Corporativo</span>
+              <p class="text-sm font-semibold text-white mb-3">fernando.analistadados@exemplo.com</p>
+              <button id="copyEmailBtn" class="btn-secondary w-full text-xs !py-2 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                <span>Copiar E-mail</span>
+              </button>
+            </div>
+
+            <!-- Card WhatsApp / Telegram -->
+            <div class="glass-panel p-5 rounded-2xl border border-neutral-800">
+              <span class="text-xs font-mono text-neutral-400 block mb-1">WhatsApp & Contato Direto</span>
+              <p class="text-sm font-semibold text-white mb-3">+55 (11) 99999-9999</p>
+              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" class="btn-secondary w-full text-xs !py-2 flex items-center justify-center gap-2 text-emerald-400 hover:text-emerald-300">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <span>Conversar no WhatsApp</span>
+              </a>
+            </div>
+
+            <!-- Redes Sociais -->
+            <div class="glass-panel p-5 rounded-2xl border border-neutral-800 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-mono text-neutral-400 block">Conexões Profissionais</span>
+                <span class="text-sm font-semibold text-white">LinkedIn & GitHub</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-neutral-900 text-neutral-400 hover:text-sky-400 hover:bg-neutral-800 transition-colors">
+                  <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.2a1.66 1.66 0 0 0-1.66 1.66 1.66 1.66 0 0 0 1.66 1.66 1.66 1.66 0 0 0 1.66-1.66A1.66 1.66 0 0 0 7.83 6.2z"/></svg>
+                </a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-neutral-900 text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors">
+                  <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Formulário Estático Funcional (3 Colunas) -->
+          <div class="lg:col-span-3">
+            <form id="contactForm" class="glass-panel p-8 rounded-3xl border border-neutral-800 space-y-5">
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="contactName" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Seu Nome *</label>
+                  <input type="text" id="contactName" required placeholder="Ex: Ana Silva" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors">
+                </div>
+                <div>
+                  <label for="contactEmail" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Seu E-mail Corporativo *</label>
+                  <input type="email" id="contactEmail" required placeholder="ana@empresa.com" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors">
+                </div>
+              </div>
+
+              <div>
+                <label for="contactSubject" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Objetivo do Projeto</label>
+                <select id="contactSubject" class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white focus:outline-none focus:border-sky-500 transition-colors">
+                  <option value="otimizacao">Otimização de Custos & Auditoria de Fretes</option>
+                  <option value="bi">Construção de Dashboards & Camada Semântica</option>
+                  <option value="automacao">Automação de Pipelines & Alertas (n8n/Python)</option>
+                  <option value="contratacao">Oportunidade de Contratação / Posição Sênior</option>
+                  <option value="outro">Outro assunto</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="contactMessage" class="block text-xs font-mono uppercase text-neutral-400 mb-1.5">Mensagem *</label>
+                <textarea id="contactMessage" rows="4" required placeholder="Conte brevemente sobre o contexto ou oportunidade..." class="w-full px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors"></textarea>
+              </div>
+
+              <button type="submit" class="btn-primary w-full text-sm !py-3">
+                <span>Enviar Mensagem</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </button>
+
+              <p class="text-[11px] text-center text-neutral-500 font-mono">
+                Respondo habitualmente em menos de 24 horas úteis.
+              </p>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       8. FOOTER
+       ========================================================================= -->
+  <footer class="border-t border-neutral-900 py-10 bg-[#06070a] text-xs text-neutral-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-sky-400">&lt;FD/&gt;</span>
+        <span>© 2026 Fernando. Desenvolvido para entrega de alto impacto em Dados.</span>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <a href="#sobre" class="hover:text-white transition-colors">Início</a>
+        <a href="#projetos" class="hover:text-white transition-colors">Projetos</a>
+        <a href="#contato" class="hover:text-white transition-colors">Contato</a>
+        <a href="#sobre" class="p-2 rounded-lg bg-neutral-900 hover:text-sky-400 text-neutral-400 transition-colors" title="Voltar ao Topo">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       MODAL DE ESTUDO DE CASO (ACESSIBILIDADE & DETALHES TÉCNICOS)
+       ========================================================================= -->
+  <div id="caseStudyModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content relative p-6 sm:p-8">
+      
+      <!-- Botão Fechar Modal -->
+      <button id="closeModalBtn" aria-label="Fechar Modal" class="absolute top-5 right-5 p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <!-- Conteúdo Injetado Dinamicamente -->
+      <div id="modalBody">
+        <!-- Renderizado por main.js -->
+      </div>
+
+      <div class="mt-8 pt-5 border-t border-neutral-800 flex justify-end">
+        <button onclick="document.getElementById('caseStudyModal').classList.remove('open'); document.body.style.overflow='';" class="btn-secondary text-xs !py-2 !px-4">
+          Fechar Estudo de Caso
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       TOAST NOTIFICATION
+       ========================================================================= -->
+  <div id="toast" role="alert" aria-live="polite">
+    <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    <span id="toastMessage">Ação concluída com sucesso!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="main.js"></script>
+</body>
+</html>
