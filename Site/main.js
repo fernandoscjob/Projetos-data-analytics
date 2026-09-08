@@ -582,8 +582,8 @@ function initCaseStudyModal() {
         <!-- LINK EM DESTAQUE PARA ACESSAR O PAINEL DE ANÁLISE COMPLETO COM TODAS AS ETAPAS -->
         <div class="p-5 rounded-2xl bg-gradient-to-r from-sky-500/15 via-indigo-500/10 to-emerald-500/10 border border-sky-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-sky-950/30">
           <div>
-            <span class="text-sm font-bold text-white block">Acessar Painel de Análise & Etapas Metodológicas</span>
-            <span class="text-xs text-neutral-400 block mt-0.5">Explore o dashboard interativo, métricas em tempo real e todas as etapas técnicas (CRISP-DM, Código, Resultados, Governança) nas abas da página.</span>
+            <span class="text-sm font-bold text-white block">Acessar Painel de Análise Completo</span>
+            <span class="text-xs text-neutral-400 block mt-0.5">Explore o cockpit interativo, métricas em tempo real, metodologia CRISP-DM, código em produção e o Roadmap de Recomendações Estratégicas no menu lateral do painel.</span>
           </div>
           <div class="flex items-center gap-2.5 w-full sm:w-auto">
             <a href="${data.actionUrl}" target="_blank" class="btn-primary flex-1 sm:flex-initial text-xs !py-2.5 !px-5 whitespace-nowrap !bg-sky-500 hover:!bg-sky-400 !text-slate-950 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(56,189,248,0.3)]">

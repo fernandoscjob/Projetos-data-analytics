@@ -69,17 +69,28 @@ Todo case de portfólio (tanto na documentação `README.md` quanto no modal int
 
 ---
 
-### 🛠️ 5. Plano de Implementação, Governança e Próximos Passos
+### 🛠️ 5. Plano de Implementação, Governança & Adoção
 *Demonstração de maturidade sênior sobre a sustentabilidade da solução na rotina corporativa:*
 - **Estratégia de Deploy & Segurança:** Agendamentos automáticos, controle de acesso (Row-Level Security - RLS) e contingência.
-- **Matriz de Adoção (Quem Usa e Como):** 
+- **Matriz de Adoção Operacional (Quem Usa e Como):** 
   - Cargos e equipes usuárias (Ex.: C-Level, Gerentes de Contas, Analistas de Operações).
   - Como a rotina diária/semanal desses profissionais mudou (eliminação de planilhas paralelas).
-- **Próximas Recomendações:** Melhorias incrementais sugeridas (automações adicionais, modelos preditivos ou integrações via API).
 
 ---
 
-### 📊 6. Design do Dashboard de Suporte e Perguntas-Chave
+### 🚀 6. Recomendações Estratégicas & Próximos Passos (Roadmap)
+*Prescrições de alto retorno financeiro e cronograma estruturado de evolução analítica:*
+- **Recomendações Práticas para o Negócio:**
+  - 3 a 4 ações prescritivas com Prioridade (Crítica/Alta/Média), Equipe Responsável e Impacto Esperado em R$ ou Churn.
+- **Roadmap de Evolução Analítica (Próximos Passos):**
+  - **Curto Prazo • 30 Dias (Quick Wins):** Automações imediatas, alertas e rotinas de exportação.
+  - **Médio Prazo • 60-90 Dias (Estruturante):** Modelos estatísticos/ML, novas fontes de dados e catálogo de metadados.
+  - **Longo Prazo • 180 Dias (Transformacional):** Mecanismos preditivos avançados, precificação dinâmica e GenAI.
+- **Matriz de Priorização (Esforço vs. Impacto):** Classificação visual das iniciativas (Quick Wins, Projetos Estratégicos, Inovação).
+
+---
+
+### 📊 7. Decisões Estratégicas C-Level & Perguntas-Chave
 *Arquitetura de visualização e decisões ágeis proporcionadas pelo painel:*
 - **Audiência Específica:** Quem são os decisores primários e secundários do painel?
 - **Perguntas de Negócio Respondidas em Menos de 5 Segundos:**
