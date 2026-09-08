@@ -1,4 +1,4 @@
-﻿"""
+"""
 Módulo de Auditoria Contratual de Fretes e Otimização Logística
 ===============================================================
 Automatiza a conferência de Conhecimentos de Transporte Eletrônicos (CT-e)
@@ -82,6 +82,51 @@ def gerar_base_sintetica_ctes(n_registros: int = 500, seed: int = 42) -> pd.Data
         })
         
     return pd.DataFrame(registros)
+
+
+def recalcular_auditoria_dinamica(
+    df: pd.DataFrame,
+    fator_cubagem: float = 300.0,
+    tolerancia_glosa: float = 10.0,
+    aliquota_gris: float = 0.003
+) -> pd.DataFrame:
+    """Recalcula os valores devidos e status de auditoria com parâmetros dinâmicos."""
+    df_recalc = df.copy()
+    
+    tarifas_base = {"TRANS_ALPHA_LOG": 28.50, "RAPIDO_COMETA": 32.00, "CARGO_EXPRESS_BR": 25.00, "RODO_VELOZ": 29.90}
+    taxa_kg = {"TRANS_ALPHA_LOG": 0.85, "RAPIDO_COMETA": 0.95, "CARGO_EXPRESS_BR": 0.78, "RODO_VELOZ": 0.88}
+    
+    # Recalcula peso cubado e tarifado
+    df_recalc["peso_cubado_kg"] = (df_recalc["volume_m3"] * fator_cubagem).round(2)
+    df_recalc["peso_tarifado_esperado_kg"] = np.maximum(df_recalc["peso_real_kg"], df_recalc["peso_cubado_kg"]).round(2)
+    
+    # Recalcula tarifas
+    def calc_devido(row):
+        transp = row.get("transportadora", "TRANS_ALPHA_LOG")
+        t_base = tarifas_base.get(transp, 28.50)
+        t_kg = taxa_kg.get(transp, 0.85)
+        peso = row["peso_tarifado_esperado_kg"]
+        valor_merc = row.get("valor_mercadoria", 1000.0)
+        
+        pedagio = np.ceil(peso / 100.0) * 4.50
+        ad_val = valor_merc * aliquota_gris
+        return round(t_base + (t_kg * peso) + ad_val + pedagio, 2)
+        
+    df_recalc["valor_devido"] = df_recalc.apply(calc_devido, axis=1)
+    df_recalc["divergencia"] = (df_recalc["valor_faturado"] - df_recalc["valor_devido"]).round(2)
+    
+    # Status com base na tolerância
+    df_recalc["status_auditoria"] = np.where(
+        df_recalc["divergencia"] > tolerancia_glosa,
+        "REJEITADO / GLOSA",
+        np.where(
+            df_recalc["divergencia"] < -tolerancia_glosa,
+            "REVISÃO MANUAL",
+            "APROVADO"
+        )
+    )
+    
+    return df_recalc
 
 
 def executar_auditoria(df: pd.DataFrame) -> dict:

@@ -43,6 +43,7 @@ Portifólio em Dados/
 ├── 🌐 Site/                                 # ARQUIVOS DO SITE DE PORTFÓLIO (FRONTEND)
 │   ├── index.html                          # Aplicação web completa do portfólio
 │   ├── dashboard-rfm.html                  # Cockpit Analítico RFM Standalone (Plotly.js)
+│   ├── dashboard-fretes.html               # Cockpit de Auditoria de Fretes Standalone (Plotly.js)
 │   ├── style.css                           # Design tokens, glassmorphism e animações
 │   ├── main.js                             # Lógica interativa, Chart.js, Cohort e AJAX
 │   ├── profile.jpg                         # Foto de perfil profissional em alta resolução
@@ -58,9 +59,10 @@ Portifólio em Dados/
 │   │   └── README.md                       # Documentação técnica detalhada do projeto
 │   │
 │   ├── 02_Auditoria_Fretes_Logistica/      # Projeto 02: Auditoria Contratual de Fretes & Glosas
+│   │   ├── app.py                          # Aplicação Web executiva em Streamlit & Plotly
 │   │   ├── auditoria_fretes.py             # Script de conciliação de faturas vs contrato
 │   │   ├── queries_auditoria.sql           # Pipeline SQL avançado (CTEs e Window Functions)
-│   │   ├── requirements.txt                # Dependências (pandas, numpy)
+│   │   ├── requirements.txt                # Dependências (streamlit, pandas, numpy, plotly)
 │   │   └── README.md                       # Documentação com regras de cubagem e ROI
 │   │
 │   ├── 03_Cohort_Retencao_Churn/           # Projeto 03: Modelagem de Cohort & Churn
@@ -106,7 +108,11 @@ Portifólio em Dados/
    ```
    *Acesse a aplicação no navegador em `http://localhost:8501`.*
 
-2. **Projeto 02 - Auditoria de Fretes & Glosas (Python/SQL):**
+2. **Projeto 02 - Auditoria de Fretes & Glosas (Streamlit / Python / SQL):**
+   ```bash
+   streamlit run Projetos/02_Auditoria_Fretes_Logistica/app.py
+   ```
+   *Ou execução direta via CLI:*
    ```bash
    python Projetos/02_Auditoria_Fretes_Logistica/auditoria_fretes.py
    ```

@@ -132,7 +132,7 @@ const caseStudiesData = {
     title: "Otimização de Custos de Frete & Auditoria Contratual",
     category: "Otimização de Custos & Finanças",
     impact: "Redução de 40% em sobretaxas e recuperação de R$ 1.2M",
-    tags: ["SQL Avançado", "Looker (LookML)", "Python (Pandas)", "BigQuery", "Data Governance"],
+    tags: ["SQL Avançado", "Python (Streamlit/Pandas)", "Plotly", "Looker (LookML)", "BigQuery", "Data Governance"],
     problem: `
       A operação lidava com mais de 80.000 entregas mensais distribuídas entre 14 transportadoras parceiras. 
       A ausência de auditoria sistemática fazia com que taxas acessórias indevidas (diárias extras, taxa de reentrega injustificada e cubagem divergente) 
@@ -141,7 +141,7 @@ const caseStudiesData = {
     solution: `
       1. <strong>Pipeline de Conciliação em Python:</strong> Script automatizado para extração, validação e cruzamento de XMLs de NF-e e CT-e com as tabelas contratuais vigentes.<br>
       2. <strong>Modelagem de Auditoria em BigQuery / SQL:</strong> Uso de Window Functions e CTEs para recalcular o peso cúbico e a tarifa contratual exata para cada frete emitido.<br>
-      3. <strong>Cockpit Operacional no Looker:</strong> Criação de dashboard de divergências em tempo real para o time de Logística aprovar faturas ou gerar cartas de contestação automáticas.
+      3. <strong>Cockpit Operacional & Exportação de Glosas:</strong> Interface analítica dinâmica com dispersão de cubagem (peso real vs cubado), pareto de divergências e download de carta de contestação em Excel/CSV.
     `,
     codeSnippet: `-- Exemplo de detecção de divergência de cubagem e sobretaxa
 WITH CalculoContratual AS (

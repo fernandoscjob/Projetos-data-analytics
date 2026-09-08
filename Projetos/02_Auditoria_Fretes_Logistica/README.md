@@ -1,11 +1,11 @@
-﻿# 🚚 Auditoria Contratual de Fretes & Otimização de Custos de Transporte
+# 🚚 Auditoria Contratual de Fretes & Otimização de Custos de Transporte
 
-![Status](https://img.shields.io/badge/Status-Produção-emerald?style=for-the-badge)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-FF4B4B?style=for-the-badge&logo=streamlit)
+![Plotly](https://img.shields.io/badge/Plotly-5.18%2B-3F4F75?style=for-the-badge&logo=plotly)
 ![SQL](https://img.shields.io/badge/SQL-BigQuery_•_PostgreSQL-00758F?style=for-the-badge&logo=postgresql)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
-![Looker](https://img.shields.io/badge/BI-Looker_(LookML)-4285F4?style=for-the-badge&logo=googlecloud)
 
-Pipeline analítico de engenharia e auditoria de dados para conciliação automatizada de faturas de frete (CT-e) contra tabelas contratuais vigentes de transportadoras, identificação de cobranças indevidas (glosas) e otimização logística.
+Pipeline analítico de engenharia e auditoria de dados para conciliação automatizada de faturas de frete (CT-e) contra tabelas contratuais vigentes de transportadoras, identificação de cobranças indevidas (glosas) e otimização logística. Acompanha aplicação web interativa em **Streamlit** e dashboard standalone dedicado com **Plotly.js**.
 
 ---
 
@@ -41,9 +41,10 @@ Grandes operações logísticas com dezenas de milhares de entregas mensais sofr
 
 ```
 02_Auditoria_Fretes_Logistica/
+├── app.py                    # Aplicação Web completa em Streamlit & Plotly
 ├── auditoria_fretes.py       # Motor Python de simulação, conciliação e geração de KPIs
 ├── queries_auditoria.sql     # Pipeline analítico em SQL (BigQuery/Postgres) com CTEs
-├── requirements.txt          # Dependências mínimas (pandas, numpy)
+├── requirements.txt          # Dependências (streamlit, pandas, numpy, plotly, openpyxl)
 └── README.md                 # Documentação técnica do projeto
 ```
 
@@ -51,8 +52,18 @@ Grandes operações logísticas com dezenas de milhares de entregas mensais sofr
 
 ## 🚀 Como Executar Localmente
 
+### Opção 1: Executar o Cockpit Interativo em Streamlit
+Na raiz do repositório:
 ```bash
-cd Projetos/02_Auditoria_Fretes_Logistica
-python auditoria_fretes.py
+streamlit run Projetos/02_Auditoria_Fretes_Logistica/app.py
+```
+Acesse no navegador: `http://localhost:8501`. Permite upload de planilhas de CT-e em CSV/Excel, ajuste dinâmico de tolerância e download de carta de contestação.
+
+### Opção 2: Executar o Motor de Auditoria no Terminal (CLI)
+```bash
+python Projetos/02_Auditoria_Fretes_Logistica/auditoria_fretes.py
 ```
 O script gerará uma amostra estocástica de 500 CT-es, aplicará as regras contratuais e imprimirá o resumo consolidado de valores recuperáveis por transportadora.
+
+### Opção 3: Visualizar o Dashboard Standalone no Navegador
+Abra o arquivo [`Site/dashboard-fretes.html`](../../Site/dashboard-fretes.html) diretamente no navegador para interagir com o cockpit sem precisar de backend Python.
