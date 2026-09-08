@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cockpit Analítico RFM | Fernando Cavalcante</title>
+  <meta name="description" content="Dashboard executivo de segmentação RFM (Recência, Frequência e Valor Monetário) para prevenção de churn e diagnóstico de carteira.">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23090a0f%22/><text y=%2265%22 x=%2250%22 text-anchor=%22middle%22 font-size=%2250%22 font-family=%22monospace%22 font-weight=%22bold%22 fill=%22%2310b981%22>&lt;RFM/&gt;</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              dark: '#090a0f',
+              surface: '#0f121d',
+              card: '#121520',
+              accent: '#38bdf8',
+              emerald: '#10b981',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Plotly.js CDN -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <style>
+    body {
+      background-color: #090a0f;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(15, 18, 29, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .metric-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .metric-alert {
+      border-left: 4px solid #ef4444 !important;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.02) 100%);
+    }
+    @keyframes alertGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+      50% { box-shadow: 0 0 20px 2px rgba(239, 68, 68, 0.5); }
+    }
+    .alert-pulse {
+      animation: alertGlow 2.5s infinite;
+    }
+    .rfm-pill {
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: #94a3b8;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .rfm-pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .rfm-pill.active {
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.5);
+      font-weight: 700;
+    }
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.825rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      color: #94a3b8;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    /* Tabela customizada */
+    .data-table th {
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .data-table td {
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 0.875rem 1.25rem;
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      color: #f8fafc;
+      font-size: 0.875rem;
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
+    }
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased selection:bg-sky-500/30 selection:text-sky-200">
+
+  <!-- NAVBAR DO COCKPIT -->
+  <header class="sticky top-0 z-50 glass-panel border-b border-neutral-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      
+      <!-- Brand & Back -->
+      <div class="flex items-center gap-4">
+        <a href="index.html#projetos" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-medium text-neutral-300 hover:text-white hover:border-neutral-700 transition-colors">
+          <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Voltar ao Portfólio</span>
+        </a>
+        <div class="hidden sm:block h-5 w-px bg-neutral-800"></div>
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-sm">
+            🎯
+          </div>
+          <div>
+            <span class="font-bold text-sm text-white block leading-tight">Cockpit Analítico RFM</span>
+            <span class="text-[11px] font-mono text-neutral-400">Fernando Cavalcante • Analista de Dados & BI</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status & Ações Rápidas -->
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-medium text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Base Analisada (18 Meses)</span>
+        </div>
+        <button id="exportCsvBtn" class="px-3.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-semibold hover:bg-emerald-500/30 transition-all flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Exportar CRM (CSV)</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- HEADER DO DASHBOARD -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-neutral-800">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Customer Analytics & Retenção</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-500/10 text-sky-400 border border-sky-500/20">Machine Intelligence</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          Diagnóstico de Carteira & Prevenção de Churn
+        </h1>
+        <p class="text-xs sm:text-sm text-neutral-400 max-w-2xl mt-1 leading-relaxed">
+          Segmentação multidimensional por <strong>Recência</strong> (dias sem comprar), <strong>Frequência</strong> (pedidos) e <strong>Valor Monetário</strong> (faturamento total) com scores quantílicos determinísticos e playbooks comerciais acionáveis.
+        </p>
+      </div>
+
+      <!-- Barra de Filtro Rápido -->
+      <div class="flex flex-wrap items-center gap-3 glass-panel p-3 rounded-xl border border-neutral-800 self-start lg:self-auto">
+        <div>
+          <label class="text-[10px] font-mono uppercase text-neutral-400 block mb-1">Filtro de Segmento:</label>
+          <select id="segmentFilterSelect" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-white focus:outline-none focus:border-sky-500 transition-colors">
+            <option value="all">Todos os Segmentos (11 clusters)</option>
+          </select>
+        </div>
+        <div class="self-end">
+          <button id="resetFiltersBtn" class="px-3 py-1.5 rounded-lg bg-neutral-800 text-neutral-300 hover:text-white text-xs font-medium transition-colors">
+            Resetar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDS DE KPIS EXECUTIVOS -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <div class="metric-card">
+        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Receita Filtrada</span>
+        <div class="text-2xl font-extrabold text-white font-mono" id="kpiRevenue">R$ 0,00</div>
+        <span class="text-[11px] text-neutral-500 block mt-1.5" id="kpiRevenueSub">Volume faturado no período</span>
+      </div>
+
+      <div class="metric-card">
+        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Clientes Únicos</span>
+        <div class="text-2xl font-extrabold text-white font-mono" id="kpiCustomers">0</div>
+        <span class="text-[11px] text-sky-400 block mt-1.5" id="kpiCustomersSub">100% categorizados</span>
+      </div>
+
+      <div class="metric-card">
+        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Ticket Médio Geral</span>
+        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTicket">R$ 0,00</div>
+        <span class="text-[11px] text-neutral-500 block mt-1.5">Média por transação concluída</span>
+      </div>
+
+      <div class="metric-card metric-alert alert-pulse">
+        <span class="text-xs font-mono uppercase tracking-wider text-rose-400 font-bold block mb-1">🚨 Receita em Risco</span>
+        <div class="text-2xl font-extrabold text-rose-400 font-mono" id="kpiRiskRevenue">R$ 0,00</div>
+        <span class="text-[11px] text-rose-300/80 block mt-1.5 font-medium" id="kpiRiskShare">0.0% da receita global</span>
+      </div>
+
+    </section>
+
+    <!-- NAVEGAÇÃO RÁPIDA POR CLUSTERS (PÍLULAS) -->
+    <section class="space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Navegar por Cluster Estratégico:</span>
+        <span class="text-[11px] text-neutral-500">Clique em qualquer segmento para filtrar os gráficos e a lista operacional</span>
+      </div>
+      <div class="flex flex-wrap gap-2" id="clusterPillsContainer">
+        <!-- Injetado dinamicamente -->
+      </div>
+    </section>
+
+    <!-- VISUALIZAÇÕES ANALÍTICAS (PLOTLY) -->
+    <section class="glass-panel rounded-2xl p-6 border border-neutral-800 space-y-6">
+      
+      <!-- Controles das Abas de Gráficos -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-neutral-800/80">
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-900 border border-neutral-800">
+          <button class="tab-btn active" data-tab="treemap">🌳 Treemap (Mix & Volume)</button>
+          <button class="tab-btn" data-tab="scatter">🪐 Dispersão 2D / 3D</button>
+          <button class="tab-btn" data-tab="heatmap">🔥 Matriz de Concentração 5x5</button>
+        </div>
+
+        <div id="treemapMetricToggle" class="flex items-center gap-2 text-xs">
+          <span class="text-neutral-400">Dimensão:</span>
+          <button id="metricRevenueBtn" class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium">Receita (R$)</button>
+          <button id="metricCountBtn" class="px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium">Qtd Clientes</button>
+        </div>
+
+        <div id="scatterDimToggle" class="hidden flex items-center gap-2 text-xs">
+          <span class="text-neutral-400">Visão:</span>
+          <button id="scatter2dBtn" class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium">2D (Recência x Freq)</button>
+          <button id="scatter3dBtn" class="px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium">3D Espacial</button>
+        </div>
+      </div>
+
+      <!-- Container dos Gráficos Plotly -->
+      <div class="relative w-full min-h-[460px]">
+        <div id="plotlyChart" class="w-full h-[460px]"></div>
+      </div>
+
+    </section>
+
+    <!-- PLAYBOOK COMERCIAL DO CLUSTER EM FOCO -->
+    <section id="playbookCardContainer" class="glass-panel p-6 rounded-2xl border border-neutral-800 space-y-4">
+      <!-- Injetado dinamicamente -->
+    </section>
+
+    <!-- TABELA OPERACIONAL DE AÇÃO & CLIENTES -->
+    <section class="glass-panel rounded-2xl p-6 border border-neutral-800 space-y-5">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-white">Lista Operacional para CRM & Vendas</h3>
+          <p class="text-xs text-neutral-400">Clientes elegíveis para abordagem imediata com base nos scores calculados.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" id="tableSearchInput" placeholder="🔍 Buscar ID de cliente..." class="px-3.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors w-48 sm:w-64">
+          <span id="tableCountBadge" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300">
+            0 clientes
+          </span>
+        </div>
+      </div>
+
+      <!-- Tabela com Scroll -->
+      <div class="overflow-x-auto rounded-xl border border-neutral-800/80 max-h-[420px]">
+        <table class="data-table w-full text-left">
+          <thead class="sticky top-0 bg-neutral-950 z-10">
+            <tr>
+              <th>ID Cliente</th>
+              <th>Segmento RFM</th>
+              <th>Prioridade</th>
+              <th>Recência (Dias)</th>
+              <th>Frequência</th>
+              <th>Valor Total</th>
+              <th>Ticket Médio</th>
+              <th>R-F-M</th>
+            </tr>
+          </thead>
+          <tbody id="customersTableBody">
+            <!-- Linhas dinâmicas -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- BANNER DE EXECUÇÃO STREAMLIT (BACKEND PYTHON) -->
+    <section class="p-5 rounded-2xl bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-emerald-500/10 border border-sky-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl flex-shrink-0">
+          ⚡
+        </div>
+        <div>
+          <h4 class="text-sm font-bold text-white">Prefere rodar com sua própria base transacional?</h4>
+          <p class="text-xs text-neutral-400">A aplicação completa em Streamlit permite upload de planilhas CSV/Excel reais, mapeamento dinâmico de colunas e reclassificação em tempo real.</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <button id="copyCmdBtn" class="px-3.5 py-2 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-mono text-neutral-300 hover:text-white transition-colors flex items-center gap-1.5 whitespace-nowrap">
+          <span>Copiar: <code>streamlit run app.py</code></span>
+        </button>
+        <a href="http://localhost:8501" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs hover:bg-emerald-400 transition-all flex items-center gap-1.5 whitespace-nowrap shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+          <span>Abrir Streamlit Local</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer class="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-500">
+    <p>Cockpit Analítico RFM • Desenvolvido por <strong>Fernando Cavalcante</strong> • Analista de Dados & Especialista em BI</p>
+  </footer>
+
+  <!-- TOAST DE NOTIFICAÇÃO -->
+  <div id="toast">Ação concluída com sucesso!</div>
+
+  <!-- DADOS EMBUTIDOS E ENGINE JS -->
+  <script>
+    const CUSTOMERS_DATA = [{"id": "CLI-1001", "recencia": 15, "frequencia": 25, "valor": 3555.45, "ticket": 142.22, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1002", "recencia": 42, "frequencia": 4, "valor": 1081.4, "ticket": 270.35, "r": 4, "f": 3, "m": 4, "score": "434", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1003", "recencia": 197, "frequencia": 2, "valor": 367.03, "ticket": 183.52, "r": 2, "f": 2, "m": 2, "score": "222", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1004", "recencia": 57, "frequencia": 4, "valor": 986.99, "ticket": 246.75, "r": 4, "f": 3, "m": 4, "score": "434", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1007", "recencia": 1, "frequencia": 15, "valor": 3167.94, "ticket": 211.2, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1008", "recencia": 151, "frequencia": 8, "valor": 1332.32, "ticket": 166.54, "r": 2, "f": 4, "m": 4, "score": "244", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1009", "recencia": 66, "frequencia": 5, "valor": 2235.99, "ticket": 447.2, "r": 4, "f": 3, "m": 5, "score": "435", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1011", "recencia": 60, "frequencia": 43, "valor": 20142.8, "ticket": 468.44, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1012", "recencia": 262, "frequencia": 4, "valor": 271.82, "ticket": 67.96, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1013", "recencia": 70, "frequencia": 1, "valor": 71.04, "ticket": 71.04, "r": 3, "f": 1, "m": 1, "score": "311", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1014", "recencia": 2, "frequencia": 3, "valor": 216.71, "ticket": 72.24, "r": 5, "f": 2, "m": 2, "score": "522", "segmento": "Potenciais Clientes Leais", "prioridade": "Média-Alta"}, {"id": "CLI-1015", "recencia": 114, "frequencia": 1, "valor": 193.91, "ticket": 193.91, "r": 3, "f": 1, "m": 2, "score": "312", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1017", "recencia": 508, "frequencia": 1, "valor": 141.18, "ticket": 141.18, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1019", "recencia": 401, "frequencia": 2, "valor": 67.0, "ticket": 33.5, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1020", "recencia": 21, "frequencia": 8, "valor": 883.31, "ticket": 110.41, "r": 5, "f": 4, "m": 4, "score": "544", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1022", "recencia": 430, "frequencia": 1, "valor": 45.42, "ticket": 45.42, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1023", "recencia": 333, "frequencia": 3, "valor": 1759.23, "ticket": 586.41, "r": 1, "f": 2, "m": 4, "score": "124", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1024", "recencia": 278, "frequencia": 2, "valor": 97.53, "ticket": 48.76, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1025", "recencia": 30, "frequencia": 12, "valor": 3432.0, "ticket": 286.0, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1026", "recencia": 119, "frequencia": 2, "valor": 228.72, "ticket": 114.36, "r": 3, "f": 2, "m": 2, "score": "322", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1027", "recencia": 110, "frequencia": 7, "valor": 503.83, "ticket": 71.98, "r": 3, "f": 4, "m": 3, "score": "343", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1028", "recencia": 42, "frequencia": 5, "valor": 276.61, "ticket": 55.32, "r": 4, "f": 3, "m": 2, "score": "432", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1030", "recencia": 129, "frequencia": 7, "valor": 487.41, "ticket": 69.63, "r": 3, "f": 4, "m": 3, "score": "343", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1031", "recencia": 177, "frequencia": 2, "valor": 151.62, "ticket": 75.81, "r": 2, "f": 2, "m": 1, "score": "221", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1032", "recencia": 21, "frequencia": 1, "valor": 97.45, "ticket": 97.45, "r": 5, "f": 1, "m": 1, "score": "511", "segmento": "Novos Clientes", "prioridade": "Média"}, {"id": "CLI-1033", "recencia": 4, "frequencia": 30, "valor": 2387.72, "ticket": 79.59, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1034", "recencia": 24, "frequencia": 31, "valor": 4944.57, "ticket": 159.5, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1035", "recencia": 221, "frequencia": 8, "valor": 794.43, "ticket": 99.3, "r": 2, "f": 4, "m": 3, "score": "243", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1036", "recencia": 56, "frequencia": 4, "valor": 992.67, "ticket": 248.17, "r": 4, "f": 3, "m": 4, "score": "434", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1037", "recencia": 119, "frequencia": 1, "valor": 477.15, "ticket": 477.15, "r": 3, "f": 1, "m": 3, "score": "313", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1038", "recencia": 76, "frequencia": 7, "valor": 868.24, "ticket": 124.03, "r": 3, "f": 4, "m": 4, "score": "344", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1039", "recencia": 394, "frequencia": 1, "valor": 93.94, "ticket": 93.94, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1041", "recencia": 257, "frequencia": 3, "valor": 1023.84, "ticket": 341.28, "r": 2, "f": 2, "m": 4, "score": "224", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1042", "recencia": 272, "frequencia": 2, "valor": 111.59, "ticket": 55.8, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1043", "recencia": 32, "frequencia": 22, "valor": 2025.82, "ticket": 92.08, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1044", "recencia": 205, "frequencia": 1, "valor": 252.48, "ticket": 252.48, "r": 2, "f": 1, "m": 2, "score": "212", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1045", "recencia": 251, "frequencia": 9, "valor": 826.2, "ticket": 91.8, "r": 2, "f": 4, "m": 4, "score": "244", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1046", "recencia": 93, "frequencia": 2, "valor": 242.07, "ticket": 121.04, "r": 3, "f": 2, "m": 2, "score": "322", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1047", "recencia": 396, "frequencia": 1, "valor": 232.04, "ticket": 232.04, "r": 1, "f": 1, "m": 2, "score": "112", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1048", "recencia": 191, "frequencia": 4, "valor": 355.58, "ticket": 88.9, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1050", "recencia": 2, "frequencia": 48, "valor": 4104.03, "ticket": 85.5, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1051", "recencia": 219, "frequencia": 3, "valor": 542.41, "ticket": 180.8, "r": 2, "f": 2, "m": 3, "score": "223", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1052", "recencia": 3, "frequencia": 27, "valor": 6117.25, "ticket": 226.56, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1053", "recencia": 32, "frequencia": 13, "valor": 1179.29, "ticket": 90.71, "r": 4, "f": 5, "m": 4, "score": "454", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1054", "recencia": 12, "frequencia": 4, "valor": 1063.11, "ticket": 265.78, "r": 5, "f": 3, "m": 4, "score": "534", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1055", "recencia": 10, "frequencia": 19, "valor": 2360.5, "ticket": 124.24, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1057", "recencia": 149, "frequencia": 2, "valor": 549.52, "ticket": 274.76, "r": 2, "f": 2, "m": 3, "score": "223", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1059", "recencia": 177, "frequencia": 2, "valor": 702.27, "ticket": 351.14, "r": 2, "f": 2, "m": 3, "score": "223", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1060", "recencia": 34, "frequencia": 3, "valor": 213.61, "ticket": 71.2, "r": 4, "f": 2, "m": 2, "score": "422", "segmento": "Potenciais Clientes Leais", "prioridade": "Média-Alta"}, {"id": "CLI-1061", "recencia": 140, "frequencia": 3, "valor": 1215.74, "ticket": 405.25, "r": 2, "f": 3, "m": 4, "score": "234", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1062", "recencia": 16, "frequencia": 13, "valor": 1392.88, "ticket": 107.14, "r": 5, "f": 5, "m": 4, "score": "554", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1065", "recencia": 42, "frequencia": 7, "valor": 2388.22, "ticket": 341.17, "r": 4, "f": 4, "m": 5, "score": "445", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1067", "recencia": 98, "frequencia": 7, "valor": 2866.84, "ticket": 409.55, "r": 3, "f": 4, "m": 5, "score": "345", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1069", "recencia": 5, "frequencia": 51, "valor": 4821.74, "ticket": 94.54, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1070", "recencia": 33, "frequencia": 8, "valor": 521.16, "ticket": 65.14, "r": 4, "f": 4, "m": 3, "score": "443", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1073", "recencia": 108, "frequencia": 7, "valor": 429.53, "ticket": 61.36, "r": 3, "f": 4, "m": 3, "score": "343", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1074", "recencia": 96, "frequencia": 7, "valor": 1820.66, "ticket": 260.09, "r": 3, "f": 4, "m": 5, "score": "345", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1075", "recencia": 5, "frequencia": 7, "valor": 641.36, "ticket": 91.62, "r": 5, "f": 4, "m": 3, "score": "543", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1076", "recencia": 30, "frequencia": 5, "valor": 1343.08, "ticket": 268.62, "r": 4, "f": 3, "m": 4, "score": "434", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1078", "recencia": 31, "frequencia": 5, "valor": 563.31, "ticket": 112.66, "r": 4, "f": 3, "m": 3, "score": "433", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1080", "recencia": 24, "frequencia": 15, "valor": 1731.96, "ticket": 115.46, "r": 5, "f": 5, "m": 4, "score": "554", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1081", "recencia": 369, "frequencia": 1, "valor": 162.36, "ticket": 162.36, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1082", "recencia": 102, "frequencia": 2, "valor": 181.1, "ticket": 90.55, "r": 3, "f": 2, "m": 2, "score": "322", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1083", "recencia": 236, "frequencia": 1, "valor": 160.1, "ticket": 160.1, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1084", "recencia": 66, "frequencia": 4, "valor": 402.07, "ticket": 100.52, "r": 3, "f": 3, "m": 3, "score": "333", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1086", "recencia": 22, "frequencia": 5, "valor": 1378.15, "ticket": 275.63, "r": 5, "f": 3, "m": 4, "score": "534", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1087", "recencia": 177, "frequencia": 3, "valor": 431.67, "ticket": 143.89, "r": 2, "f": 3, "m": 3, "score": "233", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1088", "recencia": 42, "frequencia": 21, "valor": 2105.97, "ticket": 100.28, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1090", "recencia": 91, "frequencia": 1, "valor": 2767.84, "ticket": 2767.84, "r": 3, "f": 1, "m": 5, "score": "315", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1091", "recencia": 232, "frequencia": 2, "valor": 2388.39, "ticket": 1194.2, "r": 2, "f": 2, "m": 5, "score": "225", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1092", "recencia": 118, "frequencia": 4, "valor": 229.23, "ticket": 57.31, "r": 3, "f": 3, "m": 2, "score": "332", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1093", "recencia": 143, "frequencia": 5, "valor": 393.82, "ticket": 78.76, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1094", "recencia": 29, "frequencia": 10, "valor": 856.74, "ticket": 85.67, "r": 4, "f": 4, "m": 4, "score": "444", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1095", "recencia": 224, "frequencia": 5, "valor": 373.79, "ticket": 74.76, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1096", "recencia": 363, "frequencia": 2, "valor": 1064.14, "ticket": 532.07, "r": 1, "f": 2, "m": 4, "score": "124", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1097", "recencia": 102, "frequencia": 5, "valor": 548.25, "ticket": 109.65, "r": 3, "f": 3, "m": 3, "score": "333", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1101", "recencia": 31, "frequencia": 5, "valor": 851.57, "ticket": 170.31, "r": 4, "f": 3, "m": 4, "score": "434", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1102", "recencia": 183, "frequencia": 2, "valor": 674.26, "ticket": 337.13, "r": 2, "f": 2, "m": 3, "score": "223", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1103", "recencia": 211, "frequencia": 4, "valor": 553.47, "ticket": 138.37, "r": 2, "f": 3, "m": 3, "score": "233", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1104", "recencia": 33, "frequencia": 13, "valor": 1610.69, "ticket": 123.9, "r": 4, "f": 5, "m": 4, "score": "454", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1106", "recencia": 320, "frequencia": 2, "valor": 65.0, "ticket": 32.5, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1107", "recencia": 13, "frequencia": 8, "valor": 3852.05, "ticket": 481.51, "r": 5, "f": 4, "m": 5, "score": "545", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1109", "recencia": 398, "frequencia": 1, "valor": 322.77, "ticket": 322.77, "r": 1, "f": 1, "m": 2, "score": "112", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1110", "recencia": 458, "frequencia": 2, "valor": 132.16, "ticket": 66.08, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1111", "recencia": 138, "frequencia": 3, "valor": 638.65, "ticket": 212.88, "r": 2, "f": 3, "m": 3, "score": "233", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1112", "recencia": 36, "frequencia": 17, "valor": 1781.44, "ticket": 104.79, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1113", "recencia": 47, "frequencia": 6, "valor": 581.43, "ticket": 96.9, "r": 4, "f": 4, "m": 3, "score": "443", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1114", "recencia": 51, "frequencia": 3, "valor": 113.93, "ticket": 37.98, "r": 4, "f": 3, "m": 1, "score": "431", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1115", "recencia": 58, "frequencia": 12, "valor": 1541.83, "ticket": 128.49, "r": 4, "f": 5, "m": 4, "score": "454", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1116", "recencia": 16, "frequencia": 5, "valor": 696.81, "ticket": 139.36, "r": 5, "f": 3, "m": 3, "score": "533", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1117", "recencia": 350, "frequencia": 1, "valor": 91.81, "ticket": 91.81, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1118", "recencia": 30, "frequencia": 13, "valor": 1538.8, "ticket": 118.37, "r": 4, "f": 5, "m": 4, "score": "454", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1119", "recencia": 337, "frequencia": 1, "valor": 343.68, "ticket": 343.68, "r": 1, "f": 1, "m": 2, "score": "112", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1120", "recencia": 129, "frequencia": 10, "valor": 1125.0, "ticket": 112.5, "r": 3, "f": 4, "m": 4, "score": "344", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1121", "recencia": 32, "frequencia": 15, "valor": 1822.73, "ticket": 121.52, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1124", "recencia": 35, "frequencia": 1, "valor": 104.99, "ticket": 104.99, "r": 4, "f": 1, "m": 1, "score": "411", "segmento": "Novos Clientes", "prioridade": "Média"}, {"id": "CLI-1125", "recencia": 33, "frequencia": 7, "valor": 705.04, "ticket": 100.72, "r": 4, "f": 4, "m": 3, "score": "443", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1126", "recencia": 91, "frequencia": 15, "valor": 1962.65, "ticket": 130.84, "r": 3, "f": 5, "m": 5, "score": "355", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1127", "recencia": 9, "frequencia": 12, "valor": 2084.65, "ticket": 173.72, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1129", "recencia": 130, "frequencia": 2, "valor": 582.08, "ticket": 291.04, "r": 3, "f": 2, "m": 3, "score": "323", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1130", "recencia": 155, "frequencia": 3, "valor": 384.98, "ticket": 128.33, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1132", "recencia": 36, "frequencia": 1, "valor": 256.09, "ticket": 256.09, "r": 4, "f": 1, "m": 2, "score": "412", "segmento": "Novos Clientes", "prioridade": "Média"}, {"id": "CLI-1133", "recencia": 337, "frequencia": 1, "valor": 124.96, "ticket": 124.96, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1134", "recencia": 11, "frequencia": 20, "valor": 1564.78, "ticket": 78.24, "r": 5, "f": 5, "m": 4, "score": "554", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1135", "recencia": 80, "frequencia": 2, "valor": 289.12, "ticket": 144.56, "r": 3, "f": 2, "m": 2, "score": "322", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1136", "recencia": 130, "frequencia": 3, "valor": 293.11, "ticket": 97.7, "r": 3, "f": 3, "m": 2, "score": "332", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1137", "recencia": 14, "frequencia": 7, "valor": 1439.86, "ticket": 205.69, "r": 5, "f": 4, "m": 4, "score": "544", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1138", "recencia": 327, "frequencia": 1, "valor": 51.46, "ticket": 51.46, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1139", "recencia": 5, "frequencia": 34, "valor": 6227.31, "ticket": 183.16, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1140", "recencia": 10, "frequencia": 34, "valor": 2458.66, "ticket": 72.31, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1141", "recencia": 498, "frequencia": 1, "valor": 139.46, "ticket": 139.46, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1142", "recencia": 108, "frequencia": 5, "valor": 472.65, "ticket": 94.53, "r": 3, "f": 3, "m": 3, "score": "333", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1143", "recencia": 20, "frequencia": 1, "valor": 84.57, "ticket": 84.57, "r": 5, "f": 1, "m": 1, "score": "511", "segmento": "Novos Clientes", "prioridade": "Média"}, {"id": "CLI-1144", "recencia": 118, "frequencia": 2, "valor": 321.35, "ticket": 160.68, "r": 3, "f": 2, "m": 2, "score": "322", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1146", "recencia": 177, "frequencia": 4, "valor": 806.54, "ticket": 201.64, "r": 2, "f": 3, "m": 3, "score": "233", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1147", "recencia": 489, "frequencia": 1, "valor": 42.82, "ticket": 42.82, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1149", "recencia": 88, "frequencia": 3, "valor": 738.04, "ticket": 246.01, "r": 3, "f": 3, "m": 3, "score": "333", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1150", "recencia": 90, "frequencia": 19, "valor": 1952.19, "ticket": 102.75, "r": 3, "f": 5, "m": 5, "score": "355", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1151", "recencia": 416, "frequencia": 1, "valor": 130.1, "ticket": 130.1, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1152", "recencia": 307, "frequencia": 1, "valor": 153.62, "ticket": 153.62, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1153", "recencia": 107, "frequencia": 2, "valor": 103.67, "ticket": 51.84, "r": 3, "f": 2, "m": 1, "score": "321", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1154", "recencia": 2, "frequencia": 61, "valor": 15137.96, "ticket": 248.16, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1155", "recencia": 150, "frequencia": 3, "valor": 279.06, "ticket": 93.02, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1156", "recencia": 240, "frequencia": 3, "valor": 1750.53, "ticket": 583.51, "r": 2, "f": 3, "m": 4, "score": "234", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1157", "recencia": 12, "frequencia": 12, "valor": 943.57, "ticket": 78.63, "r": 5, "f": 5, "m": 4, "score": "554", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1159", "recencia": 2, "frequencia": 12, "valor": 1756.98, "ticket": 146.42, "r": 5, "f": 5, "m": 4, "score": "554", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1160", "recencia": 339, "frequencia": 1, "valor": 712.01, "ticket": 712.01, "r": 1, "f": 1, "m": 3, "score": "113", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1161", "recencia": 504, "frequencia": 1, "valor": 151.6, "ticket": 151.6, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1162", "recencia": 90, "frequencia": 3, "valor": 810.58, "ticket": 270.19, "r": 3, "f": 3, "m": 3, "score": "333", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1163", "recencia": 246, "frequencia": 2, "valor": 108.71, "ticket": 54.36, "r": 2, "f": 2, "m": 1, "score": "221", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1164", "recencia": 161, "frequencia": 1, "valor": 44.21, "ticket": 44.21, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1165", "recencia": 65, "frequencia": 9, "valor": 2132.55, "ticket": 236.95, "r": 4, "f": 4, "m": 5, "score": "445", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1166", "recencia": 3, "frequencia": 1, "valor": 174.95, "ticket": 174.95, "r": 5, "f": 1, "m": 2, "score": "512", "segmento": "Novos Clientes", "prioridade": "Média"}, {"id": "CLI-1169", "recencia": 191, "frequencia": 2, "valor": 268.78, "ticket": 134.39, "r": 2, "f": 2, "m": 2, "score": "222", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1170", "recencia": 32, "frequencia": 8, "valor": 6265.44, "ticket": 783.18, "r": 4, "f": 4, "m": 5, "score": "445", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1172", "recencia": 361, "frequencia": 3, "valor": 568.47, "ticket": 189.49, "r": 1, "f": 3, "m": 3, "score": "133", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1173", "recencia": 417, "frequencia": 1, "valor": 187.06, "ticket": 187.06, "r": 1, "f": 1, "m": 2, "score": "112", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1174", "recencia": 282, "frequencia": 5, "valor": 912.09, "ticket": 182.42, "r": 1, "f": 3, "m": 4, "score": "134", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1175", "recencia": 217, "frequencia": 1, "valor": 36.98, "ticket": 36.98, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1176", "recencia": 151, "frequencia": 10, "valor": 1030.95, "ticket": 103.1, "r": 2, "f": 4, "m": 4, "score": "244", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1178", "recencia": 6, "frequencia": 23, "valor": 3576.74, "ticket": 155.51, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1180", "recencia": 311, "frequencia": 1, "valor": 157.79, "ticket": 157.79, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1181", "recencia": 268, "frequencia": 1, "valor": 79.42, "ticket": 79.42, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1182", "recencia": 38, "frequencia": 18, "valor": 12078.35, "ticket": 671.02, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1183", "recencia": 69, "frequencia": 15, "valor": 2291.74, "ticket": 152.78, "r": 3, "f": 5, "m": 5, "score": "355", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1184", "recencia": 77, "frequencia": 2, "valor": 441.08, "ticket": 220.54, "r": 3, "f": 2, "m": 3, "score": "323", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1185", "recencia": 18, "frequencia": 8, "valor": 471.67, "ticket": 58.96, "r": 5, "f": 4, "m": 3, "score": "543", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1186", "recencia": 13, "frequencia": 9, "valor": 2289.68, "ticket": 254.41, "r": 5, "f": 4, "m": 5, "score": "545", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1187", "recencia": 263, "frequencia": 2, "valor": 427.93, "ticket": 213.96, "r": 1, "f": 2, "m": 3, "score": "123", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1188", "recencia": 66, "frequencia": 3, "valor": 695.71, "ticket": 231.9, "r": 3, "f": 3, "m": 3, "score": "333", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1189", "recencia": 481, "frequencia": 1, "valor": 322.56, "ticket": 322.56, "r": 1, "f": 1, "m": 2, "score": "112", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1191", "recencia": 4, "frequencia": 15, "valor": 1818.59, "ticket": 121.24, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1192", "recencia": 27, "frequencia": 22, "valor": 5697.39, "ticket": 258.97, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1193", "recencia": 136, "frequencia": 4, "valor": 287.99, "ticket": 72.0, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1194", "recencia": 61, "frequencia": 2, "valor": 241.42, "ticket": 120.71, "r": 4, "f": 2, "m": 2, "score": "422", "segmento": "Potenciais Clientes Leais", "prioridade": "Média-Alta"}, {"id": "CLI-1195", "recencia": 15, "frequencia": 1, "valor": 271.2, "ticket": 271.2, "r": 5, "f": 1, "m": 2, "score": "512", "segmento": "Novos Clientes", "prioridade": "Média"}, {"id": "CLI-1196", "recencia": 22, "frequencia": 4, "valor": 571.33, "ticket": 142.83, "r": 5, "f": 3, "m": 3, "score": "533", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1197", "recencia": 26, "frequencia": 14, "valor": 1507.63, "ticket": 107.69, "r": 4, "f": 5, "m": 4, "score": "454", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1198", "recencia": 117, "frequencia": 12, "valor": 2156.31, "ticket": 179.69, "r": 3, "f": 5, "m": 5, "score": "355", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1199", "recencia": 71, "frequencia": 10, "valor": 2095.87, "ticket": 209.59, "r": 3, "f": 4, "m": 5, "score": "345", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1200", "recencia": 102, "frequencia": 2, "valor": 197.69, "ticket": 98.84, "r": 3, "f": 2, "m": 2, "score": "322", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1201", "recencia": 444, "frequencia": 2, "valor": 123.14, "ticket": 61.57, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1203", "recencia": 155, "frequencia": 13, "valor": 1873.64, "ticket": 144.13, "r": 2, "f": 5, "m": 5, "score": "255", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1204", "recencia": 156, "frequencia": 5, "valor": 383.68, "ticket": 76.74, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1205", "recencia": 320, "frequencia": 1, "valor": 382.89, "ticket": 382.89, "r": 1, "f": 1, "m": 2, "score": "112", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1206", "recencia": 509, "frequencia": 1, "valor": 119.4, "ticket": 119.4, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1207", "recencia": 21, "frequencia": 7, "valor": 1201.4, "ticket": 171.63, "r": 5, "f": 4, "m": 4, "score": "544", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1208", "recencia": 192, "frequencia": 2, "valor": 219.86, "ticket": 109.93, "r": 2, "f": 2, "m": 2, "score": "222", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1209", "recencia": 192, "frequencia": 1, "valor": 97.22, "ticket": 97.22, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1210", "recencia": 43, "frequencia": 2, "valor": 411.5, "ticket": 205.75, "r": 4, "f": 2, "m": 3, "score": "423", "segmento": "Potenciais Clientes Leais", "prioridade": "Média-Alta"}, {"id": "CLI-1211", "recencia": 121, "frequencia": 5, "valor": 725.35, "ticket": 145.07, "r": 3, "f": 3, "m": 3, "score": "333", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1212", "recencia": 26, "frequencia": 6, "valor": 679.51, "ticket": 113.25, "r": 4, "f": 4, "m": 3, "score": "443", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1214", "recencia": 127, "frequencia": 10, "valor": 2025.06, "ticket": 202.51, "r": 3, "f": 4, "m": 5, "score": "345", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1215", "recencia": 61, "frequencia": 2, "valor": 149.47, "ticket": 74.74, "r": 4, "f": 2, "m": 1, "score": "421", "segmento": "Potenciais Clientes Leais", "prioridade": "Média-Alta"}, {"id": "CLI-1216", "recencia": 201, "frequencia": 1, "valor": 149.64, "ticket": 149.64, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1217", "recencia": 172, "frequencia": 7, "valor": 789.79, "ticket": 112.83, "r": 2, "f": 4, "m": 3, "score": "243", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1218", "recencia": 97, "frequencia": 5, "valor": 2960.31, "ticket": 592.06, "r": 3, "f": 3, "m": 5, "score": "335", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1219", "recencia": 30, "frequencia": 11, "valor": 1606.6, "ticket": 146.05, "r": 4, "f": 4, "m": 4, "score": "444", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1220", "recencia": 65, "frequencia": 8, "valor": 1315.42, "ticket": 164.43, "r": 4, "f": 4, "m": 4, "score": "444", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1221", "recencia": 278, "frequencia": 2, "valor": 389.01, "ticket": 194.5, "r": 1, "f": 2, "m": 2, "score": "122", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1222", "recencia": 19, "frequencia": 1, "valor": 82.88, "ticket": 82.88, "r": 5, "f": 1, "m": 1, "score": "511", "segmento": "Novos Clientes", "prioridade": "Média"}, {"id": "CLI-1223", "recencia": 74, "frequencia": 4, "valor": 1030.88, "ticket": 257.72, "r": 3, "f": 3, "m": 4, "score": "334", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1225", "recencia": 458, "frequencia": 1, "valor": 787.72, "ticket": 787.72, "r": 1, "f": 1, "m": 3, "score": "113", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1226", "recencia": 3, "frequencia": 48, "valor": 4714.83, "ticket": 98.23, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1227", "recencia": 305, "frequencia": 2, "valor": 210.72, "ticket": 105.36, "r": 1, "f": 2, "m": 2, "score": "122", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1228", "recencia": 26, "frequencia": 20, "valor": 2230.48, "ticket": 111.52, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1229", "recencia": 124, "frequencia": 2, "valor": 113.39, "ticket": 56.7, "r": 3, "f": 2, "m": 1, "score": "321", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1230", "recencia": 11, "frequencia": 13, "valor": 9028.22, "ticket": 694.48, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1231", "recencia": 309, "frequencia": 3, "valor": 425.51, "ticket": 141.84, "r": 1, "f": 3, "m": 3, "score": "133", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1232", "recencia": 345, "frequencia": 1, "valor": 92.14, "ticket": 92.14, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1233", "recencia": 71, "frequencia": 1, "valor": 219.09, "ticket": 219.09, "r": 3, "f": 1, "m": 2, "score": "312", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1234", "recencia": 73, "frequencia": 1, "valor": 200.66, "ticket": 200.66, "r": 3, "f": 1, "m": 2, "score": "312", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1235", "recencia": 176, "frequencia": 10, "valor": 981.98, "ticket": 98.2, "r": 2, "f": 4, "m": 4, "score": "244", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1236", "recencia": 72, "frequencia": 2, "valor": 100.27, "ticket": 50.14, "r": 3, "f": 2, "m": 1, "score": "321", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1238", "recencia": 17, "frequencia": 4, "valor": 554.65, "ticket": 138.66, "r": 5, "f": 3, "m": 3, "score": "533", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1239", "recencia": 424, "frequencia": 1, "valor": 69.28, "ticket": 69.28, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1240", "recencia": 6, "frequencia": 24, "valor": 14837.74, "ticket": 618.24, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1241", "recencia": 30, "frequencia": 29, "valor": 4672.13, "ticket": 161.11, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1242", "recencia": 1, "frequencia": 15, "valor": 1207.51, "ticket": 80.5, "r": 5, "f": 5, "m": 4, "score": "554", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1243", "recencia": 161, "frequencia": 6, "valor": 1071.44, "ticket": 178.57, "r": 2, "f": 4, "m": 4, "score": "244", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1245", "recencia": 5, "frequencia": 29, "valor": 9853.49, "ticket": 339.78, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1246", "recencia": 272, "frequencia": 1, "valor": 25.0, "ticket": 25.0, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1247", "recencia": 16, "frequencia": 25, "valor": 2533.24, "ticket": 101.33, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1248", "recencia": 4, "frequencia": 30, "valor": 9649.45, "ticket": 321.65, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1249", "recencia": 59, "frequencia": 12, "valor": 1556.97, "ticket": 129.75, "r": 4, "f": 5, "m": 4, "score": "454", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1250", "recencia": 247, "frequencia": 1, "valor": 33.93, "ticket": 33.93, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1251", "recencia": 336, "frequencia": 2, "valor": 211.57, "ticket": 105.78, "r": 1, "f": 2, "m": 2, "score": "122", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1252", "recencia": 6, "frequencia": 13, "valor": 3652.42, "ticket": 280.96, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1254", "recencia": 81, "frequencia": 1, "valor": 231.65, "ticket": 231.65, "r": 3, "f": 1, "m": 2, "score": "312", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1255", "recencia": 12, "frequencia": 4, "valor": 279.52, "ticket": 69.88, "r": 5, "f": 3, "m": 2, "score": "532", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1256", "recencia": 4, "frequencia": 20, "valor": 2726.85, "ticket": 136.34, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1257", "recencia": 109, "frequencia": 6, "valor": 1617.7, "ticket": 269.62, "r": 3, "f": 4, "m": 4, "score": "344", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1258", "recencia": 508, "frequencia": 2, "valor": 912.41, "ticket": 456.2, "r": 1, "f": 2, "m": 4, "score": "124", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1259", "recencia": 284, "frequencia": 1, "valor": 123.36, "ticket": 123.36, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1260", "recencia": 11, "frequencia": 7, "valor": 420.15, "ticket": 60.02, "r": 5, "f": 4, "m": 3, "score": "543", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1261", "recencia": 23, "frequencia": 66, "valor": 11345.49, "ticket": 171.9, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1262", "recencia": 75, "frequencia": 2, "valor": 351.12, "ticket": 175.56, "r": 3, "f": 2, "m": 2, "score": "322", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1263", "recencia": 8, "frequencia": 2, "valor": 243.0, "ticket": 121.5, "r": 5, "f": 2, "m": 2, "score": "522", "segmento": "Potenciais Clientes Leais", "prioridade": "Média-Alta"}, {"id": "CLI-1264", "recencia": 79, "frequencia": 18, "valor": 1491.62, "ticket": 82.87, "r": 3, "f": 5, "m": 4, "score": "354", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1265", "recencia": 195, "frequencia": 10, "valor": 952.87, "ticket": 95.29, "r": 2, "f": 4, "m": 4, "score": "244", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1266", "recencia": 103, "frequencia": 7, "valor": 784.24, "ticket": 112.03, "r": 3, "f": 4, "m": 3, "score": "343", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1267", "recencia": 15, "frequencia": 3, "valor": 468.72, "ticket": 156.24, "r": 5, "f": 3, "m": 3, "score": "533", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1268", "recencia": 456, "frequencia": 1, "valor": 84.55, "ticket": 84.55, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1269", "recencia": 152, "frequencia": 2, "valor": 1005.07, "ticket": 502.54, "r": 2, "f": 2, "m": 4, "score": "224", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1270", "recencia": 165, "frequencia": 10, "valor": 981.48, "ticket": 98.15, "r": 2, "f": 4, "m": 4, "score": "244", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1271", "recencia": 109, "frequencia": 11, "valor": 2519.46, "ticket": 229.04, "r": 3, "f": 4, "m": 5, "score": "345", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1272", "recencia": 26, "frequencia": 15, "valor": 10447.74, "ticket": 696.52, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1273", "recencia": 7, "frequencia": 17, "valor": 1805.43, "ticket": 106.2, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1275", "recencia": 283, "frequencia": 3, "valor": 264.68, "ticket": 88.23, "r": 1, "f": 3, "m": 2, "score": "132", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1276", "recencia": 60, "frequencia": 12, "valor": 980.91, "ticket": 81.74, "r": 4, "f": 5, "m": 4, "score": "454", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1277", "recencia": 104, "frequencia": 3, "valor": 310.44, "ticket": 103.48, "r": 3, "f": 3, "m": 2, "score": "332", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1278", "recencia": 3, "frequencia": 7, "valor": 1351.47, "ticket": 193.07, "r": 5, "f": 4, "m": 4, "score": "544", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1279", "recencia": 5, "frequencia": 7, "valor": 611.41, "ticket": 87.34, "r": 5, "f": 4, "m": 3, "score": "543", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1280", "recencia": 26, "frequencia": 11, "valor": 1123.99, "ticket": 102.18, "r": 4, "f": 4, "m": 4, "score": "444", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1281", "recencia": 387, "frequencia": 2, "valor": 301.72, "ticket": 150.86, "r": 1, "f": 2, "m": 2, "score": "122", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1283", "recencia": 131, "frequencia": 2, "valor": 267.5, "ticket": 133.75, "r": 2, "f": 2, "m": 2, "score": "222", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1284", "recencia": 38, "frequencia": 5, "valor": 506.58, "ticket": 101.32, "r": 4, "f": 3, "m": 3, "score": "433", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1286", "recencia": 159, "frequencia": 4, "valor": 435.52, "ticket": 108.88, "r": 2, "f": 3, "m": 3, "score": "233", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1287", "recencia": 282, "frequencia": 3, "valor": 1197.79, "ticket": 399.26, "r": 1, "f": 3, "m": 4, "score": "134", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1288", "recencia": 276, "frequencia": 2, "valor": 188.05, "ticket": 94.02, "r": 1, "f": 2, "m": 2, "score": "122", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1289", "recencia": 118, "frequencia": 3, "valor": 527.83, "ticket": 175.94, "r": 3, "f": 3, "m": 3, "score": "333", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1290", "recencia": 222, "frequencia": 1, "valor": 127.88, "ticket": 127.88, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1291", "recencia": 143, "frequencia": 2, "valor": 143.79, "ticket": 71.9, "r": 2, "f": 2, "m": 1, "score": "221", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1292", "recencia": 2, "frequencia": 20, "valor": 1664.41, "ticket": 83.22, "r": 5, "f": 5, "m": 4, "score": "554", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1293", "recencia": 68, "frequencia": 6, "valor": 603.59, "ticket": 100.6, "r": 3, "f": 4, "m": 3, "score": "343", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1294", "recencia": 127, "frequencia": 1, "valor": 120.01, "ticket": 120.01, "r": 3, "f": 1, "m": 1, "score": "311", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1295", "recencia": 268, "frequencia": 2, "valor": 669.15, "ticket": 334.58, "r": 1, "f": 2, "m": 3, "score": "123", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1296", "recencia": 50, "frequencia": 13, "valor": 1606.26, "ticket": 123.56, "r": 4, "f": 5, "m": 4, "score": "454", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1297", "recencia": 239, "frequencia": 1, "valor": 32.24, "ticket": 32.24, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1298", "recencia": 185, "frequencia": 3, "valor": 226.08, "ticket": 75.36, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1299", "recencia": 497, "frequencia": 1, "valor": 178.14, "ticket": 178.14, "r": 1, "f": 1, "m": 2, "score": "112", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1301", "recencia": 258, "frequencia": 3, "valor": 763.69, "ticket": 254.56, "r": 2, "f": 3, "m": 3, "score": "233", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1302", "recencia": 185, "frequencia": 1, "valor": 36.33, "ticket": 36.33, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1303", "recencia": 50, "frequencia": 5, "valor": 271.32, "ticket": 54.26, "r": 4, "f": 3, "m": 2, "score": "432", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1304", "recencia": 262, "frequencia": 6, "valor": 831.99, "ticket": 138.66, "r": 1, "f": 4, "m": 4, "score": "144", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1305", "recencia": 2, "frequencia": 46, "valor": 7307.3, "ticket": 158.85, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1306", "recencia": 260, "frequencia": 2, "valor": 275.29, "ticket": 137.65, "r": 2, "f": 2, "m": 2, "score": "222", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1308", "recencia": 157, "frequencia": 7, "valor": 1350.12, "ticket": 192.87, "r": 2, "f": 4, "m": 4, "score": "244", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1309", "recencia": 130, "frequencia": 1, "valor": 55.52, "ticket": 55.52, "r": 3, "f": 1, "m": 1, "score": "311", "segmento": "Promissores", "prioridade": "Média"}, {"id": "CLI-1310", "recencia": 35, "frequencia": 1, "valor": 135.17, "ticket": 135.17, "r": 4, "f": 1, "m": 1, "score": "411", "segmento": "Novos Clientes", "prioridade": "Média"}, {"id": "CLI-1311", "recencia": 189, "frequencia": 1, "valor": 104.87, "ticket": 104.87, "r": 2, "f": 1, "m": 1, "score": "211", "segmento": "Quase Hibernando", "prioridade": "Média"}, {"id": "CLI-1313", "recencia": 50, "frequencia": 27, "valor": 2858.7, "ticket": 105.88, "r": 4, "f": 5, "m": 5, "score": "455", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1314", "recencia": 57, "frequencia": 11, "valor": 3104.82, "ticket": 282.26, "r": 4, "f": 4, "m": 5, "score": "445", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1315", "recencia": 182, "frequencia": 5, "valor": 480.7, "ticket": 96.14, "r": 2, "f": 3, "m": 3, "score": "233", "segmento": "Em Risco", "prioridade": "Crítica"}, {"id": "CLI-1316", "recencia": 3, "frequencia": 2, "valor": 99.1, "ticket": 49.55, "r": 5, "f": 2, "m": 1, "score": "521", "segmento": "Potenciais Clientes Leais", "prioridade": "Média-Alta"}, {"id": "CLI-1317", "recencia": 310, "frequencia": 1, "valor": 104.42, "ticket": 104.42, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1319", "recencia": 509, "frequencia": 1, "valor": 28.13, "ticket": 28.13, "r": 1, "f": 1, "m": 1, "score": "111", "segmento": "Perdidos", "prioridade": "Baixa"}, {"id": "CLI-1320", "recencia": 35, "frequencia": 6, "valor": 985.26, "ticket": 164.21, "r": 4, "f": 4, "m": 4, "score": "444", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1321", "recencia": 82, "frequencia": 6, "valor": 741.97, "ticket": 123.66, "r": 3, "f": 4, "m": 3, "score": "343", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1322", "recencia": 125, "frequencia": 4, "valor": 884.46, "ticket": 221.12, "r": 3, "f": 3, "m": 4, "score": "334", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1323", "recencia": 198, "frequencia": 5, "valor": 488.61, "ticket": 97.72, "r": 2, "f": 4, "m": 3, "score": "243", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1324", "recencia": 21, "frequencia": 26, "valor": 11501.69, "ticket": 442.37, "r": 5, "f": 5, "m": 5, "score": "555", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1325", "recencia": 72, "frequencia": 7, "valor": 709.91, "ticket": 101.42, "r": 3, "f": 4, "m": 3, "score": "343", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1326", "recencia": 43, "frequencia": 3, "valor": 512.9, "ticket": 170.97, "r": 4, "f": 3, "m": 3, "score": "433", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1327", "recencia": 2, "frequencia": 10, "valor": 887.2, "ticket": 88.72, "r": 5, "f": 4, "m": 4, "score": "544", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1328", "recencia": 362, "frequencia": 2, "valor": 357.08, "ticket": 178.54, "r": 1, "f": 2, "m": 2, "score": "122", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1329", "recencia": 53, "frequencia": 2, "valor": 188.04, "ticket": 94.02, "r": 4, "f": 2, "m": 2, "score": "422", "segmento": "Potenciais Clientes Leais", "prioridade": "Média-Alta"}, {"id": "CLI-1331", "recencia": 104, "frequencia": 6, "valor": 568.18, "ticket": 94.7, "r": 3, "f": 4, "m": 3, "score": "343", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1333", "recencia": 475, "frequencia": 1, "valor": 45.26, "ticket": 45.26, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1335", "recencia": 96, "frequencia": 1, "valor": 174.1, "ticket": 174.1, "r": 3, "f": 2, "m": 1, "score": "321", "segmento": "Precisam de Atenção", "prioridade": "Alta"}, {"id": "CLI-1336", "recencia": 94, "frequencia": 8, "valor": 1036.72, "ticket": 129.59, "r": 3, "f": 4, "m": 4, "score": "344", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1337", "recencia": 39, "frequencia": 10, "valor": 845.63, "ticket": 84.56, "r": 4, "f": 4, "m": 4, "score": "444", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1338", "recencia": 27, "frequencia": 6, "valor": 447.63, "ticket": 74.6, "r": 4, "f": 4, "m": 3, "score": "443", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1340", "recencia": 27, "frequencia": 6, "valor": 491.66, "ticket": 81.94, "r": 4, "f": 4, "m": 3, "score": "443", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1342", "recencia": 517, "frequencia": 1, "valor": 355.06, "ticket": 355.06, "r": 1, "f": 2, "m": 2, "score": "122", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1343", "recencia": 60, "frequencia": 3, "valor": 212.85, "ticket": 70.95, "r": 4, "f": 3, "m": 2, "score": "432", "segmento": "Leais", "prioridade": "Alta"}, {"id": "CLI-1344", "recencia": 487, "frequencia": 2, "valor": 171.26, "ticket": 85.63, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1345", "recencia": 39, "frequencia": 5, "valor": 695.48, "ticket": 139.1, "r": 4, "f": 4, "m": 3, "score": "443", "segmento": "Campeões", "prioridade": "Alta"}, {"id": "CLI-1346", "recencia": 204, "frequencia": 7, "valor": 1962.01, "ticket": 280.29, "r": 2, "f": 4, "m": 5, "score": "245", "segmento": "Não Podemos Perder", "prioridade": "Crítica"}, {"id": "CLI-1347", "recencia": 341, "frequencia": 1, "valor": 94.37, "ticket": 94.37, "r": 1, "f": 2, "m": 1, "score": "121", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1348", "recencia": 449, "frequencia": 2, "valor": 343.98, "ticket": 171.99, "r": 1, "f": 2, "m": 2, "score": "122", "segmento": "Hibernando", "prioridade": "Baixa"}, {"id": "CLI-1349", "recencia": 261, "frequencia": 4, "valor": 389.84, "ticket": 97.46, "r": 2, "f": 3, "m": 2, "score": "232", "segmento": "Em Risco", "prioridade": "Crítica"}];
+    const CLUSTERS_META = {"Campeões": {"descricao": "Compraram recentemente, compram com alta frequência e possuem os maiores volumes de gastos.", "objetivo": "Fidelização máxima, retenção ativa e programas de evangelização da marca.", "plano_de_acao": "1. Oferecer acesso antecipado a lançamentos de novos produtos e serviços.\n2. Conceder atendimento prioritário (Key Account / Gerente Dedicado).\n3. Criar programa exclusivo de indicação (Member Get Member) com recompensas VIP.\n4. Evitar envio de cupons de desconto agressivos (eles já compram pelo valor percebido).", "canais_recomendados": "WhatsApp Concierge, Contato Telefônico Executivo, E-mail VIP", "prioridade": "Alta", "cor": "#10B981"}, "Leais": {"descricao": "Clientes com compras consistentes, boa frequência e gastos acima da média.", "objetivo": "Aumentar o Lifetime Value (LTV) por meio de cross-selling e up-selling.", "plano_de_acao": "1. Apresentar pacotes de produtos complementares de tíquete superior.\n2. Incentivar adesão a planos de assinatura ou clubes de fidelidade com acúmulo de pontos.\n3. Solicitar depoimentos (reviews) e casos de sucesso para prova social.\n4. Bonificar com brindes exclusivos em compras consecutivas.", "canais_recomendados": "E-mail Marketing Segmentado, WhatsApp Comercial, Push Notification", "prioridade": "Alta", "cor": "#3B82F6"}, "Potenciais Clientes Leais": {"descricao": "Clientes recentes que já realizaram mais de uma compra e demonstraram engajamento promissor.", "objetivo": "Transformar compradores recorrentes em clientes leais e defensores da marca.", "plano_de_acao": "1. Enviar réguas de nutrição com casos de uso e melhores práticas dos itens adquiridos.\n2. Ofertar incentivo na 3ª ou 4ª compra com validade regressiva (gatilho de escassez).\n3. Convidar para comunidade exclusiva ou eventos/webinars da marca.", "canais_recomendados": "E-mail Educativo, WhatsApp Comercial, Remarketing de Produtos Relacionados", "prioridade": "Média-Alta", "cor": "#8B5CF6"}, "Novos Clientes": {"descricao": "Compraram pela primeira vez recentemente. Alto potencial, mas frequência ainda unitária.", "objetivo": "Garantir o sucesso do onboarding e induzir a segunda compra o mais rápido possível.", "plano_de_acao": "1. Disparar e-mail de boas-vindas acolhedor e pesquisa rápida de satisfação pós-primeira compra.\n2. Enviar tutorial/guia de utilização do produto ou serviço adquirido.\n3. Disponibilizar cupom de incentivo exclusivo para a próxima compra válido por 30 dias.\n4. Garantir suporte proativo via canais rápidos para sanar dúvidas iniciais.", "canais_recomendados": "E-mail de Onboarding, SMS/WhatsApp com Cupom de Boas-Vindas", "prioridade": "Média", "cor": "#06B6D4"}, "Promissores": {"descricao": "Compraram recentemente pela primeira vez e gastaram valor moderado, mas ainda sem repetição.", "objetivo": "Criar vínculo e construir percepção de valor para estimular a recompra.", "plano_de_acao": "1. Criar campanhas de reengajamento baseadas na categoria do primeiro item comprado.\n2. Apresentar avaliações de outros compradores em categorias afins.\n3. Enviar ofertas de itens 'best-sellers' com condições especiais de frete ou pagamento.", "canais_recomendados": "E-mail Marketing, Remarketing de Catálogo", "prioridade": "Média", "cor": "#14B8A6"}, "Precisam de Atenção": {"descricao": "Clientes com recência e frequência moderadas. Risco iminente de esfriamento se não estimulados.", "objetivo": "Reativar o hábito de compra antes da entrada na zona de inatividade.", "plano_de_acao": "1. Campanhas de incentivo com tempo limitado (ofertas 'flash' de 48 horas).\n2. Ofertar combos ou kits de reposição com desconto no pacote.\n3. Relembrar novidades do portfólio adicionadas desde sua última interação.", "canais_recomendados": "E-mail de Oportunidade, Remarketing Display, WhatsApp com Oferta Rápida", "prioridade": "Alta", "cor": "#F59E0B"}, "Quase Hibernando": {"descricao": "Baixa recência e pouca frequência. Clientes prestes a se tornarem inativos.", "objetivo": "Evitar o churn definitivo com comunicação de reengajamento assertiva.", "plano_de_acao": "1. Campanha 'Sentimos sua falta' com benefícios diretos na volta.\n2. Apresentar produtos populares com condições agressivas de preço.\n3. Questionar de forma breve se o produto anterior atendeu às expectativas.", "canais_recomendados": "E-mail de Reativação, Tráfego Pago Segmentado (Custom Audience)", "prioridade": "Média", "cor": "#F97316"}, "Não Podemos Perder": {"descricao": "Clientes que compravam com alta frequência e altos volumes monetários, mas não compram há muito tempo.", "objetivo": "Reconquista urgente e investigação de atrito/insatisfação. Risco financeiro crítico.", "plano_de_acao": "1. Ação imediata de SDR/Gerente de Contas via ligação direta ou mensagem executiva personalizada.\n2. Investigar se houve problema com atendimento, qualidade do produto ou migração para concorrente.\n3. Ofertar plano de renovação sob medida com condições especiais irrecusáveis.\n4. Envolver liderança de Vendas/CS para resgatar o relacionamento.", "canais_recomendados": "Ligação Telefônica Direta, Reunião Presencial/Online, WhatsApp Pessoal de Gerente", "prioridade": "Crítica", "cor": "#DC2626"}, "Em Risco": {"descricao": "Clientes com histórico sólido de compras anteriores que deixaram de comprar no período recente.", "objetivo": "Interromper o processo de churn e recapturar a atenção do cliente.", "plano_de_acao": "1. Disparo de pesquisas de satisfação (NPS/CSAT) para entender os motivos de afastamento.\n2. Ofertar cupons substanciais de reativação para a volta.\n3. Renovar o catálogo exibindo lançamentos e melhorias recentes que o cliente não conheceu.", "canais_recomendados": "E-mail de Reconquista, WhatsApp de Relacionamento, Anúncios de Retargeting", "prioridade": "Crítica", "cor": "#EF4444"}, "Hibernando": {"descricao": "Frequência muito baixa e última compra realizada há muitos meses.", "objetivo": "Reativação de baixo custo ou limpeza de base para otimização de campanhas.", "plano_de_acao": "1. Campanhas de queima de estoque ou promoções sazonais agressivas (ex: Black Friday, Aniversário).\n2. Mensagem simples de reativação com opção clara de descadastramento (opt-out).\n3. Evitar envio diário de e-mails para não comprometer a entregabilidade e reputação do domínio.", "canais_recomendados": "E-mail Marketing Automatizado de Baixo Custo", "prioridade": "Baixa", "cor": "#6B7280"}, "Perdidos": {"descricao": "Realizaram uma única compra no passado distante e nunca mais retornaram.", "objetivo": "Última tentativa de contato de baixo custo operacional ou desativação de CRM.", "plano_de_acao": "1. Disparo de uma única régua 'Última chamada: cupom especial de retorno'.\n2. Se não houver clique ou abertura após 30 dias, pausar envios de marketing para cortar custos.\n3. Reavaliar a qualidade do canal de aquisição de onde vieram esses clientes.", "canais_recomendados": "E-mail de Despedida / Limpeza de Base", "prioridade": "Baixa", "cor": "#475569"}};
+
+    let currentSegment = 'all';
+    let currentTab = 'treemap';
+    let treemapMetric = 'revenue'; // 'revenue' ou 'count'
+    let scatterDim = '2d'; // '2d' ou '3d'
+    let searchQuery = '';
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      initFilterDropdown();
+      initClusterPills();
+      initTabControls();
+      initSearch();
+      initExportBtn();
+      initCopyBtn();
+      updateDashboard();
+    });
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 3500);
+    }
+
+    function initFilterDropdown() {
+      const select = document.getElementById('segmentFilterSelect');
+      Object.keys(CLUSTERS_META).forEach(seg => {
+        const opt = document.createElement('option');
+        opt.value = seg;
+        opt.textContent = seg;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', (e) => {
+        currentSegment = e.target.value;
+        updateDashboard();
+      });
+
+      document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+        currentSegment = 'all';
+        select.value = 'all';
+        searchQuery = '';
+        document.getElementById('tableSearchInput').value = '';
+        updateDashboard();
+      });
+    }
+
+    function initClusterPills() {
+      const container = document.getElementById('clusterPillsContainer');
+      
+      const allPill = document.createElement('button');
+      allPill.className = 'rfm-pill active';
+      allPill.textContent = 'Todos os Segmentos';
+      allPill.addEventListener('click', () => {
+        currentSegment = 'all';
+        document.getElementById('segmentFilterSelect').value = 'all';
+        updateDashboard();
+      });
+      container.appendChild(allPill);
+
+      Object.keys(CLUSTERS_META).forEach(seg => {
+        const pill = document.createElement('button');
+        pill.className = 'rfm-pill';
+        pill.textContent = seg;
+        pill.addEventListener('click', () => {
+          currentSegment = seg;
+          document.getElementById('segmentFilterSelect').value = seg;
+          updateDashboard();
+        });
+        container.appendChild(pill);
+      });
+    }
+
+    function initTabControls() {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const treemapToggle = document.getElementById('treemapMetricToggle');
+      const scatterToggle = document.getElementById('scatterDimToggle');
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentTab = btn.getAttribute('data-tab');
+
+          if (currentTab === 'treemap') {
+            treemapToggle.classList.remove('hidden');
+            scatterToggle.classList.add('hidden');
+          } else if (currentTab === 'scatter') {
+            treemapToggle.classList.add('hidden');
+            scatterToggle.classList.remove('hidden');
+          } else {
+            treemapToggle.classList.add('hidden');
+            scatterToggle.classList.add('hidden');
+          }
+
+          renderPlotlyChart();
+        });
+      });
+
+      // Treemap metric buttons
+      const btnRev = document.getElementById('metricRevenueBtn');
+      const btnCnt = document.getElementById('metricCountBtn');
+      btnRev.addEventListener('click', () => {
+        treemapMetric = 'revenue';
+        btnRev.className = 'px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium';
+        btnCnt.className = 'px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium';
+        renderPlotlyChart();
+      });
+      btnCnt.addEventListener('click', () => {
+        treemapMetric = 'count';
+        btnCnt.className = 'px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium';
+        btnRev.className = 'px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium';
+        renderPlotlyChart();
+      });
+
+      // Scatter 2d/3d buttons
+      const btn2d = document.getElementById('scatter2dBtn');
+      const btn3d = document.getElementById('scatter3dBtn');
+      btn2d.addEventListener('click', () => {
+        scatterDim = '2d';
+        btn2d.className = 'px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium';
+        btn3d.className = 'px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium';
+        renderPlotlyChart();
+      });
+      btn3d.addEventListener('click', () => {
+        scatterDim = '3d';
+        btn3d.className = 'px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium';
+        btn2d.className = 'px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium';
+        renderPlotlyChart();
+      });
+    }
+
+    function initSearch() {
+      const search = document.getElementById('tableSearchInput');
+      search.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        renderTable();
+      });
+    }
+
+    function initCopyBtn() {
+      const btn = document.getElementById('copyCmdBtn');
+      btn.addEventListener('click', () => {
+        const cmd = 'streamlit run app.py';
+        navigator.clipboard.writeText(cmd).then(() => {
+          showToast('Comando copiado: ' + cmd);
+        }).catch(() => {
+          showToast('Execute no terminal: ' + cmd);
+        });
+      });
+    }
+
+    function initExportBtn() {
+      document.getElementById('exportCsvBtn').addEventListener('click', () => {
+        const filtered = getFilteredCustomers();
+        if (!filtered.length) {
+          showToast('Nenhum dado para exportar.');
+          return;
+        }
+
+        let csv = "\uFEFF"; // BOM para Excel
+        csv += "ID Cliente;Segmento;Prioridade;Recencia;Frequencia;Valor Total;Ticket Medio;Score RFM\n";
+        filtered.forEach(c => {
+          csv += `${c.id};${c.segmento};${c.prioridade};${c.recencia};${c.frequencia};${c.valor.toFixed(2)};${c.ticket.toFixed(2)};${c.score}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `rfm_${currentSegment.toLowerCase().replace(/\s+/g, '_')}_clientes.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        showToast('Download do CSV iniciado com sucesso!');
+      });
+    }
+
+    function getFilteredCustomers() {
+      return CUSTOMERS_DATA.filter(c => {
+        const matchesSegment = (currentSegment === 'all' || c.segmento === currentSegment);
+        const matchesSearch = (!searchQuery || c.id.toLowerCase().includes(searchQuery) || c.segmento.toLowerCase().includes(searchQuery));
+        return matchesSegment && matchesSearch;
+      });
+    }
+
+    function updateDashboard() {
+      updatePills();
+      updateKpis();
+      renderPlotlyChart();
+      renderPlaybook();
+      renderTable();
+    }
+
+    function updatePills() {
+      const pills = document.querySelectorAll('.rfm-pill');
+      pills.forEach(p => {
+        if (p.textContent === 'Todos os Segmentos' && currentSegment === 'all') {
+          p.classList.add('active');
+        } else if (p.textContent === currentSegment) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+    }
+
+    function updateKpis() {
+      const filtered = getFilteredCustomers();
+      const totalRev = filtered.reduce((acc, c) => acc + c.valor, 0);
+      const totalCount = filtered.length;
+      const totalOrders = filtered.reduce((acc, c) => acc + c.frequencia, 0);
+      const avgTicket = totalOrders > 0 ? (totalRev / totalOrders) : 0;
+
+      // Receita em Risco Global (Em Risco + Não Podemos Perder)
+      const globalRev = CUSTOMERS_DATA.reduce((acc, c) => acc + c.valor, 0);
+      const riskCustomers = CUSTOMERS_DATA.filter(c => ['Em Risco', 'Não Podemos Perder'].includes(c.segmento));
+      const riskRev = riskCustomers.reduce((acc, c) => acc + c.valor, 0);
+      const riskShare = globalRev > 0 ? ((riskRev / globalRev) * 100).toFixed(1) : '0.0';
+
+      document.getElementById('kpiRevenue').textContent = `R$ ${totalRev.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('kpiCustomers').textContent = totalCount.toLocaleString('pt-BR');
+      document.getElementById('kpiTicket').textContent = `R$ ${avgTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('kpiRiskRevenue').textContent = `R$ ${riskRev.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('kpiRiskShare').innerHTML = `<b>${riskShare}%</b> da base global (${riskCustomers.length} clientes)`;
+    }
+
+    function renderPlotlyChart() {
+      const container = document.getElementById('plotlyChart');
+      if (!container) return;
+
+      if (currentTab === 'treemap') {
+        renderTreemap(container);
+      } else if (currentTab === 'scatter') {
+        renderScatter(container);
+      } else {
+        renderHeatmap(container);
+      }
+    }
+
+    function renderTreemap(container) {
+      // Agrupa por segmento
+      const segSummary = {};
+      CUSTOMERS_DATA.forEach(c => {
+        if (!segSummary[c.segmento]) {
+          segSummary[c.segmento] = { count: 0, revenue: 0 };
+        }
+        segSummary[c.segmento].count += 1;
+        segSummary[c.segmento].revenue += c.valor;
+      });
+
+      const labels = Object.keys(segSummary);
+      const values = labels.map(l => treemapMetric === 'revenue' ? segSummary[l].revenue : segSummary[l].count);
+      const colors = labels.map(l => CLUSTERS_META[l] ? CLUSTERS_META[l].cor : '#38bdf8');
+      const textInfo = treemapMetric === 'revenue' 
+        ? labels.map(l => `R$ ${segSummary[l].revenue.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}<br>${segSummary[l].count} cli`)
+        : labels.map(l => `${segSummary[l].count} clientes<br>R$ ${segSummary[l].revenue.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`);
+
+      const data = [{
+        type: 'treemap',
+        labels: labels,
+        parents: labels.map(() => ''),
+        values: values,
+        text: textInfo,
+        textinfo: 'label+text',
+        marker: {
+          colors: colors
+        },
+        hoverinfo: 'label+value+percent root'
+      }];
+
+      const layout = {
+        margin: { t: 10, l: 10, r: 10, b: 10 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc' }
+      };
+
+      Plotly.newPlot(container, data, layout, { responsive: true, displayModeBar: false });
+
+      container.on('plotly_click', (data) => {
+        if (data.points && data.points.length) {
+          const clickedLabel = data.points[0].label;
+          if (CLUSTERS_META[clickedLabel]) {
+            currentSegment = clickedLabel;
+            document.getElementById('segmentFilterSelect').value = clickedLabel;
+            updateDashboard();
+          }
+        }
+      });
+    }
+
+    function renderScatter(container) {
+      const filtered = getFilteredCustomers();
+      const segments = [...new Set(filtered.map(c => c.segmento))];
+
+      if (scatterDim === '2d') {
+        const traces = segments.map(seg => {
+          const segClients = filtered.filter(c => c.segmento === seg);
+          return {
+            name: seg,
+            x: segClients.map(c => c.recencia),
+            y: segClients.map(c => c.frequencia),
+            text: segClients.map(c => `${c.id}<br>Valor: R$ ${c.valor.toFixed(2)}<br>Score: ${c.score}`),
+            mode: 'markers',
+            marker: {
+              size: segClients.map(c => Math.max(8, Math.min(30, Math.sqrt(c.valor) * 1.4))),
+              color: CLUSTERS_META[seg] ? CLUSTERS_META[seg].cor : '#38bdf8',
+              opacity: 0.8
+            }
+          };
+        });
+
+        const layout = {
+          margin: { t: 20, l: 50, r: 20, b: 50 },
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          plot_bgcolor: 'rgba(0,0,0,0)',
+          xaxis: {
+            title: 'Recência (Dias desde a última compra)',
+            color: '#94a3b8',
+            gridcolor: 'rgba(255,255,255,0.05)'
+          },
+          yaxis: {
+            title: 'Frequência (Nº de Compras)',
+            color: '#94a3b8',
+            gridcolor: 'rgba(255,255,255,0.05)'
+          },
+          legend: {
+            orientation: 'h',
+            y: 1.12,
+            font: { color: '#94a3b8', size: 10 }
+          },
+          font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc' }
+        };
+
+        Plotly.newPlot(container, traces, layout, { responsive: true, displayModeBar: false });
+      } else {
+        // 3D
+        const traces = segments.map(seg => {
+          const segClients = filtered.filter(c => c.segmento === seg);
+          return {
+            name: seg,
+            x: segClients.map(c => c.recencia),
+            y: segClients.map(c => c.frequencia),
+            z: segClients.map(c => c.valor),
+            text: segClients.map(c => `${c.id}<br>Score: ${c.score}`),
+            type: 'scatter3d',
+            mode: 'markers',
+            marker: {
+              size: 5,
+              color: CLUSTERS_META[seg] ? CLUSTERS_META[seg].cor : '#38bdf8',
+              opacity: 0.85
+            }
+          };
+        });
+
+        const layout = {
+          margin: { t: 10, l: 10, r: 10, b: 10 },
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          scene: {
+            xaxis: { title: 'Recência (Dias)', color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.1)' },
+            yaxis: { title: 'Frequência', color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.1)' },
+            zaxis: { title: 'Monetário (R$)', color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.1)' }
+          },
+          legend: { font: { color: '#94a3b8', size: 10 } },
+          font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc' }
+        };
+
+        Plotly.newPlot(container, traces, layout, { responsive: true, displayModeBar: false });
+      }
+    }
+
+    function renderHeatmap(container) {
+      const matrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+      const revMatrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+
+      CUSTOMERS_DATA.forEach(c => {
+        const rIdx = 5 - c.r; // R5 -> linha 0, R1 -> linha 4
+        const fIdx = c.f - 1; // F1 -> col 0, F5 -> col 4
+        if (rIdx >= 0 && rIdx < 5 && fIdx >= 0 && fIdx < 5) {
+          matrix[rIdx][fIdx] += 1;
+          revMatrix[rIdx][fIdx] += c.valor;
+        }
+      });
+
+      const textMatrix = matrix.map((row, rIdx) => 
+        row.map((val, fIdx) => `${val} cli<br>R$ ${revMatrix[rIdx][fIdx].toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`)
+      );
+
+      const data = [{
+        type: 'heatmap',
+        z: matrix,
+        x: ['F1', 'F2', 'F3', 'F4', 'F5'],
+        y: ['R5 (Recente)', 'R4', 'R3', 'R2', 'R1 (Antigo)'],
+        text: textMatrix,
+        texttemplate: '%{text}',
+        colorscale: 'Blues',
+        colorbar: { title: 'Clientes' },
+        hoverongaps: false
+      }];
+
+      const layout = {
+        margin: { t: 20, l: 120, r: 20, b: 50 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        xaxis: { title: 'Frequência (F1 = Poucas Compras ➡️ F5 = Compra Frequentemente)', color: '#94a3b8' },
+        yaxis: { title: 'Recência', color: '#94a3b8' },
+        font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc' }
+      };
+
+      Plotly.newPlot(container, data, layout, { responsive: true, displayModeBar: false });
+    }
+
+    function renderPlaybook() {
+      const container = document.getElementById('playbookCardContainer');
+      const targetSeg = currentSegment === 'all' ? 'Não Podemos Perder' : currentSegment;
+      const meta = CLUSTERS_META[targetSeg];
+      if (!meta) return;
+
+      const prioColor = 
+        meta.prioridade === 'Crítica' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' :
+        meta.prioridade === 'Alta' ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' :
+        'text-sky-400 bg-sky-500/10 border-sky-500/30';
+
+      container.style.borderLeftColor = meta.cor;
+      container.style.borderLeftWidth = '4px';
+
+      container.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-800">
+          <div class="flex items-center gap-2.5">
+            <span class="w-3.5 h-3.5 rounded-full" style="background-color: ${meta.cor};"></span>
+            <h3 class="text-base font-bold text-white uppercase tracking-wider font-mono">
+              Playbook Comercial: ${targetSeg}
+            </h3>
+            ${currentSegment === 'all' ? '<span class="text-[11px] text-neutral-500">(Cluster de Maior Exposição em Risco)</span>' : ''}
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold border uppercase self-start sm:self-auto ${prioColor}">
+            Prioridade: ${meta.prioridade}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <div class="space-y-3 text-xs">
+            <div>
+              <span class="text-neutral-400 font-mono text-[10px] uppercase block mb-0.5">Perfil Comportamental:</span>
+              <p class="text-neutral-200 leading-relaxed">${meta.descricao}</p>
+            </div>
+            <div>
+              <span class="text-neutral-400 font-mono text-[10px] uppercase block mb-0.5">Objetivo de Negócio:</span>
+              <p class="text-emerald-400 font-semibold">${meta.objetivo}</p>
+            </div>
+            <div>
+              <span class="text-neutral-400 font-mono text-[10px] uppercase block mb-1">Canais Prioritários:</span>
+              <code class="px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-sky-300 font-mono text-xs block">${meta.canais_recomendados}</code>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <span class="text-neutral-400 font-mono text-[10px] uppercase block">Ações Comerciais Recomendadas:</span>
+            <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 text-xs text-neutral-300 leading-relaxed whitespace-pre-line">${meta.plano_de_acao}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('customersTableBody');
+      const badge = document.getElementById('tableCountBadge');
+      const filtered = getFilteredCustomers();
+
+      badge.textContent = `${filtered.length} cliente(s)`;
+      tbody.innerHTML = '';
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-neutral-500">Nenhum cliente encontrado para os filtros selecionados.</td></tr>';
+        return;
+      }
+
+      // Limita a exibição inicial a 100 linhas para manter máxima performance
+      const displayRows = filtered.slice(0, 100);
+
+      displayRows.forEach(c => {
+        const meta = CLUSTERS_META[c.segmento] || { cor: '#94a3b8' };
+        const prioBadge = 
+          c.prioridade === 'Crítica' ? 'text-rose-400 bg-rose-500/10' :
+          c.prioridade === 'Alta' ? 'text-amber-400 bg-amber-500/10' :
+          'text-sky-400 bg-sky-500/10';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="font-mono font-bold text-white">${c.id}</td>
+          <td>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium" style="background-color: ${meta.cor}15; color: ${meta.cor};">
+              <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${meta.cor};"></span>
+              ${c.segmento}
+            </span>
+          </td>
+          <td><span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${prioBadge}">${c.prioridade}</span></td>
+          <td class="font-mono text-neutral-300">${c.recencia} dias</td>
+          <td class="font-mono text-neutral-300">${c.frequencia} pedidos</td>
+          <td class="font-mono font-bold text-emerald-400">R$ ${c.valor.toFixed(2)}</td>
+          <td class="font-mono text-neutral-400">R$ ${c.ticket.toFixed(2)}</td>
+          <td class="font-mono text-sky-400 font-bold">${c.score}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+
+</body>
+</html>
