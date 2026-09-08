@@ -35,7 +35,7 @@ Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | 
 
 ## 📁 Estrutura de Arquivos Isolada
 
-O repositório é organizado de forma modular e isolada, separando a camada do **Site de Portfólio** dos **Projetos de Dados**:
+O repositório é organizado de forma modular e isolada, separando a camada do **Site de Portfólio** dos **5 Projetos de Dados**:
 
 ```
 Portifólio em Dados/
@@ -49,12 +49,36 @@ Portifólio em Dados/
 │   ├── curriculo-fernando.pdf              # Arquivo de currículo para download direto
 │   └── video_dashboard.mp4                 # Vídeo demonstrativo dos dashboards
 │
-├── 📊 Projetos/                             # PROJETOS ANALÍTICOS E ENGENHARIA DE DADOS
-│   └── 01_Cockpit_RFM_Analytics/           # Projeto 01: Segmentação RFM & Prevenção de Churn
-│       ├── app.py                          # Aplicação Web analítica executiva em Streamlit
-│       ├── rfm_engine.py                   # Motor de cálculo RFM por quantis e 11 clusters
-│       ├── requirements.txt                # Dependências (streamlit, pandas, numpy, plotly)
-│       └── README.md                       # Documentação técnica detalhada do projeto
+├── 📊 Projetos/                             # PROJETOS DE ENGENHARIA, ANALYTICS E BI
+│   │
+│   ├── 01_Cockpit_RFM_Analytics/           # Projeto 01: Segmentação RFM & Prevenção de Churn
+│   │   ├── app.py                          # Aplicação Web analítica executiva em Streamlit
+│   │   ├── rfm_engine.py                   # Motor de cálculo RFM por quantis e 11 clusters
+│   │   ├── requirements.txt                # Dependências (streamlit, pandas, numpy, plotly)
+│   │   └── README.md                       # Documentação técnica detalhada do projeto
+│   │
+│   ├── 02_Auditoria_Fretes_Logistica/      # Projeto 02: Auditoria Contratual de Fretes & Glosas
+│   │   ├── auditoria_fretes.py             # Script de conciliação de faturas vs contrato
+│   │   ├── queries_auditoria.sql           # Pipeline SQL avançado (CTEs e Window Functions)
+│   │   ├── requirements.txt                # Dependências (pandas, numpy)
+│   │   └── README.md                       # Documentação com regras de cubagem e ROI
+│   │
+│   ├── 03_Cohort_Retencao_Churn/           # Projeto 03: Modelagem de Cohort & Churn
+│   │   ├── cohort_model.py                 # Modelo Python de safras e curvas de retenção
+│   │   ├── cohort_pipeline.sql             # Pipeline dbt / BigQuery SQL de sobrevivência
+│   │   ├── requirements.txt                # Dependências (pandas, numpy)
+│   │   └── README.md                       # Documentação de Early Churn e retenção
+│   │
+│   ├── 04_Camada_Semantica_Cockpit_BI/     # Projeto 04: Camada Semântica & Modelagem Kimball
+│   │   ├── dbt_models/                     # Modelos dbt (dim_clientes, dim_produtos, dim_calendario, fct_vendas, schema.yml)
+│   │   ├── medidas_dax_corporativas.dax    # Catálogo com 14 métricas corporativas DAX
+│   │   └── README.md                       # Documentação de SSOT e governança dimensional
+│   │
+│   └── 05_Orquestracao_Alertas_Anomalias/  # Projeto 05: Orquestração de Pipelines e Alertas
+│       ├── anomaly_detector.py             # Motor estatístico de cálculo de Z-Score (> 2.5)
+│       ├── n8n_workflow_alertas.json       # Workflow n8n exportado com webhooks
+│       ├── requirements.txt                # Dependências (pandas, numpy, requests)
+│       └── README.md                       # Guia de integração n8n e webhooks Slack
 │
 ├── index.html                              # Redirecionamento instantâneo para Site/index.html (compatibilidade GitHub Pages)
 ├── .gitignore                              # Ignora ambientes virtuais (.venv) e caches
@@ -63,9 +87,9 @@ Portifólio em Dados/
 
 ---
 
-## 🚀 Como Executar Localmente
+## 🚀 Como Executar os Projetos Localmente
 
-### Opção 1: Abrir o Portfólio Web (Pasta `Site/`)
+### 🌐 Abrir o Portfólio Web (Pasta `Site/`)
 - **Direto pelo Navegador**: Dê dois cliques em [`Site/index.html`](Site/index.html) ou no [`index.html`](index.html) da raiz (que redireciona automaticamente para o site).
 - **Via VS Code Live Server**: Abra a pasta `Site/` ou a raiz no VS Code e inicie com o Live Server.
 - **Via Servidor Local Python**:
@@ -74,18 +98,33 @@ Portifólio em Dados/
   ```
   Acesse no navegador: `http://localhost:3000/Site/index.html`.
 
-### Opção 2: Executar o Projeto de Dados RFM (Streamlit)
-No terminal da raiz do repositório:
-```bash
-streamlit run Projetos/01_Cockpit_RFM_Analytics/app.py
-```
-*Ou via ambiente virtual Python:*
-```powershell
-.\.venv\Scripts\python.exe -m streamlit run Projetos/01_Cockpit_RFM_Analytics/app.py
-```
-Acesse no navegador: `http://localhost:8501`.
+### 📊 Executar os Projetos de Dados em Python
 
-### Opção 3: Visualizar o Dashboard RFM Standalone (Navegador)
+1. **Projeto 01 - Cockpit RFM (Streamlit):**
+   ```bash
+   streamlit run Projetos/01_Cockpit_RFM_Analytics/app.py
+   ```
+   *Acesse a aplicação no navegador em `http://localhost:8501`.*
+
+2. **Projeto 02 - Auditoria de Fretes & Glosas (Python/SQL):**
+   ```bash
+   python Projetos/02_Auditoria_Fretes_Logistica/auditoria_fretes.py
+   ```
+
+3. **Projeto 03 - Modelagem de Cohort & Retenção (Python/dbt):**
+   ```bash
+   python Projetos/03_Cohort_Retencao_Churn/cohort_model.py
+   ```
+
+4. **Projeto 04 - Camada Semântica & Modelagem Dimensional (dbt/DAX):**
+   - Inspecione os modelos em [`Projetos/04_Camada_Semantica_Cockpit_BI/dbt_models/`](Projetos/04_Camada_Semantica_Cockpit_BI/dbt_models/) e a biblioteca de medidas em [`medidas_dax_corporativas.dax`](Projetos/04_Camada_Semantica_Cockpit_BI/medidas_dax_corporativas.dax).
+
+5. **Projeto 05 - Detector de Anomalias & Alertas (n8n/Python):**
+   ```bash
+   python Projetos/05_Orquestracao_Alertas_Anomalias/anomaly_detector.py
+   ```
+
+### ⚡ Dashboard RFM Standalone Direto no Navegador (Sem Python)
 Dê dois cliques no arquivo [`Site/dashboard-rfm.html`](Site/dashboard-rfm.html). Ele funciona diretamente no navegador sem exigir servidor Python em execução.
 
 ---

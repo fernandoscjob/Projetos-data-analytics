@@ -1,0 +1,127 @@
+﻿{
+  "name": "Pipeline Proativo de Alertas e Deteccao de Anomalias",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger-15min",
+      "name": "Agendamento a cada 15 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT DATE_TRUNC('hour', data_pedido) AS hora_janela, categoria_produto, COUNT(*) AS volume_pedidos, AVG(lead_time_minutos) AS avg_lead_time FROM transacoes_ecommerce WHERE data_pedido >= NOW() - INTERVAL '3 hours' GROUP BY 1, 2 ORDER BY 1 DESC;"
+      },
+      "id": "postgres-query-metrics",
+      "name": "Consultar Metricas PostgreSQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "command": "python anomaly_detector.py"
+      },
+      "id": "execute-python-detector",
+      "name": "Executar Detector Z-Score",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.tem_anomalia }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-has-anomaly",
+      "name": "Ha Anomalia Critica?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://hooks.slack.com/services/SEU/WEBHOOK/SLACK",
+        "sendBody": true,
+        "specifyHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "jsonBody": "={{ $json.slack_payload }}"
+      },
+      "id": "slack-alert-webhook",
+      "name": "Disparar Webhook Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1120, 220]
+    }
+  ],
+  "connections": {
+    "Agendamento a cada 15 min": {
+      "main": [
+        [
+          {
+            "node": "Consultar Metricas PostgreSQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Metricas PostgreSQL": {
+      "main": [
+        [
+          {
+            "node": "Executar Detector Z-Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar Detector Z-Score": {
+      "main": [
+        [
+          {
+            "node": "Ha Anomalia Critica?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ha Anomalia Critica?": {
+      "main": [
+        [
+          {
+            "node": "Disparar Webhook Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

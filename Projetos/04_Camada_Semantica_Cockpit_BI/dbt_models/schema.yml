@@ -1,0 +1,46 @@
+﻿version: 2
+
+models:
+  - name: dim_clientes
+    description: "Dimensão conformada de clientes com granularidade por conta corporativa."
+    columns:
+      - name: sk_cliente
+        description: "Chave substituta única do cliente."
+        tests:
+          - unique
+          - not_null
+      - name: bk_cliente
+        description: "Business Key originada do CRM."
+        tests:
+          - not_null
+
+  - name: dim_produtos
+    description: "Dimensão de catálogo de produtos com categorização e preços base."
+    columns:
+      - name: sk_produto
+        tests:
+          - unique
+          - not_null
+      - name: bk_sku
+        tests:
+          - not_null
+
+  - name: fct_vendas
+    description: "Tabela fato incremental de vendas no nível de item de pedido."
+    columns:
+      - name: sk_venda_item
+        tests:
+          - unique
+          - not_null
+      - name: sk_cliente
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_clientes')
+              field: sk_cliente
+      - name: sk_produto
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_produtos')
+              field: sk_produto

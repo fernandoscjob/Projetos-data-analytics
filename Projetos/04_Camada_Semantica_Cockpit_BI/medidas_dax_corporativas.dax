@@ -1,0 +1,56 @@
+﻿// =============================================================================
+// CATÁLOGO DE MÉTRICAS DA CAMADA SEMÂNTICA CORPORATIVA (POWER BI / DAX)
+// Padronização Contábil & Governança C-Level
+// =============================================================================
+
+// 1. RECEITA BRUTA
+Receita_Bruta := 
+SUM(fct_vendas[valor_bruto])
+
+// 2. RECEITA LÍQUIDA
+Receita_Liquida := 
+SUM(fct_vendas[valor_liquido_faturado])
+
+// 3. CUSTO TOTAL DA MERCADORIA VENDIDA (CMV)
+CMV_Total := 
+SUM(fct_vendas[cmv])
+
+// 4. MARGEM DE CONTRIBUIÇÃO (VALOR)
+Margem_Contribuicao_Valor := 
+[Receita_Liquida] - [CMV_Total] - SUM(fct_vendas[valor_frete_rateado]) - SUM(fct_vendas[valor_impostos])
+
+// 5. MARGEM DE CONTRIBUIÇÃO (%)
+Margem_Contribuicao_Pct := 
+DIVIDE([Margem_Contribuicao_Valor], [Receita_Liquida], 0)
+
+// 6. TICKET MÉDIO POR PEDIDO
+Ticket_Medio := 
+DIVIDE([Receita_Liquida], DISTINCTCOUNT(fct_vendas[numero_pedido]), 0)
+
+// 7. QUANTIDADE TOTAL DE ITENS VENDIDOS
+Qtd_Itens_Vendidos := 
+SUM(fct_vendas[quantidade])
+
+// 8. CLIENTES ATIVOS NO PERÍODO
+Clientes_Ativos := 
+CALCULATE(
+    DISTINCTCOUNT(fct_vendas[sk_cliente]),
+    fct_vendas[valor_liquido_faturado] > 0
+)
+
+// 9. CRESCIMENTO MoM (Month-over-Month)
+Crescimento_Receita_MoM := 
+VAR ReceitaMesAnterior = 
+    CALCULATE(
+        [Receita_Liquida],
+        DATEADD(dim_calendario[data_completa], -1, MONTH)
+    )
+RETURN
+    DIVIDE([Receita_Liquida] - ReceitaMesAnterior, ReceitaMesAnterior, 0)
+
+// 10. RECEITA RECORRENTE MENSAL (MRR ESTIMADO)
+MRR_Equivalente := 
+CALCULATE(
+    [Receita_Liquida],
+    dim_clientes[segmento_mercado] IN {"ENTERPRISE", "RECORRENTE_B2B"}
+)
