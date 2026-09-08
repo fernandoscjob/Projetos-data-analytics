@@ -174,51 +174,88 @@
     }
 </style>
 <style>
-    /* ESTILOS DE IMPRESSÃO / EXPORTAÇÃO COMPLETA EM PDF */
-    @media print {
-      aside, 
-      nav, 
-      button, 
-      .quick-actions-bar,
-      .no-print {
-        display: none !important;
-      }
+    
+    /* =========================================================================
+       REGRAS AVANÇADAS DE IMPRESSÃO / EXPORTAÇÃO EM PDF (ZERO CORTES)
+       ========================================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 10mm 15mm 10mm;
+    }
 
-      body, html {
-        background: #080b11 !important;
-        color: #e2e8f0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
+    @media print {
+      /* 1. RESET RADICAL DE OVERFLOW E ALTURA (ELIMINA CORTE VERTICAL DE PÁGINAS) */
+      html, body {
+        display: block !important;
+        position: static !important;
         width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        background: #080b11 !important;
+        color: #f1f5f9 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
 
-      .flex-1 {
+      /* Anular restrições de flex e altura de containers pais */
+      body > div,
+      .flex-1,
+      main,
+      div,
+      article,
+      section {
+        display: block !important;
+        position: static !important;
         width: 100% !important;
         max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
       }
 
       main {
-        width: 100% !important;
-        max-width: 100% !important;
-        padding: 1cm !important;
+        padding: 0 !important;
         margin: 0 !important;
-        overflow: visible !important;
       }
 
-      /* Exibir TODAS as etapas sequencialmente no PDF */
+      /* 2. OCULTAR NAVEGAÇÃO, SIDEBAR, BOTÕES E CONTROLES INTERATIVOS */
+      aside,
+      nav,
+      button,
+      .quick-actions-bar,
+      #stageTabsNav,
+      .no-print,
+      #toast,
+      select,
+      input {
+        display: none !important;
+        visibility: hidden !important;
+      }
+
+      /* 3. EXIBIR TODAS AS ETAPAS COM QUEBRA DE PÁGINA LIMPA */
       .stage-view-content {
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+        margin-bottom: 2.5rem !important;
+        padding-bottom: 1.5rem !important;
+        border-bottom: 1px dashed #334155 !important;
+        page-break-before: always !important;
+        break-before: page !important;
         page-break-inside: auto !important;
         break-inside: auto !important;
-        margin-bottom: 2.5rem !important;
-        padding-bottom: 2rem !important;
-        border-bottom: 1px dashed #334155 !important;
       }
 
       .stage-view-content.hidden {
@@ -227,21 +264,109 @@
         opacity: 1 !important;
       }
 
+      /* A primeira etapa (Cockpit) fica logo abaixo do cabeçalho de impressão sem quebra antes */
+      #tab-cockpit {
+        page-break-before: avoid !important;
+        break-before: avoid !important;
+      }
+
+      /* 4. CABEÇALHO EXECUTIVO FORMAL DE IMPRESSÃO */
       #printReportHeader {
         display: block !important;
         visibility: visible !important;
-      }
-
-      .stage-card, .metric-card, .glass-panel, pre, table, tr {
-        break-inside: avoid !important;
         page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: 2rem !important;
       }
 
+      /* 5. EVITAR QUE CARDS, TABELAS E CÓDIGO SEJAM CORTADOS AO MEIO */
+      .stage-card,
+      .metric-card,
+      .glass-panel,
+      pre,
+      .code-box,
+      table,
+      tr,
+      .case-tldr-item {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        box-shadow: none !important;
+        background: #0f172a !important;
+        border: 1px solid #1e293b !important;
+        color: #f1f5f9 !important;
+      }
+
+      /* 6. RESPONSIVIDADE HORIZONTAL DE GRIDS (EMPILHAMENTO PARA NÃO VAZAR A FOLHA A4) */
+      .grid {
+        display: block !important;
+      }
+
+      .grid > * {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 1.25rem !important;
+      }
+
+      /* Cards de métricas podem ficar em 2 por linha se houver espaço */
+      .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem !important;
+      }
+
+      /* 7. TABELAS: LARGURA TOTAL COM QUEBRA DE LINHA NAS CÉLULAS (SEM CORTE À DIREITA) */
+      .overflow-x-auto,
+      .cohort-container {
+        overflow: visible !important;
+        width: 100% !important;
+      }
+
+      table {
+        width: 100% !important;
+        max-width: 100% !important;
+        table-layout: auto !important;
+        font-size: 7.5pt !important;
+        border-collapse: collapse !important;
+      }
+
+      th, td {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        padding: 4px 6px !important;
+        font-size: 7.5pt !important;
+      }
+
+      /* 8. CÓDIGO FONTE COM QUEBRA DE LINHA AUTOMÁTICA */
+      pre, .code-box, code {
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        font-size: 7.5pt !important;
+        max-width: 100% !important;
+      }
+
+      /* 9. GRÁFICOS PLOTLY AJUSTADOS À LARGURA DA FOLHA */
+      .plotly-graph-div,
+      .js-plotly-plot,
+      .plot-container,
+      svg.main-svg {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      /* 10. RODAPÉ */
       footer {
         display: block !important;
         page-break-before: auto !important;
+        margin-top: 2rem !important;
+        padding-top: 1rem !important;
       }
     }
+
 </style>
 </head>
 <body class="min-h-screen bg-[#080b11] text-slate-100 flex flex-col md:flex-row antialiased selection:bg-sky-500/30 selection:text-sky-200">
@@ -872,49 +997,82 @@ def detectar_anomalia_transacional(df_historico, limiar_zscore=2.5):
   // CONTROLE DE NAVEGAÇÃO POR ABAS / ETAPAS
   
   
+  
   function exportFullReportPdf() {
+    // 1. Marcar body como modo de impressão ativo
+    document.body.classList.add('is-exporting-pdf');
+
+    // 2. Revelar todas as etapas que estavam ocultas
     const stageViews = document.querySelectorAll('.stage-view-content');
-    const previouslyHidden = [];
+    const hiddenStages = [];
     stageViews.forEach(view => {
       if (view.classList.contains('hidden')) {
-        previouslyHidden.push(view);
+        hiddenStages.push(view);
         view.classList.remove('hidden');
         view.classList.add('temp-print-visible');
       }
     });
 
+    // 3. Exibir cabeçalho executivo de impressão
     const printHeader = document.getElementById('printReportHeader');
     if (printHeader) printHeader.classList.remove('hidden');
 
+    // 4. Preencher data e hora da emissão
+    const dateDisplays = document.querySelectorAll('.current-date-display');
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+    dateDisplays.forEach(el => el.textContent = formattedDate);
+
+    // 5. Redimensionar todos os gráficos Plotly para a largura completa da página
     if (window.Plotly) {
       document.querySelectorAll('.plotly-graph-div').forEach(gd => {
-        try { Plotly.Plots.resize(gd); } catch(e) {}
+        try {
+          Plotly.relayout(gd, { autosize: true, width: null });
+          Plotly.Plots.resize(gd);
+        } catch(e) {}
       });
     }
 
-    const dateDisplays = document.querySelectorAll('.current-date-display');
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    dateDisplays.forEach(el => el.textContent = formattedDate);
+    // Forçar recálculo síncrono do layout do navegador
+    void document.body.offsetHeight;
 
+    // 6. Função de restauração pós-impressão
+    function restoreAfterPrint() {
+      document.body.classList.remove('is-exporting-pdf');
+      hiddenStages.forEach(view => {
+        view.classList.add('hidden');
+        view.classList.remove('temp-print-visible');
+      });
+      if (printHeader) printHeader.classList.add('hidden');
+
+      // Restaurar gráficos da aba ativa
+      if (window.Plotly) {
+        document.querySelectorAll('.plotly-graph-div').forEach(gd => {
+          try {
+            Plotly.relayout(gd, { autosize: true });
+            Plotly.Plots.resize(gd);
+          } catch(e) {}
+        });
+      }
+      window.removeEventListener('afterprint', restoreAfterPrint);
+    }
+
+    window.addEventListener('afterprint', restoreAfterPrint);
+
+    // 7. Disparar a impressão com tempo suficiente para renderização completa
     setTimeout(() => {
       window.print();
-
-      setTimeout(() => {
-        previouslyHidden.forEach(view => {
-          view.classList.add('hidden');
-          view.classList.remove('temp-print-visible');
-        });
-        if (printHeader) printHeader.classList.add('hidden');
-
-        if (window.Plotly) {
-          document.querySelectorAll('.plotly-graph-div').forEach(gd => {
-            try { Plotly.Plots.resize(gd); } catch(e) {}
-          });
-        }
-      }, 500);
-    }, 300);
+      // Fallback de segurança para navegadores que não disparam afterprint
+      setTimeout(restoreAfterPrint, 3000);
+    }, 650);
   }
+
 
   function initStageTabs() {
     const tabBtns = document.querySelectorAll('.stage-tab-btn');
