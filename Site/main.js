@@ -129,135 +129,116 @@ function initProjectFilters() {
    ========================================================================== */
 const caseStudiesData = {
   logistica: {
-    title: "Otimização de Custos de Frete & Auditoria Contratual",
+    title: "Auditoria Contratual de Fretes & Otimização de Custos",
     category: "Otimização de Custos & Finanças",
     impact: "Redução de 40% em sobretaxas e recuperação de R$ 1.2M",
-    tags: ["SQL Avançado", "Python (Streamlit/Pandas)", "Plotly", "Looker (LookML)", "BigQuery", "Data Governance"],
+    tags: ["SQL Avançado", "Python (Streamlit/Pandas)", "Plotly", "BigQuery", "Data Governance", "Auditoria de Glosas"],
+    actionUrl: "dashboard-fretes.html",
+    actionText: "Acessar Cockpit de Fretes Interativo",
+    tldr: {
+      objetivo: "Automatizar a conciliação de mais de 80.000 CT-es/mês em 14 transportadoras parceiras contra tabelas tarifárias contratuais, eliminando sobretaxas indevidas.",
+      metricas: "100% de assertividade na reconciliação de tarifas, cubagem volumétrica e taxas acessórias em lote de 800 CT-es auditados.",
+      roi: "R$ 1.200.000,00 recuperados em glosas e faturas contestadas retroativas; redução de 40% em sobretaxas acessórias não negociadas (-14.8% no custo total de frete).",
+      tempo: "Ciclo de auditoria e liberação de pagamento reduzido de 12 dias úteis para menos de 2 horas (aprovação D-0)."
+    },
     problem: `
-      A operação lidava com mais de 80.000 entregas mensais distribuídas entre 14 transportadoras parceiras. 
-      A ausência de auditoria sistemática fazia com que taxas acessórias indevidas (diárias extras, taxa de reentrega injustificada e cubagem divergente) 
-      fossem faturadas sem contestação, gerando estouro orçamentário superior a 15% ao mês.
+      A operação lidava com mais de 80.000 entregas mensais distribuídas entre 14 transportadoras parceiras sem qualquer mecanismo de conciliação algorítmica. 
+      Transportadoras faturavam cubagem superestimada (45% das glosas), taxas acessórias indevidas como diárias e reentrega sem comprovante (32%), tarifas por kg acima da tabela negociada (16%) 
+      e cobrança duplicada de pedágio/GRIS (7%). Esse processo gerava um estouro orçamentário mensal superior a 14.8%, com as áreas de Logística e Contas a Pagar sem capacidade operacional de auditar milhares de CT-es antes do vencimento dos boletos.
     `,
-    solution: `
-      1. <strong>Pipeline de Conciliação em Python:</strong> Script automatizado para extração, validação e cruzamento de XMLs de NF-e e CT-e com as tabelas contratuais vigentes.<br>
-      2. <strong>Modelagem de Auditoria em BigQuery / SQL:</strong> Uso de Window Functions e CTEs para recalcular o peso cúbico e a tarifa contratual exata para cada frete emitido.<br>
-      3. <strong>Cockpit Operacional & Exportação de Glosas:</strong> Interface analítica dinâmica com dispersão de cubagem (peso real vs cubado), pareto de divergências e download de carta de contestação em Excel/CSV.
-    `,
-    codeSnippet: `-- Exemplo de detecção de divergência de cubagem e sobretaxa
+    crispDm: {
+      dataUnderstanding: "Ingestão de arquivos XML de CT-e, NF-e e bases cadastrais de tabelas tarifárias contratuais vigentes. Na análise exploratória (EDA), identificaram-se discrepâncias de cálculo em 30% das faturas emitidas e dados nulos em comprovantes de ocorrência de reentrega.",
+      dataPreparation: "Construção de pipelines de dados em Python e BigQuery SQL com normalização das chaves de acesso, conversão de volumes m³ para peso cubado (fator 300 kg/m³) e cruzamento com a vigência temporal de cada tabela negociada.",
+      modeling: "Algoritmo determinístico de auditoria contratual comparando <code>peso_real_kg</code> vs <code>peso_cubado_kg</code>, cálculo de ad valorem (GRIS/seguro 0.3%), pedágio fracionado e tarifa base, identificando automaticamente a divergência exata e classificando em APROVADO, REJEITADO/GLOSA ou REVISÃO MANUAL com base na margem de tolerância.",
+      qa: "Validação retroativa de 12 meses (80.000 CT-es) reconciliada contra os pagamentos históricos do ERP, com homologação formal pela Controladoria e emissão automática de minutas de contestação juridicamente embasadas.",
+      codeSnippet: `-- Pipeline SQL para detecção de divergência de cubagem e cálculo de glosa
 WITH CalculoContratual AS (
     SELECT 
         cte.numero_cte,
-        cte.transportadora_id,
+        cte.transportadora,
+        cte.cidade_destino,
         cte.valor_faturado,
-        -- Cálculo da cubagem contratada vs peso real
-        GREATEST(cte.peso_real, cte.volume_m3 * tab.fator_cubagem) AS peso_tarifado_esperado,
-        (tab.tarifa_base + (GREATEST(cte.peso_real, cte.volume_m3 * tab.fator_cubagem) * tab.preco_kg)) AS valor_devido
-    FROM bronze_fretes.ctes cte
+        -- Regra contratual: peso tarifado é o maior entre peso real e cubado
+        GREATEST(cte.peso_real_kg, cte.volume_m3 * tab.fator_cubagem) AS peso_tarifado_esperado,
+        ROUND(
+            tab.tarifa_base + 
+            (GREATEST(cte.peso_real_kg, cte.volume_m3 * tab.fator_cubagem) * tab.taxa_kg) + 
+            (cte.valor_mercadoria * tab.aliquota_gris) + 
+            (CEIL(GREATEST(cte.peso_real_kg, cte.volume_m3 * tab.fator_cubagem) / 100.0) * tab.valor_pedagio_fracao),
+            2
+        ) AS valor_devido_contratual
+    FROM bronze_logistica.ctes cte
     INNER JOIN silver_contratos.tabelas_vigentes tab
-        ON cte.transportadora_id = tab.transportadora_id
+        ON cte.transportadora = tab.transportadora
         AND cte.data_emissao BETWEEN tab.vigencia_inicio AND tab.vigencia_fim
 )
 SELECT 
     numero_cte,
-    transportadora_id,
+    transportadora,
     valor_faturado,
-    valor_devido,
-    (valor_faturado - valor_devido) AS divergencia_cobrada
+    valor_devido_contratual,
+    (valor_faturado - valor_devido_contratual) AS valor_glosa,
+    CASE 
+        WHEN (valor_faturado - valor_devido_contratual) > 10.00 THEN 'REJEITADO / GLOSA'
+        WHEN (valor_faturado - valor_devido_contratual) < -10.00 THEN 'REVISAO MANUAL'
+        ELSE 'APROVADO'
+    END AS status_auditoria
 FROM CalculoContratual
-WHERE (valor_faturado - valor_devido) > 15.00
-ORDER BY divergencia_cobrada DESC;`,
-    results: [
-      "40% de redução nas sobretaxas acessórias não contratuais logo no primeiro trimestre.",
-      "R$ 1.200.000 recuperados em glosas e notas contestadas em auditoria retroativa de 12 meses.",
-      "Ciclo de conferência de faturas reduzido de 12 dias úteis para aprovação em menos de 2 horas."
-    ]
+WHERE (valor_faturado - valor_devido_contratual) > 10.00
+ORDER BY valor_glosa DESC;`
+    },
+    resultsInsights: {
+      insights: [
+        "Identificação de que 45% do valor total glosado (R$ 540.000,00) originava-se de divergências de peso volumétrico aferidas incorretamente nos hubs de transbordo.",
+        "Mapeamento de 2 transportadoras específicas responsáveis por mais de 35% de todas as sobretaxas indevidas de reentrega sem comprovante de tentativa prévia.",
+        "Redução consolidada do custo total de frete em 14.8% sem necessidade de renegociação das tabelas-base, apenas aplicando o cumprimento rigoroso do contrato."
+      ],
+      kpis: [
+        { label: "Glosas Recuperadas", val: "R$ 1.2M", desc: "100% comprovadas em contrato" },
+        { label: "Sobretaxa Contestada", val: "-40%", desc: "Corte imediato de cobranças indevidas" },
+        { label: "Tempo de Conferência", val: "< 2h", desc: "Redução de 12 dias para D-0" },
+        { label: "Transportadoras", val: "14 Parceiras", desc: "100% monitoradas no cockpit" }
+      ]
+    },
+    governance: {
+      deploy: "Pipeline em BigQuery com orquestração diária e dashboard analítico standalone em HTML5/Plotly + aplicação Streamlit, com exportação instantânea de cartas de contestação em CSV formatado para Excel (BOM UTF-8).",
+      adoption: "Adotado diariamente pela equipe de Logística/Transportes para bloqueio preventivo de faturas no ERP, pela Controladoria para provisão contábil de fretes e por Suprimentos para negociação de renovação de contratos com base no histórico de conformidade.",
+      nextSteps: "Integração via EDI/API diretamente com os TMSs das transportadoras para bloqueio prévio da emissão de faturas divergentes na origem."
+    },
+    dashboardDesign: {
+      audience: "Diretor de Operações e Supply Chain, Head de Controladoria, Gerentes de Logística e Analistas de Fretes.",
+      decisions: [
+        { question: "Quais transportadoras apresentam maior volume de glosas?", metric: "Bar Chart comparativo Faturado vs Devido vs Glosas por parceiro" },
+        { question: "Qual a causa-raiz predominante do estouro de frete?", metric: "Gráfico Donut com divisão percentual dos 4 motivos de divergência" },
+        { question: "Houve superdimensionamento de peso cubado na pesagem?", metric: "Gráfico de Dispersão Peso Real vs Peso Cubado com linha de paridade" },
+        { question: "Quais faturas específicas devem ser retidas para pagamento?", metric: "Tabela operacional com filtro de status e exportação da carta de glosa" }
+      ]
+    }
   },
-  bi: {
-    title: "Camada Semântica Corporativa & Cockpit Executivo",
-    category: "Business Intelligence & Governança",
-    impact: "Unificação de 14 KPIs críticos e suporte a 120+ decisores",
-    tags: ["Power BI", "dbt", "Modelagem Dimensional", "DAX", "PostgreSQL"],
-    problem: `
-      Divergência crônica entre os relatórios da área Comercial e da Controladoria. 
-      Vendas reportava receita com base em pedidos emitidos, enquanto Finanças reportava com base em faturamento líquido e baixas contábeis. 
-      As reuniões de diretoria perdiam tempo discutindo a veracidade dos dados ao invés de estratégias de expansão.
-    `,
-    solution: `
-      1. <strong>Modelagem Dimensional (Kimball):</strong> Construção de Fatos e Dimensões compartilhadas (Conformed Dimensions) com dbt garantindo granularidade atômica.<br>
-      2. <strong>Camada Semântica Centralizada:</strong> Criação de métricas corporativas imutáveis no dbt / Power BI (MRR, Margem de Contribuição, Churn e LTV).<br>
-      3. <strong>Governança e RLS:</strong> Implementação de Row-Level Security por região e unidade de negócio com painéis de navegação intuitiva para C-Level e gerentes.
-    `,
-    codeSnippet: `// Medida DAX Corporativa com Padronização Contábil
-Margem_Contribuicao_Liquida := 
-VAR ReceitaLiquida = 
-    CALCULATE(
-        SUM(faturamento[valor_liquido]),
-        dim_status_nf[aprovada] = TRUE()
-    )
-VAR CustoVariavel = 
-    CALCULATE(
-        SUM(custos[custo_produto_vendido]) + SUM(fretes[frete_rateado]),
-        dim_status_nf[aprovada] = TRUE()
-    )
-RETURN
-    DIVIDE(ReceitaLiquida - CustoVariavel, ReceitaLiquida, 0)`,
-    results: [
-      "Fonte única da verdade adotada por 100% da diretoria e mais de 120 gestores operacionais.",
-      "Fechamento do reporte executivo mensal acelerado de 5 dias úteis para visualização em D-0.",
-      "Identificação de 3 linhas de produtos com margem líquida negativa, possibilitando reajuste imediato de precificação."
-    ]
-  },
-  automacao: {
-    title: "Orquestração de Pipelines e Alertas Proativos",
-    category: "Engenharia de Dados & Automação",
-    impact: "18 horas/semana economizadas e detecção de incidentes em < 5 min",
-    tags: ["n8n", "Python", "Webhooks", "PostgreSQL", "Slack API"],
-    problem: `
-      A equipe de analistas gastava entre 3 e 4 horas diárias baixando arquivos CSV de múltiplos portais de parceiros, 
-      fazendo joins manuais no Excel e conferindo estoque. Anomalias como pedidos retidos ou falhas de sincronização 
-      só eram percebidas quando clientes abriam chamados de reclamação.
-    `,
-    solution: `
-      1. <strong>Orquestração com n8n:</strong> Workflows agendados consumindo APIs REST, realizando validações de integridade e gravando em banco analítico.<br>
-      2. <strong>Script de Análise Estatística em Python:</strong> Cálculo em tempo real de Z-score no volume de vendas e lead time de entrega para detectar quebras de padrão.<br>
-      3. <strong>Bots de Notificação Contextual:</strong> Envio de alertas inteligentes com botões de ação direta nos canais do Slack e Teams para os times de suporte e logística.
-    `,
-    codeSnippet: `# Script Python para detecção de anomalias no pipeline de pedidos
-import pandas as pd
-import numpy as np
 
-def detectar_anomalia_volume(df_pedidos):
-    # Calcula média móvel de 7 dias e desvio padrão por categoria
-    df_stats = df_pedidos.groupby('categoria')['volume_hora'].agg(['mean', 'std']).reset_index()
-    df_merged = df_pedidos.merge(df_stats, on='categoria')
-    
-    # Detecção com limite de Z-Score > 2.5 (anomalia estatística)
-    df_merged['z_score'] = (df_merged['volume_hora'] - df_merged['mean']) / df_merged['std'].replace(0, 1)
-    anomalias = df_merged[df_merged['z_score'].abs() > 2.5]
-    
-    return anomalias[['timestamp', 'categoria', 'volume_hora', 'z_score']]`,
-    results: [
-      "100% dos processos diários de ingestão de relatórios automatizados sem intervenção humana.",
-      "Economia direta de mais de 18 horas semanais de trabalho repetitivo do time analítico.",
-      "Redução no tempo de identificação de falhas sistêmicas de 14 horas para menos de 5 minutos."
-    ]
-  },
   cohort: {
     title: "Modelagem de Cohort, Retenção & Prevenção de Churn",
     category: "Analytics de Vendas & SaaS",
     impact: "Aumento de 18 p.p. na retenção e R$ 640k em ARR recuperado",
     tags: ["SQL Window Functions", "dbt", "Python (Cohort Heatmap)", "Power BI", "LTV/CAC Modeling"],
+    actionUrl: "#demo",
+    actionText: "Ver Heatmap de Cohort Interativo",
+    tldr: {
+      objetivo: "Construir uma matriz longitudinal de safras (cohort analysis) para rastrear o comportamento de retenção de clientes ao longo do tempo e erradicar o churn precoce nos primeiros 60 dias.",
+      metricas: "Elevação de 18 pontos percentuais na retenção de M3 (de 58% para 76%) e queda de 25% no churn involuntário.",
+      roi: "Preservação de aproximadamente R$ 640.000,00 em ARR anualizado na carteira de clientes corporativos.",
+      tempo: "Processamento automatizado de safras rodando diariamente em D+1 via dbt no Data Warehouse (substituindo consolidação manual quinzenal)."
+    },
     problem: `
-      A empresa apresentava forte volume de novos clientes no topo de funil, porém sofria com uma evasão silenciosa de 28% da base nos primeiros 60 dias pós-conversão (Early Churn).
-      Essa perda precoce drenava o Life Time Value (LTV), elevava o período de Payback do CAC para mais de 14 meses e gerava desalinhamento entre Marketing, Vendas e Customer Success.
+      A empresa apresentava forte investimento em aquisição de topo de funil, porém sofria com uma evasão silenciosa de 28% da base nos primeiros 60 dias pós-conversão (Early Churn). 
+      Essa perda precoce destruía a rentabilidade das campanhas de marketing, elevava o Payback do CAC para mais de 14 meses e provocava atritos entre Marketing, Vendas e Customer Success sem visibilidade clara de onde ocorria a quebra de retenção.
     `,
-    solution: `
-      1. <strong>Identificação da Safra Inicial (First-Touch Cohort):</strong> Criação de pipeline no Data Warehouse mapeando a data da 1ª transação/assinatura de cada cliente via SQL.<br>
-      2. <strong>Cálculo Dinâmico de Retenção Longitudinal:</strong> Matriz temporal calculando a diferença em meses (M0 a M6+) entre a safra de origem e compras subsequentes.<br>
-      3. <strong>Detecção de Padrões de Churn (Survival Curve):</strong> Descoberta analítica de que clientes sem ativação de 2 recursos-chave até o 14º dia apresentavam risco 3.8x maior de evasão.<br>
-      4. <strong>Automação de Ações Proativas:</strong> Disparo de gatilhos automáticos para CS ao detectar declínio de consumo no período crítico antes da renovação.
-    `,
-    codeSnippet: `-- Pipeline SQL para Matriz de Cohort e Retenção Mensal
+    crispDm: {
+      dataUnderstanding: "Análise de logs de transações de pedidos, dados cadastrais de clientes e eventos de uso da plataforma nos últimos 24 meses. Tratamento de registros duplicados e sincronização de fusos horários de checkout.",
+      dataPreparation: "Modelagem no Data Warehouse com dbt identificando a data da primeira compra (first-touch cohort) através de SQL Window Functions (<code>MIN(data_compra) OVER (PARTITION BY cliente_id)</code>) e calculando o índice temporal <code>periodo_m</code> de 0 a 6+ meses.",
+      modeling: "Matriz triangular de retenção e churn percentual por safra, complementada por análise de curvas de sobrevivência de Kaplan-Meier para mapear a probabilidade condicional de evasão em cada marco temporal.",
+      qa: "Validação da consistência dos cohorts confrontando o faturamento total da matriz contra os lançamentos fiscais e contábeis do ERP, sem nenhuma divergência de clientes ativos.",
+      codeSnippet: `-- Pipeline SQL para Matriz de Cohort e Retenção Mensal
 WITH ClientesSafra AS (
     -- Define a data de aquisição/safra de cada cliente
     SELECT 
@@ -297,31 +278,194 @@ SELECT
 FROM AtividadeMensal a
 INNER JOIN TamanhoSafras s ON a.safra_mes = s.safra_mes
 GROUP BY a.safra_mes, s.total_clientes_m0, a.periodo_m
-ORDER BY a.safra_mes, a.periodo_m;`,
-    results: [
-      "Identificação do gap crítico de engajamento entre os dias D14 e D28, permitindo redesenhar o onboarding de clientes.",
-      "Aumento de 18 pontos percentuais na taxa de retenção de M3 (de 58% para 76%) nas safras que utilizaram a nova jornada orientada a dados.",
-      "Redução consolidada de 25% no Churn involuntário com automação de alertas proativos de risco.",
-      "Preservação de aproximadamente R$ 640.000 em ARR anualizado na carteira de clientes."
-    ]
+ORDER BY a.safra_mes, a.periodo_m;`
+    },
+    resultsInsights: {
+      insights: [
+        "Descoberta analítica de que a maior quebra de engajamento ocorria entre os dias D14 e D28 pós-aquisição, antes mesmo do primeiro ciclo de renovação.",
+        "Clientes que não realizavam uma segunda interação na plataforma até o 14º dia apresentavam uma probabilidade 3.8x maior de churn antes de completar M3.",
+        "Após a implementação do novo onboarding orientado por esses dados em Março/24, a taxa de retenção de M3 saltou de 58% para 76% nas safras seguintes."
+      ],
+      kpis: [
+        { label: "Retenção em M3", val: "76%", desc: "+18 p.p. vs safras anteriores" },
+        { label: "Queda Churn Precoce", val: "-47.2%", desc: "Redução drástica no D60" },
+        { label: "ARR Preservado", val: "R$ 640.000", desc: "Impacto financeiro anualizado" },
+        { label: "Atualização", val: "D+1 Automático", desc: "Pipeline orquestrado via dbt" }
+      ]
+    },
+    governance: {
+      deploy: "Modelos dbt versionados no GitHub, orquestrados em BigQuery e conectados ao Power BI com atualização agendada e Row-Level Security por gerência regional.",
+      adoption: "O time de Customer Success reformulou os playbooks de onboarding para atuar proativamente entre D7 e D14; o time de Produto ajustou o fluxo inicial da aplicação; e a Diretoria acompanha a evolução das safras mensalmente.",
+      nextSteps: "Desenvolvimento de modelo preditivo de Machine Learning para pontuar o risco individual de churn de cada novo cliente logo nos primeiros 7 dias."
+    },
+    dashboardDesign: {
+      audience: "Diretor de Customer Success, Chief Product Officer (CPO), VP de Vendas e CFO.",
+      decisions: [
+        { question: "Qual safra de clientes performou melhor em retenção?", metric: "Heatmap triangular com escala de cores gradiente por safra e mês de vida" },
+        { question: "Em que mês a evasão de clientes se estabiliza?", metric: "Curva de sobrevivência longitudinal (M0 a M6+)" },
+        { question: "As mudanças no produto reduziram o churn precoce?", metric: "Comparativo de safras pré e pós-onboarding orientado a dados" },
+        { question: "Qual o impacto do churn na receita recorrente?", metric: "Alternador de visão Retenção de Clientes vs Churn Financeiro" }
+      ]
+    }
   },
+
+  bi: {
+    title: "Camada Semântica Corporativa & Cockpit Executivo",
+    category: "Business Intelligence & Governança",
+    impact: "Unificação de 14 KPIs críticos e suporte a 120+ decisores",
+    tags: ["Power BI", "dbt", "Modelagem Dimensional", "DAX", "PostgreSQL", "Star Schema"],
+    actionUrl: "#contato",
+    actionText: "Solicitar Demonstração do Modelo",
+    tldr: {
+      objetivo: "Construir uma camada semântica corporativa centralizada e um cockpit executivo no Power BI, unificando regras contábeis e comerciais em uma fonte única da verdade (Single Source of Truth).",
+      metricas: "100% de convergência métrica entre Vendas e Controladoria; adoção diária por mais de 120 gestores e diretores.",
+      roi: "Identificação e descontinuação de 3 linhas de produtos com margem líquida negativa, preservando mais de R$ 380.000,00 anuais em margem operacional.",
+      tempo: "Fechamento do reporte executivo mensal acelerado de 5 dias úteis para atualização automática em tempo real (D-0)."
+    },
+    problem: `
+      Divergência crônica entre os relatórios da área Comercial e da Controladoria. 
+      Vendas reportava receita com base em pedidos emitidos brutos, enquanto Finanças reportava com base em faturamento líquido e baixas contábeis. 
+      As reuniões de diretoria perdiam tempo discutindo a veracidade das planilhas ao invés de definir estratégias de expansão e precificação.
+    `,
+    crispDm: {
+      dataUnderstanding: "Mapeamento das tabelas relacionais do ERP corporativo (pedidos, faturamento, devoluções, fretes e centro de custos) e dados de CRM. Identificação de inconsistências em devoluções parciais não deduzidas das metas de vendas.",
+      dataPreparation: "Modelagem dimensional de acordo com a metodologia de Ralph Kimball: criação de tabela fato (<code>fct_vendas</code>) e dimensões conformadas (<code>dim_clientes</code>, <code>dim_produtos</code>, <code>dim_calendario</code>, <code>dim_status_nf</code>) via dbt com arquitetura em camadas (Bronze, Silver, Gold).",
+      modeling: "Criação de medidas DAX corporativas auditadas e imutáveis (Margem de Contribuição Líquida, Receita Líquida, GMV, Ticket Médio e Atingimento de Metas Orçamentárias).",
+      qa: "Testes de integridade dbt (<code>not_null</code>, <code>unique</code>, <code>relationships</code>) e conciliação cruzada centavo a centavo com o balancete oficial da Controladoria.",
+      codeSnippet: `// Medida DAX Corporativa com Padronização Contábil
+Margem_Contribuicao_Liquida := 
+VAR ReceitaLiquida = 
+    CALCULATE(
+        SUM(fct_vendas[valor_liquido]),
+        dim_status_nf[aprovada] = TRUE()
+    )
+VAR CustoVariavel = 
+    CALCULATE(
+        SUM(fct_vendas[custo_produto_vendido]) + SUM(fct_vendas[frete_rateado]),
+        dim_status_nf[aprovada] = TRUE()
+    )
+RETURN
+    DIVIDE(ReceitaLiquida - CustoVariavel, ReceitaLiquida, 0)`
+    },
+    resultsInsights: {
+      insights: [
+        "Descoberta de que 3 linhas de produtos com alto volume de vendas apresentavam margem de contribuição negativa após o rateio real de frete e devoluções.",
+        "Eliminação de mais de 40 planilhas manuais paralelas que circulavam entre os gerentes regionais com dados desatualizados.",
+        "Redução no tempo de preparação das reuniões de Conselho de 40 horas de trabalho analítico para zero."
+      ],
+      kpis: [
+        { label: "Decisores Conectados", val: "120+", desc: "C-Level, Diretores e Gerentes" },
+        { label: "Fechamento Mensal", val: "D-0", desc: "Redução de 5 dias para tempo real" },
+        { label: "Margem Preservada", val: "R$ 380k/ano", desc: "Corte de itens deficitários" },
+        { label: "Convergência", val: "100%", desc: "Auditoria formal contábil/comercial" }
+      ]
+    },
+    governance: {
+      deploy: "Publicação no Power BI Service com Gateway Corporativo, atualização agendada a cada 2 horas e Row-Level Security (RLS) dinâmico baseado no login do usuário (Active Directory).",
+      adoption: "Adotado como a única base de dados permitida nas reuniões semanais de diretoria e utilizado pelos gerentes regionais para acompanhamento diário de metas.",
+      nextSteps: "Implementação de alertas automáticos via Power Automate quando a margem líquida de qualquer filial cair abaixo do threshold de 18%."
+    },
+    dashboardDesign: {
+      audience: "Conselho de Administração, CEO, CFO, Diretores Comerciais e Gerentes de Categoria.",
+      decisions: [
+        { question: "Qual a margem de contribuição líquida real após custos de frete?", metric: "Cartão de KPI em destaque com indicador de meta e comparativo orçado vs realizado" },
+        { question: "Quais categorias ou filiais estão gerando margem negativa?", metric: "Matriz hierárquica detalhada com drill-down de Categoria para SKU" },
+        { question: "Qual o ritmo de atingimento das metas no mês corrente?", metric: "Gráfico de termômetro e tendência temporal diária acumulada" },
+        { question: "Quais descontos médios estão sendo concedidos na ponta?", metric: "Dispersão de margem percentual por faixa de preço negociado" }
+      ]
+    }
+  },
+
+  automacao: {
+    title: "Orquestração de Pipelines e Alertas Proativos",
+    category: "Engenharia de Dados & Automação",
+    impact: "18 horas/semana economizadas e detecção de incidentes em < 5 min",
+    tags: ["n8n", "Python", "Webhooks", "PostgreSQL", "Slack API", "Data Quality"],
+    actionUrl: "#contato",
+    actionText: "Ver Arquitetura de Workflows",
+    tldr: {
+      objetivo: "Automatizar a ingestão contínua de pedidos e arquivos de múltiplos portais de parceiros, aplicando detecção estatística de anomalias com alertas inteligentes em tempo real.",
+      metricas: "100% dos processos diários de ingestão automatizados sem falhas; tempo de resposta a incidentes reduzido de 14 horas para menos de 5 minutos.",
+      roi: "Economia direta de mais de 18 horas semanais de trabalho braçal do time analítico (~R$ 95.000/ano em esforço operacional recuperado).",
+      tempo: "Monitoramento ininterrupto com rotinas de checagem a cada 15 minutos e disparos de alertas em menos de 30 segundos após a ocorrência."
+    },
+    problem: `
+      A equipe de analistas de operações gastava entre 3 e 4 horas diárias baixando arquivos CSV de múltiplos portais de parceiros de logística e marketplaces, fazendo joins manuais no Excel e conferindo status de faturamento. 
+      Anomalias graves, como travamento de lotes de pedidos no gateway ou falhas de comunicação com transportadoras, só eram descobertas após horas de atraso ou quando clientes finais abriam reclamações nos canais de atendimento.
+    `,
+    crispDm: {
+      dataUnderstanding: "Mapeamento das APIs de parceiros e bancos de dados transacionais. Detecção de inconsistências de schema nos payloads JSON recebidos e quedas intermitentes de conexão.",
+      dataPreparation: "Workflows no n8n para autenticação automática (OAuth2), normalização dos payloads, controle de idempotência (evitando pedidos duplicados) e carga em tabelas de staging no PostgreSQL.",
+      modeling: "Script analítico em Python acionado no pipeline calculando em tempo real o Z-score do volume transacionado por hora e do lead time operacional (|Z| > 2.5), diferenciando variações normais de gargalos sistêmicos reais.",
+      qa: "Implementação de dead-letter queue para isolar dados corrompidos, logs detalhados de execução e testes com injeção proposital de anomalias para validar a acurácia dos disparos de alerta.",
+      codeSnippet: `# Script Python para detecção de anomalias estatísticas no pipeline
+import pandas as pd
+import numpy as np
+
+def detectar_anomalia_volume(df_pedidos):
+    # Calcula média móvel de 7 dias e desvio padrão por categoria
+    df_stats = df_pedidos.groupby('categoria')['volume_hora'].agg(['mean', 'std']).reset_index()
+    df_merged = df_pedidos.merge(df_stats, on='categoria')
+    
+    # Detecção com limite de Z-Score > 2.5 (anomalia estatística de 99% de confiança)
+    df_merged['z_score'] = (df_merged['volume_hora'] - df_merged['mean']) / df_merged['std'].replace(0, 1)
+    anomalias = df_merged[df_merged['z_score'].abs() > 2.5]
+    
+    return anomalias[['timestamp', 'categoria', 'volume_hora', 'z_score']]`
+    },
+    resultsInsights: {
+      insights: [
+        "Identificação de que falhas de integração no gateway de pagamentos ocorriam com maior frequência às sextas-feiras à tarde, represando pedidos sem registro de erro formal.",
+        "Redução no tempo médio de resolução de incidentes críticos de 14 horas para 12 minutos, evitando quebra de SLA contratual com clientes.",
+        "Eliminação de 100% do retrabalho manual dos analistas, que foram realocados para atividades de análise de negócio e inteligência de mercado."
+      ],
+      kpis: [
+        { label: "Tempo de Detecção", val: "< 5 min", desc: "Antes levava até 14 horas" },
+        { label: "Horas Salvas", val: "18h / semana", desc: "Automação de tarefas repetitivas" },
+        { label: "Processos Automatizados", val: "100%", desc: "Ingestão e validação contínua" },
+        { label: "Custo Recuperado", val: "R$ 95k / ano", desc: "Eficiência direta de time" }
+      ]
+    },
+    governance: {
+      deploy: "Instância do n8n hospedada em ambiente corporativo seguro com PostgreSQL dedicado, segredos criptografados em variáveis de ambiente e webhooks assinados digitalmente com o Slack e Microsoft Teams.",
+      adoption: "Utilizado pela equipe de suporte operacional (NOC/Operações), analistas de logística e liderança de TI para triagem e atuação imediata através de cards interativos com botões de ação.",
+      nextSteps: "Implementação de rotinas de auto-remediação (auto-healing) para reprocessar automaticamente transações com erros temporários de timeout."
+    },
+    dashboardDesign: {
+      audience: "Coordenadores de Operações, Líderes de Suporte ao Cliente e Engenheiros de Dados.",
+      decisions: [
+        { question: "Há algum lote de pedidos represado no gateway neste momento?", metric: "Alerta em tempo real com indicador de criticidade e volume impactado" },
+        { question: "Qual transportadora está apresentando desvio no lead time de coleta?", metric: "Painel de dispersão de tempo médio de atendimento por rota" },
+        { question: "Qual o status de saúde dos pipelines de ingestão?", metric: "Gráfico de taxa de sucesso de execuções do n8n nas últimas 24 horas" },
+        { question: "Qual ação imediata deve ser disparada?", metric: "Botões de ação rápida no próprio alerta do Slack ('Reenviar Lote', 'Acionar Suporte')" }
+      ]
+    }
+  },
+
   rfm: {
     title: "Segmentação RFM & Prevenção de Churn em Vendas",
     category: "CRM Analytics, Retenção & Machine Intelligence",
     impact: "Mapeamento de R$ 485k em risco e +35% de retenção reativada",
     tags: ["Python (Pandas/NumPy)", "Streamlit", "Plotly", "Quantis RFM (qcut)", "CRM Playbooks", "LTV Modeling"],
+    actionUrl: "dashboard-rfm.html",
+    actionText: "Acessar Cockpit RFM Interativo",
+    tldr: {
+      objetivo: "Diagnosticar e segmentar uma carteira ativa de mais de 800 clientes recorrentes por Recência, Frequência e Valor Monetário, eliminando a abordagem comercial homogênea e recuperando receita em risco de evasão.",
+      metricas: "100% da base categorizada em 11 clusters determinísticos via quantis com desempate ordinal (rank(method='first')).",
+      roi: "R$ 485.200,00 (24.8% da receita global) mapeados em risco iminente nos clusters críticos Não Podemos Perder e Em Risco; aumento de 35% na taxa de reativação.",
+      tempo: "Tempo de diagnóstico da carteira reduzido de 3 dias úteis em planilhas Excel para execução automatizada em menos de 10 segundos no Streamlit."
+    },
     problem: `
       A empresa operava com uma base ativa de mais de 800 clientes recorrentes, porém adotava uma abordagem comercial uniforme para toda a carteira. 
-      Clientes de altíssimo volume histórico (grandes contas) entravam em inatividade sem alertas prévios, enquanto clientes novos recebiam a mesma régua de comunicação 
-      que compradores esporádicos. Essa homogeneidade analítica gerava perda silenciosa de clientes VIPs e desgaste da equipe comercial com leads de baixo retorno.
+      Clientes de altíssimo volume histórico (grandes contas corporativas) entravam em inatividade sem alertas prévios, enquanto clientes novos recebiam a mesma régua de comunicação 
+      que compradores esporádicos. Essa homogeneidade analítica gerava perda silenciosa de clientes VIPs e desgaste da equipe comercial com leads de baixo retorno financeiro.
     `,
-    solution: `
-      1. <strong>Motor Analítico RFM em Python:</strong> Engenharia de features para cálculo de Recência (dias desde a última transação), Frequência (pedidos únicos) e Valor Monetário (soma faturada).<br>
-      2. <strong>Pontuação por Quantis com Desempate:</strong> Aplicação rigorosa de <code>pd.qcut</code> com <code>rank(method='first')</code> para eliminar distorções de empates em clientes de 1 única compra, ranqueando de 1 a 5 cada dimensão com rigor estatístico.<br>
-      3. <strong>Matriz de 11 Clusters Estratégicos:</strong> Classificação determinística em clusters de negócio (Campeões, Leais, Potenciais Leais, Novos, Promissores, Precisam de Atenção, Quase Hibernando, Em Risco, Não Podemos Perder, Hibernando, Perdidos).<br>
-      4. <strong>Cockpit Executivo em Streamlit & Exportação CRM:</strong> Interface com Treemap financeiro, dispersão 2D/3D interativa, visualização de receita em risco e download imediato de listas operacionais em CSV (<code>utf-8-sig</code>) com playbooks personalizados.
-    `,
-    codeSnippet: `# Motor de Cálculo e Pontuação por Quantis RFM
+    crispDm: {
+      dataUnderstanding: "Base transacional cobrindo 18 meses de histórico com mais de 6.600 transações, registrando ID de cliente, timestamp da transação, ID do pedido e valor líquido faturado. Tratamento de sazonalidades (Black Friday, início de mês) e remoção de pedidos cancelados.",
+      dataPreparation: "Engenharia de features agregando por cliente para derivar Recência (dias desde a última transação até a data de corte), Frequência (pedidos únicos faturados) e Valor Monetário (soma faturada no período).",
+      modeling: "Aplicação de <code>pd.qcut</code> com <code>rank(method='first')</code> para pontuar cada cliente de 1 a 5 nas 3 dimensões com rigor estatístico, eliminando distorções de empates em clientes de primeira compra. Código composto RFM (111 a 555) e alocação determinística nos 11 clusters estratégicos.",
+      qa: "Validação da distribuição das partições quantílicas para garantir equilíbrio estatístico e homologação dos playbooks de CRM com os gerentes de contas.",
+      codeSnippet: `# Motor de Cálculo e Pontuação por Quantis RFM com Desempate
 import pandas as pd
 
 def calculate_rfm(df, ref_date):
@@ -332,7 +476,7 @@ def calculate_rfm(df, ref_date):
         'valor_total': 'sum'
     }).rename(columns={'data_transacao': 'Recencia', 'id_transacao': 'Frequencia', 'valor_total': 'Valor'})
 
-    # 2. Atribuição de Scores de 1 a 5 via Quantis com desempate
+    # 2. Atribuição de Scores de 1 a 5 via Quantis com desempate ordinal
     rfm['R_Score'] = pd.qcut(rfm['Recencia'].rank(method='first'), q=5, labels=[5, 4, 3, 2, 1]).astype(int)
     rfm['F_Score'] = pd.qcut(rfm['Frequencia'].rank(method='first'), q=5, labels=[1, 2, 3, 4, 5]).astype(int)
     rfm['M_Score'] = pd.qcut(rfm['Valor'].rank(method='first'), q=5, labels=[1, 2, 3, 4, 5]).astype(int)
@@ -341,13 +485,35 @@ def calculate_rfm(df, ref_date):
     rfm['RFM_Score'] = rfm['R_Score'].astype(str) + rfm['F_Score'].astype(str) + rfm['M_Score'].astype(str)
     rfm['Segmento'] = rfm.apply(lambda r: assign_segment(r['R_Score'], r['F_Score'], r['M_Score']), axis=1)
     
-    return rfm`,
-    results: [
-      "Identificação imediata de R$ 485.200 (24.8% da receita global) concentrados nos clusters críticos 'Não Podemos Perder' e 'Em Risco'.",
-      "Priorização de 100% dos contatos dos gerentes de contas, focando exclusivamente nas contas de maior risco e alto LTV.",
-      "Aumento de 35% na taxa de sucesso de reativação após o envio de ofertas direcionadas por canal prioritário (WhatsApp Concierge e Ligação Executiva).",
-      "Redução do tempo de diagnóstico da carteira de 3 dias no Excel para execução automatizada em menos de 10 segundos no Streamlit."
-    ]
+    return rfm`
+    },
+    resultsInsights: {
+      insights: [
+        "Identificação imediata de 142 clientes de alto valor histórico (R$ 485.200,00 - 24.8% da receita) com recência crítica nos clusters 'Não Podemos Perder' e 'Em Risco'.",
+        "Mapeamento de que o cluster Campeões (120 clientes) responde por R$ 658.000,00 da receita, exigindo programa exclusivo de atendimento Key Account.",
+        "Aumento de 35% na taxa de sucesso de reativação com o envio de ofertas direcionadas por canal prioritário (WhatsApp Concierge e Ligação Executiva direta de SDR)."
+      ],
+      kpis: [
+        { label: "Receita em Risco", val: "R$ 485.200", desc: "24.8% da receita global" },
+        { label: "Clientes Únicos", val: "800", desc: "100% segmentados em 11 clusters" },
+        { label: "Ticket Médio Geral", val: "R$ 295,00", desc: "Média ponderada da base" },
+        { label: "Sucesso Reativação", val: "+35%", desc: "Com playbooks dedicados" }
+      ]
+    },
+    governance: {
+      deploy: "Aplicação Streamlit interativa com processamento sob demanda, interface Plotly de navegação espacial (2D/3D e Treemap) e geração de listas de exportação em CSV formatado com BOM UTF-8 para Excel.",
+      adoption: "Utilizado semanalmente por Gerentes de Vendas para alocação de carteiras, pela coordenação de CRM para automação de réguas segmentadas e pela Diretoria Comercial em reuniões de forecast.",
+      nextSteps: "Conexão via webhook com Salesforce/HubSpot para atualizar dinamicamente a pontuação RFM e disparar tarefas automáticas na agenda dos SDRs."
+    },
+    dashboardDesign: {
+      audience: "VP Comercial, Head de Customer Success, Gerentes de Contas e Especialistas de CRM.",
+      decisions: [
+        { question: "Quais contas VIPs de alto faturamento estão em risco de churn?", metric: "Destaque prioritário do cluster 'Não Podemos Perder' e lista de exportação" },
+        { question: "Qual a participação de cada segmento no mix de receita?", metric: "Treemap financeiro interativo por densidade e faturamento" },
+        { question: "Como se distribuem os clientes entre Recência e Frequência?", metric: "Dispersão 2D/3D e Matriz de calor 5x5 com clique direto no playbook" },
+        { question: "Qual o plano tático imediato para cada cliente?", metric: "Cards com canal prioritário (WhatsApp, Ligação, E-mail) e ações práticas" }
+      ]
+    }
   }
 };
 
@@ -364,58 +530,169 @@ function initCaseStudyModal() {
     if (!data) return;
 
     modalBody.innerHTML = `
+      <!-- HEADER DO ESTUDO DE CASO -->
       <div class="border-b border-neutral-800 pb-5 mb-6">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
           <span class="text-xs font-mono px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">${data.category}</span>
-          <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${data.impact}
+          <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5 font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ${data.impact}
           </span>
         </div>
-        <h3 class="text-2xl font-bold text-white mb-3">${data.title}</h3>
-        <div class="flex flex-wrap gap-2">
-          ${data.tags.map(tag => `<span class="tech-badge text-xs">${tag}</span>`).join('')}
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-3 tracking-tight">${data.title}</h3>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-1.5">
+            ${data.tags.map(tag => `<span class="tech-badge text-xs">${tag}</span>`).join('')}
+          </div>
+          ${data.actionUrl ? `
+            <a href="${data.actionUrl}" ${data.actionUrl.startsWith('http') || data.actionUrl.endsWith('.html') ? 'target="_blank"' : ''} class="px-3.5 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-xs font-bold transition-all flex items-center gap-1.5">
+              <span>${data.actionText || 'Ver Solução'}</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+          ` : ''}
         </div>
       </div>
 
-      <div class="space-y-6 text-sm text-neutral-300">
+      <div class="space-y-8 text-sm text-neutral-300">
+        
+        <!-- 🚀 SEÇÃO 1: TLDR (RESUMO EXECUTIVO) -->
         <div>
-          <h4 class="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-2">
-            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            O Desafio de Negócio
-          </h4>
-          <p class="leading-relaxed bg-neutral-900/60 p-4 rounded-lg border border-neutral-800/80">${data.problem}</p>
+          <div class="case-section-title text-sky-400">
+            <span>🚀 1. TLDR (Too Long; Didn't Read) - Resumo Executivo</span>
+          </div>
+          <div class="case-tldr-grid">
+            <div class="case-tldr-item">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">🎯 Objetivo do Projeto</span>
+              <p class="text-xs text-white leading-relaxed font-medium">${data.tldr.objetivo}</p>
+            </div>
+            <div class="case-tldr-item">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">📊 Métricas Principais</span>
+              <p class="text-xs text-sky-300 leading-relaxed font-medium font-mono">${data.tldr.metricas}</p>
+            </div>
+            <div class="case-tldr-item">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 block mb-1">💰 Retorno / Eficiência (ROI)</span>
+              <p class="text-xs text-emerald-300 leading-relaxed font-medium font-mono">${data.tldr.roi}</p>
+            </div>
+            <div class="case-tldr-item">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-indigo-400 block mb-1">⚡ Tempo de Execução</span>
+              <p class="text-xs text-indigo-300 leading-relaxed font-medium font-mono">${data.tldr.tempo}</p>
+            </div>
+          </div>
         </div>
 
+        <!-- 💼 SEÇÃO 2: O PROBLEMA DE NEGÓCIO -->
         <div>
-          <h4 class="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-2">
-            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-            Arquitetura & Metodologia
-          </h4>
-          <div class="leading-relaxed bg-neutral-900/60 p-4 rounded-lg border border-neutral-800/80 space-y-2">${data.solution}</div>
+          <div class="case-section-title text-rose-400">
+            <span>💼 2. O Problema de Negócio (Business Understanding)</span>
+          </div>
+          <div class="p-4 rounded-xl bg-neutral-900/70 border border-neutral-800 leading-relaxed text-xs sm:text-sm text-neutral-300">
+            ${data.problem}
+          </div>
         </div>
 
+        <!-- 🔬 SEÇÃO 3: METODOLOGIA CIENTÍFICA E TÉCNICA (CRISP-DM) -->
         <div>
-          <h4 class="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-2">
-            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            Destaque Técnico de Implementação
-          </h4>
-          <pre class="code-block"><code>${data.codeSnippet}</code></pre>
+          <div class="case-section-title text-indigo-400">
+            <span>🔬 3. Metodologia Científica e Técnica (CRISP-DM)</span>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div class="case-crisp-block">
+              <span class="text-xs font-mono text-cyan-400 font-bold block mb-1">1. Entendimento & Avaliação de Dados</span>
+              <p class="text-xs text-neutral-300 leading-relaxed">${data.crispDm.dataUnderstanding}</p>
+            </div>
+            <div class="case-crisp-block">
+              <span class="text-xs font-mono text-indigo-400 font-bold block mb-1">2. Preparação & Engenharia de Dados</span>
+              <p class="text-xs text-neutral-300 leading-relaxed">${data.crispDm.dataPreparation}</p>
+            </div>
+            <div class="case-crisp-block">
+              <span class="text-xs font-mono text-emerald-400 font-bold block mb-1">3. Modelagem Analítica & Negócio</span>
+              <p class="text-xs text-neutral-300 leading-relaxed">${data.crispDm.modeling}</p>
+            </div>
+            <div class="case-crisp-block">
+              <span class="text-xs font-mono text-amber-400 font-bold block mb-1">4. Avaliação & Garantia de Qualidade (QA)</span>
+              <p class="text-xs text-neutral-300 leading-relaxed">${data.crispDm.qa}</p>
+            </div>
+          </div>
+
+          <!-- Code Snippet -->
+          <div>
+            <span class="text-[11px] font-mono text-neutral-400 block mb-1.5">Implementação Técnica em Destaque:</span>
+            <pre class="code-block text-xs font-mono overflow-x-auto"><code>${data.crispDm.codeSnippet}</code></pre>
+          </div>
         </div>
 
+        <!-- 📈 SEÇÃO 4: RESULTADOS E INSIGHTS GERADOS -->
         <div>
-          <h4 class="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-2">
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Resultados Mensuráveis & ROI
-          </h4>
-          <ul class="space-y-2.5 bg-neutral-900/60 p-4 rounded-lg border border-neutral-800/80">
-            ${data.results.map(res => `
+          <div class="case-section-title text-emerald-400">
+            <span>📈 4. Resultados e Insights Gerados</span>
+          </div>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
+            ${data.resultsInsights.kpis.map(k => `
+              <div class="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-center">
+                <span class="text-lg sm:text-xl font-extrabold text-emerald-300 font-mono block">${k.val}</span>
+                <span class="text-[11px] font-bold text-white block mt-0.5">${k.label}</span>
+                <span class="text-[10px] text-neutral-400 block mt-0.5">${k.desc}</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <ul class="space-y-2 p-4 rounded-xl bg-neutral-900/70 border border-neutral-800 text-xs sm:text-sm">
+            ${data.resultsInsights.insights.map(res => `
               <li class="flex items-start gap-2.5">
-                <span class="text-emerald-400 mt-0.5">✔</span>
-                <span>${res}</span>
+                <span class="text-emerald-400 font-bold mt-0.5">✔</span>
+                <span class="leading-relaxed">${res}</span>
               </li>
             `).join('')}
           </ul>
         </div>
+
+        <!-- 🛠️ SEÇÃO 5: IMPLEMENTAÇÃO, GOVERNANÇA E PRÓXIMOS PASSOS -->
+        <div>
+          <div class="case-section-title text-amber-400">
+            <span>🛠️ 5. Plano de Implementação, Governança e Próximos Passos</span>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-3.5 rounded-xl bg-neutral-900/70 border border-neutral-800">
+              <span class="text-xs font-mono text-amber-300 font-bold block mb-1">🚀 Estratégia de Deploy</span>
+              <p class="text-xs text-neutral-300 leading-relaxed">${data.governance.deploy}</p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-neutral-900/70 border border-neutral-800">
+              <span class="text-xs font-mono text-sky-300 font-bold block mb-1">👥 Matriz de Adoção</span>
+              <p class="text-xs text-neutral-300 leading-relaxed">${data.governance.adoption}</p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-neutral-900/70 border border-neutral-800">
+              <span class="text-xs font-mono text-purple-300 font-bold block mb-1">🔮 Próximas Recomendações</span>
+              <p class="text-xs text-neutral-300 leading-relaxed">${data.governance.nextSteps}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 📊 SEÇÃO 6: DESIGN DO DASHBOARD E PERGUNTAS-CHAVE -->
+        <div>
+          <div class="case-section-title text-cyan-400">
+            <span>📊 6. Design do Dashboard de Suporte e Perguntas-Chave</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-neutral-900/70 border border-neutral-800 space-y-3 text-xs">
+            <div>
+              <span class="text-neutral-400 font-mono text-[11px] uppercase block mb-1">🎯 Audiência Específica:</span>
+              <p class="text-white font-medium">${data.dashboardDesign.audience}</p>
+            </div>
+
+            <div class="space-y-1.5 pt-2 border-t border-neutral-800/80">
+              <span class="text-neutral-400 font-mono text-[11px] uppercase block mb-1.5">⚡ Decisões de Negócios Respondidas pelo Painel:</span>
+              ${data.dashboardDesign.decisions.map(d => `
+                <div class="case-decision-row">
+                  <span class="text-neutral-200 font-medium">❓ ${d.question}</span>
+                  <span class="text-sky-400 font-mono text-[11px] font-semibold">👉 ${d.metric}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
       </div>
     `;
 
