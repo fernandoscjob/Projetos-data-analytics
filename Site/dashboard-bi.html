@@ -173,13 +173,79 @@
       }
     }
 </style>
+<style>
+    /* ESTILOS DE IMPRESSÃO / EXPORTAÇÃO COMPLETA EM PDF */
+    @media print {
+      aside, 
+      nav, 
+      button, 
+      .quick-actions-bar,
+      .no-print {
+        display: none !important;
+      }
+
+      body, html {
+        background: #080b11 !important;
+        color: #e2e8f0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .flex-1 {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      main {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 1cm !important;
+        margin: 0 !important;
+        overflow: visible !important;
+      }
+
+      /* Exibir TODAS as etapas sequencialmente no PDF */
+      .stage-view-content {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+        margin-bottom: 2.5rem !important;
+        padding-bottom: 2rem !important;
+        border-bottom: 1px dashed #334155 !important;
+      }
+
+      .stage-view-content.hidden {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+
+      #printReportHeader {
+        display: block !important;
+        visibility: visible !important;
+      }
+
+      .stage-card, .metric-card, .glass-panel, pre, table, tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+
+      footer {
+        display: block !important;
+        page-break-before: auto !important;
+      }
+    }
+</style>
 </head>
 <body class="min-h-screen bg-[#080b11] text-slate-100 flex flex-col md:flex-row antialiased selection:bg-sky-500/30 selection:text-sky-200">
-
-  <!-- =========================================================================
-       SIDEBAR LATERAL À ESQUERDA (MENUS INFORMATIVOS & ETAPAS)
-       ========================================================================= -->
-  <aside class="w-full md:w-72 lg:w-80 bg-neutral-950/95 border-r border-neutral-800/80 p-5 flex flex-col justify-between shrink-0 md:sticky md:top-0 md:h-screen md:overflow-y-auto z-40 backdrop-blur-md">
+<aside class="w-full md:w-72 lg:w-80 bg-neutral-950/95 border-r border-neutral-800/80 p-5 flex flex-col justify-between shrink-0 md:sticky md:top-0 md:h-screen md:overflow-y-auto z-40 backdrop-blur-md">
     <div class="space-y-5">
       <!-- Botão Voltar ao Portfólio -->
       <a href="index.html#projetos" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-medium text-neutral-300 hover:text-white hover:border-neutral-700 transition-all group">
@@ -288,14 +354,35 @@
     </div>
   </aside>
 
-
   <!-- =========================================================================
-       ÁREA DE CONTEÚDO PRINCIPAL À DIREITA
+       CONTAINER PRINCIPAL À DIREITA (MAIN + FOOTER ALINHADOS)
        ========================================================================= -->
-  <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 space-y-8 overflow-y-auto">
+  <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 space-y-8 overflow-x-hidden">
 
+    <!-- CABEÇALHO EXECUTIVO EXCLUSIVO PARA IMPRESSÃO / PDF -->
+    <div id="printReportHeader" class="hidden pb-6 mb-8 border-b-2 border-sky-500">
+      <div class="flex items-center justify-between gap-4 mb-3">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">🏛️</span>
+          <div>
+            <span class="text-xs font-mono uppercase tracking-widest text-sky-400 font-bold block">BI Corporativo & Governança</span>
+            <h1 class="text-2xl font-black text-white">Camada Semântica & Cockpit Executivo de Planejamento (BI)</h1>
+          </div>
+        </div>
+        <div class="text-right text-xs font-mono text-neutral-400">
+          <span class="block text-emerald-400 font-bold font-mono">STATUS: HOMOLOGADO EM PRODUÇÃO</span>
+          <span class="block">Emissão: <span class="current-date-display"></span></span>
+        </div>
+      </div>
+      <div class="p-4 rounded-xl bg-neutral-900/90 border border-neutral-800 text-xs text-neutral-300 leading-relaxed">
+        <strong>RELATÓRIO TÉCNICO &amp; EXECUTIVO COMPLETO • METODOLOGIA CRISP-DM</strong><br>
+        <span>Autor: <strong>Fernando Cavalcante</strong> • Analista de Dados &amp; BI | Este documento consolida todas as etapas analíticas: Cockpit Interativo com KPIs, Problema de Negócio &amp; TLDR, Metodologia CRISP-DM &amp; Código em Produção, Resultados &amp; Insights, Governança &amp; Adoção, Recomendações Estratégicas &amp; Roadmap (30/90/180 dias) e Decisões Estratégicas C-Level.</span>
+      </div>
+    </div>
+    
     <!-- BARRA SUPERIOR DE AÇÕES RÁPIDAS (DESKTOP & MOBILE) -->
-    <div class="flex items-center justify-between gap-4 pb-4 border-b border-neutral-800/80">
+    <div class="quick-actions-bar flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-neutral-800/80">
       <div class="flex items-center gap-2">
         <span class="text-xs font-mono uppercase text-neutral-400">Ambiente Analítico:</span>
         <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400 font-semibold flex items-center gap-1.5">
@@ -304,15 +391,17 @@
         </span>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2.5">
         
-          <button onclick="window.print()" class="px-3.5 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold hover:bg-indigo-500/30 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-            <span>Exportar DRE</span>
-          </button>
-        
+        <button onclick="exportFullReportPdf()" class="btn-export-pdf px-3.5 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(56,189,248,0.3)] cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Exportar Relatório (PDF)</span>
+        </button>
       </div>
     </div>
+    
+
+    
 
     <!-- COCKPIT ANALÍTICO INTERATIVO -->
     <div id="tab-cockpit" class="stage-view-content space-y-8">
@@ -696,12 +785,19 @@ DIVIDE(_Receita - _CMV, _Receita, 0)</code></pre>
       </div>
     </div>
 
-  </main>
+  
+    </main>
+
+    <!-- FOOTER CENTRALIZADO DENTRO DO CANVAS PRINCIPAL -->
+    <footer class="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-500 bg-neutral-950/40">
+      <p>Cockpit de Camada Semântica &amp; BI • Desenvolvido por <strong>Fernando Cavalcante</strong> • Analista de Dados &amp; BI</p>
+    </footer>
+  </div>
 
 
-  <footer class="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-500">
-    <p>Cockpit de Camada Semântica &amp; BI • Desenvolvido por <strong>Fernando Cavalcante</strong> • Analista de Dados &amp; BI</p>
-  </footer>
+
+
+  
 
   <script>
     function initBICharts() {
@@ -746,6 +842,51 @@ DIVIDE(_Receita - _CMV, _Receita, 0)</code></pre>
     
   // CONTROLE DE NAVEGAÇÃO POR ABAS / ETAPAS
   
+  
+  function exportFullReportPdf() {
+    const stageViews = document.querySelectorAll('.stage-view-content');
+    const previouslyHidden = [];
+    stageViews.forEach(view => {
+      if (view.classList.contains('hidden')) {
+        previouslyHidden.push(view);
+        view.classList.remove('hidden');
+        view.classList.add('temp-print-visible');
+      }
+    });
+
+    const printHeader = document.getElementById('printReportHeader');
+    if (printHeader) printHeader.classList.remove('hidden');
+
+    if (window.Plotly) {
+      document.querySelectorAll('.plotly-graph-div').forEach(gd => {
+        try { Plotly.Plots.resize(gd); } catch(e) {}
+      });
+    }
+
+    const dateDisplays = document.querySelectorAll('.current-date-display');
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    dateDisplays.forEach(el => el.textContent = formattedDate);
+
+    setTimeout(() => {
+      window.print();
+
+      setTimeout(() => {
+        previouslyHidden.forEach(view => {
+          view.classList.add('hidden');
+          view.classList.remove('temp-print-visible');
+        });
+        if (printHeader) printHeader.classList.add('hidden');
+
+        if (window.Plotly) {
+          document.querySelectorAll('.plotly-graph-div').forEach(gd => {
+            try { Plotly.Plots.resize(gd); } catch(e) {}
+          });
+        }
+      }, 500);
+    }, 300);
+  }
+
   function initStageTabs() {
     const tabBtns = document.querySelectorAll('.stage-tab-btn');
     const viewContainers = document.querySelectorAll('.stage-view-content');
