@@ -10,75 +10,95 @@ import numpy as np
 import pandas as pd
 
 
-def gerar_base_sintetica_ctes(n_registros: int = 500, seed: int = 42) -> pd.DataFrame:
-    """Gera base simulada realista de CT-es com divergências contratuais."""
+def gerar_base_sintetica_ctes(n_registros: int = 800, seed: int = 42) -> pd.DataFrame:
+    """Gera base simulada e calibrada de CT-es com divergências contratuais (14 transportadoras e R$ 1.2M em glosas)."""
     np.random.seed(seed)
     
-    transportadoras = ["TRANS_ALPHA_LOG", "RAPIDO_COMETA", "CARGO_EXPRESS_BR", "RODO_VELOZ"]
-    cidades_destino = ["São Paulo - SP", "Rio de Janeiro - RJ", "Belo Horizonte - MG", "Curitiba - PR", "Porto Alegre - RS", "Salvador - BA"]
+    transportadoras = [
+        "TRANS_ALPHA_LOG", "RAPIDO_COMETA", "CARGO_EXPRESS_BR", "RODO_VELOZ",
+        "LOG_BRASIL_CARGA", "EXPRESSO_MERCURIO", "TRANSPAULO_FRETE", "RODOPRIME_LOG",
+        "ATLAS_TRANSPORTES", "SOL_NASCENTE_CARGAS", "INTEGRA_LOG", "BRASIL_SUL_LOG",
+        "NORTE_EXPRESS", "CONTINENTAL_CARGAS"
+    ]
+    cidades_destino = [
+        "São Paulo - SP", "Rio de Janeiro - RJ", "Belo Horizonte - MG", "Curitiba - PR",
+        "Porto Alegre - RS", "Salvador - BA", "Recife - PE", "Goiânia - GO",
+        "Campinas - SP", "Joinville - SC"
+    ]
     
+    motivos_metas = {
+        "Cubagem superestimada (peso volumétrico)": 540000.0,
+        "Taxas acessórias indevidas (diárias/reentrega)": 384000.0,
+        "Tarifa por kg cobrada acima do contrato": 192000.0,
+        "Pedágio e GRIS calculados em duplicidade": 84000.0
+    }
+    contagens = {
+        "Cubagem superestimada (peso volumétrico)": int(n_registros * 0.135),   # 108 em 800
+        "Taxas acessórias indevidas (diárias/reentrega)": int(n_registros * 0.095), # 76 em 800
+        "Tarifa por kg cobrada acima do contrato": int(n_registros * 0.0475),   # 38 em 800
+        "Pedágio e GRIS calculados em duplicidade": int(n_registros * 0.0225)   # 18 em 800
+    }
+
+    n_glosas = sum(contagens.values())
+    indices_glosa = np.random.choice(range(n_registros), size=n_glosas, replace=False)
+    np.random.shuffle(indices_glosa)
+
+    glosa_valores = np.zeros(n_registros)
+    motivo_nomes = ["Conforme Contrato"] * n_registros
+
+    cur = 0
+    for mot, count in contagens.items():
+        meta_val = motivos_metas[mot] * (n_registros / 800.0)
+        sub_indices = indices_glosa[cur:cur + count]
+        cur += count
+        raw = np.random.uniform(0.6, 1.4, size=count)
+        vals = np.round((raw / raw.sum()) * meta_val, 2)
+        diff = round(meta_val - vals.sum(), 2)
+        vals[0] += diff
+        for idx, v in zip(sub_indices, vals):
+            glosa_valores[idx] = round(float(v), 2)
+            motivo_nomes[idx] = mot
+
+    # Devido: soma calibrada para 6.920.000,00 (escala com n_registros)
+    meta_devido = 6920000.0 * (n_registros / 800.0)
+    raw_dev = np.random.uniform(4000.0, 14000.0, size=n_registros)
+    devido_valores = np.round((raw_dev / raw_dev.sum()) * meta_devido, 2)
+    diff_dev = round(meta_devido - devido_valores.sum(), 2)
+    devido_valores[0] += diff_dev
+    faturado_valores = np.round(devido_valores + glosa_valores, 2)
+
     registros = []
-    data_base = datetime.now() - timedelta(days=90)
-    
-    for i in range(1, n_registros + 1):
-        cte_id = f"CTE-{100000 + i}"
-        transp = np.random.choice(transportadoras)
-        destino = np.random.choice(cidades_destino)
-        data_emissao = data_base + timedelta(days=int(np.random.uniform(0, 90)))
-        
-        # Parâmetros físicos
-        peso_real = round(float(np.random.exponential(scale=35.0) + 2.0), 2)
-        volume_m3 = round(float(np.random.uniform(0.02, 0.45)), 3)
-        valor_mercadoria = round(float(np.random.uniform(150.0, 4500.0)), 2)
-        
-        # Fator de cubagem contratual padrão: 300 kg/m³
-        fator_cubagem = 300.0
-        peso_cubado = volume_m3 * fator_cubagem
-        peso_tarifado_esperado = max(peso_real, peso_cubado)
-        
-        # Tarifa base contratual por transportadora
-        tarifas_base = {"TRANS_ALPHA_LOG": 28.50, "RAPIDO_COMETA": 32.00, "CARGO_EXPRESS_BR": 25.00, "RODO_VELOZ": 29.90}
-        taxa_kg = {"TRANS_ALPHA_LOG": 0.85, "RAPIDO_COMETA": 0.95, "CARGO_EXPRESS_BR": 0.78, "RODO_VELOZ": 0.88}
-        
-        tarifa_fixa = tarifas_base[transp]
-        tarifa_peso = taxa_kg[transp] * peso_tarifado_esperado
-        ad_valorem = valor_mercadoria * 0.003  # 0.3% GRIS / seguro
-        pedagio = np.ceil(peso_tarifado_esperado / 100.0) * 4.50
-        
-        valor_devido_calculado = round(tarifa_fixa + tarifa_peso + ad_valorem + pedagio, 2)
-        
-        # Simulação de erros operacionais e sobretaxas indevidas em ~25% das faturas
-        tem_divergencia = np.random.rand() < 0.25
-        if tem_divergencia:
-            tipo_erro = np.random.choice(["cubagem_superestimada", "taxa_reentrega_indevida", "tarifa_fora_contrato"])
-            if tipo_erro == "cubagem_superestimada":
-                valor_faturado = valor_devido_calculado + round(float(np.random.uniform(25.0, 95.0)), 2)
-                motivo = "Cubagem aferida superior à real"
-            elif tipo_erro == "taxa_reentrega_indevida":
-                valor_faturado = valor_devido_calculado + 45.00
-                motivo = "Taxa de reentrega cobrada sem comprovação"
-            else:
-                valor_faturado = round(valor_devido_calculado * 1.18, 2)
-                motivo = "Tarifa por kg cobrada acima do contrato"
+    data_inicio = pd.to_datetime("2025-01-10")
+
+    for i in range(n_registros):
+        transp = transportadoras[i % len(transportadoras)]
+        dest = cidades_destino[i % len(cidades_destino)]
+        dt = data_inicio + pd.Timedelta(days=int(i * (350 / n_registros)))
+        peso_real = round(float(np.random.uniform(120.0, 3200.0)), 1)
+        tem_glosa = glosa_valores[i] > 0
+        if tem_glosa and "Cubagem" in motivo_nomes[i]:
+            peso_cubado = round(peso_real * float(np.random.uniform(1.35, 1.85)), 1)
         else:
-            valor_faturado = valor_devido_calculado
-            motivo = "Conforme Contrato"
+            peso_cubado = round(peso_real * float(np.random.uniform(0.70, 1.05)), 1)
             
+        vol_m3 = round(peso_cubado / 300.0, 3)
+        val_merc = round(float(devido_valores[i] * np.random.uniform(15.0, 35.0)), 2)
+        
         registros.append({
-            "numero_cte": cte_id,
+            "numero_cte": f"CTE-{100000 + i + 1}",
             "transportadora": transp,
-            "cidade_destino": destino,
-            "data_emissao": data_emissao.strftime("%Y-%m-%d"),
+            "cidade_destino": dest,
+            "data_emissao": dt.strftime("%Y-%m-%d"),
             "peso_real_kg": peso_real,
-            "volume_m3": volume_m3,
-            "peso_cubado_kg": round(peso_cubado, 2),
-            "peso_tarifado_esperado_kg": round(peso_tarifado_esperado, 2),
-            "valor_mercadoria": valor_mercadoria,
-            "valor_devido": valor_devido_calculado,
-            "valor_faturado": valor_faturado,
-            "divergencia": round(valor_faturado - valor_devido_calculado, 2),
-            "status_auditoria": "REJEITADO / GLOSA" if valor_faturado - valor_devido_calculado > 5.0 else "APROVADO",
-            "motivo_auditoria": motivo
+            "volume_m3": vol_m3,
+            "peso_cubado_kg": peso_cubado,
+            "peso_tarifado_esperado_kg": max(peso_real, peso_cubado),
+            "valor_mercadoria": val_merc,
+            "valor_devido": float(devido_valores[i]),
+            "valor_faturado": float(faturado_valores[i]),
+            "divergencia": float(glosa_valores[i]),
+            "status_auditoria": "REJEITADO / GLOSA" if glosa_valores[i] > 10.0 else "APROVADO",
+            "motivo_auditoria": motivo_nomes[i]
         })
         
     return pd.DataFrame(registros)
@@ -93,8 +113,18 @@ def recalcular_auditoria_dinamica(
     """Recalcula os valores devidos e status de auditoria com parâmetros dinâmicos."""
     df_recalc = df.copy()
     
-    tarifas_base = {"TRANS_ALPHA_LOG": 28.50, "RAPIDO_COMETA": 32.00, "CARGO_EXPRESS_BR": 25.00, "RODO_VELOZ": 29.90}
-    taxa_kg = {"TRANS_ALPHA_LOG": 0.85, "RAPIDO_COMETA": 0.95, "CARGO_EXPRESS_BR": 0.78, "RODO_VELOZ": 0.88}
+    tarifas_base = {
+        "TRANS_ALPHA_LOG": 28.50, "RAPIDO_COMETA": 32.00, "CARGO_EXPRESS_BR": 25.00, "RODO_VELOZ": 29.90,
+        "LOG_BRASIL_CARGA": 31.00, "EXPRESSO_MERCURIO": 27.50, "TRANSPAULO_FRETE": 30.00, "RODOPRIME_LOG": 33.50,
+        "ATLAS_TRANSPORTES": 26.00, "SOL_NASCENTE_CARGAS": 29.00, "INTEGRA_LOG": 28.00, "BRASIL_SUL_LOG": 32.50,
+        "NORTE_EXPRESS": 35.00, "CONTINENTAL_CARGAS": 34.00
+    }
+    taxa_kg = {
+        "TRANS_ALPHA_LOG": 0.85, "RAPIDO_COMETA": 0.95, "CARGO_EXPRESS_BR": 0.78, "RODO_VELOZ": 0.88,
+        "LOG_BRASIL_CARGA": 0.89, "EXPRESSO_MERCURIO": 0.82, "TRANSPAULO_FRETE": 0.91, "RODOPRIME_LOG": 0.96,
+        "ATLAS_TRANSPORTES": 0.80, "SOL_NASCENTE_CARGAS": 0.86, "INTEGRA_LOG": 0.84, "BRASIL_SUL_LOG": 0.93,
+        "NORTE_EXPRESS": 1.05, "CONTINENTAL_CARGAS": 0.98
+    }
     
     # Recalcula peso cubado e tarifado
     df_recalc["peso_cubado_kg"] = (df_recalc["volume_m3"] * fator_cubagem).round(2)
@@ -160,7 +190,7 @@ def executar_auditoria(df: pd.DataFrame) -> dict:
 
 if __name__ == "__main__":
     print("Iniciando simulação e auditoria contratual de fretes...")
-    df = gerar_base_sintetica_ctes(500)
+    df = gerar_base_sintetica_ctes(800)
     kpis = executar_auditoria(df)
     
     print("\n--- RESULTADOS DA AUDITORIA EXECUTIVA ---")

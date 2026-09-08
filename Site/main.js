@@ -1158,61 +1158,211 @@ function initRfmAnalysis() {
   // Matriz 5x5: [R5, R4, R3, R2, R1] cruzando com [F1, F2, F3, F4, F5]
   const rfmMatrixData = [
     {
-      rowScore: 5,
-      rowLabel: "R5 (Mais Recente)",
-      cells: [
-        { f: 1, cluster: "Novos Clientes", clients: 68, rev: "R$ 42.100", cls: "rfm-bg-novos" },
-        { f: 2, cluster: "Potenciais Clientes Leais", clients: 54, rev: "R$ 68.300", cls: "rfm-bg-potenciais" },
-        { f: 3, cluster: "Leais", clients: 38, rev: "R$ 94.200", cls: "rfm-bg-leais" },
-        { f: 4, cluster: "Campeões", clients: 42, rev: "R$ 158.400", cls: "rfm-bg-campeoes" },
-        { f: 5, cluster: "Campeões", clients: 46, rev: "R$ 214.600", cls: "rfm-bg-campeoes" }
-      ]
+        "rowScore": 5,
+        "rowLabel": "R5 (Mais Recente)",
+        "cells": [
+            {
+                "f": 1,
+                "cluster": "Novos Clientes",
+                "clients": 50,
+                "rev": "R$ 46.000",
+                "cls": "rfm-bg-novos"
+            },
+            {
+                "f": 2,
+                "cluster": "Potenciais Clientes Leais",
+                "clients": 44,
+                "rev": "R$ 76.000",
+                "cls": "rfm-bg-potenciais"
+            },
+            {
+                "f": 3,
+                "cluster": "Leais",
+                "clients": 32,
+                "rev": "R$ 115.000",
+                "cls": "rfm-bg-leais"
+            },
+            {
+                "f": 4,
+                "cluster": "Campeões",
+                "clients": 33,
+                "rev": "R$ 180.000",
+                "cls": "rfm-bg-campeoes"
+            },
+            {
+                "f": 5,
+                "cluster": "Campeões",
+                "clients": 35,
+                "rev": "R$ 225.000",
+                "cls": "rfm-bg-campeoes"
+            }
+        ]
     },
     {
-      rowScore: 4,
-      rowLabel: "R4 (Recente)",
-      cells: [
-        { f: 1, cluster: "Novos Clientes", clients: 58, rev: "R$ 36.500", cls: "rfm-bg-novos" },
-        { f: 2, cluster: "Potenciais Clientes Leais", clients: 48, rev: "R$ 59.800", cls: "rfm-bg-potenciais" },
-        { f: 3, cluster: "Leais", clients: 36, rev: "R$ 88.700", cls: "rfm-bg-leais" },
-        { f: 4, cluster: "Campeões", clients: 34, rev: "R$ 126.900", cls: "rfm-bg-campeoes" },
-        { f: 5, cluster: "Campeões", clients: 30, rev: "R$ 142.100", cls: "rfm-bg-campeoes" }
-      ]
+        "rowScore": 4,
+        "rowLabel": "R4 (Recente)",
+        "cells": [
+            {
+                "f": 1,
+                "cluster": "Novos Clientes",
+                "clients": 40,
+                "rev": "R$ 36.000",
+                "cls": "rfm-bg-novos"
+            },
+            {
+                "f": 2,
+                "cluster": "Potenciais Clientes Leais",
+                "clients": 36,
+                "rev": "R$ 60.000",
+                "cls": "rfm-bg-potenciais"
+            },
+            {
+                "f": 3,
+                "cluster": "Leais",
+                "clients": 30,
+                "rev": "R$ 98.000",
+                "cls": "rfm-bg-leais"
+            },
+            {
+                "f": 4,
+                "cluster": "Campeões",
+                "clients": 24,
+                "rev": "R$ 108.000",
+                "cls": "rfm-bg-campeoes"
+            },
+            {
+                "f": 5,
+                "cluster": "Campeões",
+                "clients": 28,
+                "rev": "R$ 145.000",
+                "cls": "rfm-bg-campeoes"
+            }
+        ]
     },
     {
-      rowScore: 3,
-      rowLabel: "R3 (Médio)",
-      cells: [
-        { f: 1, cluster: "Promissores", clients: 52, rev: "R$ 31.400", cls: "rfm-bg-promissores" },
-        { f: 2, cluster: "Precisam de Atenção", clients: 44, rev: "R$ 52.600", cls: "rfm-bg-atencao" },
-        { f: 3, cluster: "Precisam de Atenção", clients: 32, rev: "R$ 64.100", cls: "rfm-bg-atencao" },
-        { f: 4, cluster: "Leais", clients: 26, rev: "R$ 78.500", cls: "rfm-bg-leais" },
-        { f: 5, cluster: "Leais", clients: 22, rev: "R$ 96.300", cls: "rfm-bg-leais" }
-      ]
+        "rowScore": 3,
+        "rowLabel": "R3 (Médio)",
+        "cells": [
+            {
+                "f": 1,
+                "cluster": "Promissores",
+                "clients": 44,
+                "rev": "R$ 32.000",
+                "cls": "rfm-bg-promissores"
+            },
+            {
+                "f": 2,
+                "cluster": "Precisam de Atenção",
+                "clients": 36,
+                "rev": "R$ 56.000",
+                "cls": "rfm-bg-atencao"
+            },
+            {
+                "f": 3,
+                "cluster": "Precisam de Atenção",
+                "clients": 28,
+                "rev": "R$ 48.000",
+                "cls": "rfm-bg-atencao"
+            },
+            {
+                "f": 4,
+                "cluster": "Leais",
+                "clients": 22,
+                "rev": "R$ 66.000",
+                "cls": "rfm-bg-leais"
+            },
+            {
+                "f": 5,
+                "cluster": "Leais",
+                "clients": 26,
+                "rev": "R$ 85.000",
+                "cls": "rfm-bg-leais"
+            }
+        ]
     },
     {
-      rowScore: 2,
-      rowLabel: "R2 (Em Risco)",
-      cells: [
-        { f: 1, cluster: "Quase Hibernando", clients: 48, rev: "R$ 27.200", cls: "rfm-bg-quase-dormindo" },
-        { f: 2, cluster: "Quase Hibernando", clients: 38, rev: "R$ 41.800", cls: "rfm-bg-quase-dormindo" },
-        { f: 3, cluster: "Em Risco", clients: 28, rev: "R$ 62.400", cls: "rfm-bg-em-risco" },
-        { f: 4, cluster: "Não Podemos Perder", clients: 24, rev: "R$ 98.700", cls: "rfm-bg-nao-perder" },
-        { f: 5, cluster: "Não Podemos Perder", clients: 20, rev: "R$ 124.500", cls: "rfm-bg-nao-perder" }
-      ]
+        "rowScore": 2,
+        "rowLabel": "R2 (Em Risco)",
+        "cells": [
+            {
+                "f": 1,
+                "cluster": "Quase Hibernando",
+                "clients": 40,
+                "rev": "R$ 30.400",
+                "cls": "rfm-bg-quase-dormindo"
+            },
+            {
+                "f": 2,
+                "cluster": "Quase Hibernando",
+                "clients": 30,
+                "rev": "R$ 26.000",
+                "cls": "rfm-bg-quase-dormindo"
+            },
+            {
+                "f": 3,
+                "cluster": "Em Risco",
+                "clients": 30,
+                "rev": "R$ 94.000",
+                "cls": "rfm-bg-em-risco"
+            },
+            {
+                "f": 4,
+                "cluster": "Não Podemos Perder",
+                "clients": 24,
+                "rev": "R$ 82.000",
+                "cls": "rfm-bg-nao-perder"
+            },
+            {
+                "f": 5,
+                "cluster": "Não Podemos Perder",
+                "clients": 22,
+                "rev": "R$ 98.200",
+                "cls": "rfm-bg-nao-perder"
+            }
+        ]
     },
     {
-      rowScore: 1,
-      rowLabel: "R1 (Mais Antigo)",
-      cells: [
-        { f: 1, cluster: "Perdidos", clients: 64, rev: "R$ 29.800", cls: "rfm-bg-perdidos" },
-        { f: 2, cluster: "Hibernando", clients: 42, rev: "R$ 38.200", cls: "rfm-bg-hibernando" },
-        { f: 3, cluster: "Em Risco", clients: 30, rev: "R$ 61.200", cls: "rfm-bg-em-risco" },
-        { f: 4, cluster: "Não Podemos Perder", clients: 22, rev: "R$ 84.600", cls: "rfm-bg-nao-perder" },
-        { f: 5, cluster: "Não Podemos Perder", clients: 18, rev: "R$ 115.000", cls: "rfm-bg-nao-perder" }
-      ]
+        "rowScore": 1,
+        "rowLabel": "R1 (Mais Antigo)",
+        "cells": [
+            {
+                "f": 1,
+                "cluster": "Perdidos",
+                "clients": 36,
+                "rev": "R$ 11.200",
+                "cls": "rfm-bg-perdidos"
+            },
+            {
+                "f": 2,
+                "cluster": "Hibernando",
+                "clients": 44,
+                "rev": "R$ 28.000",
+                "cls": "rfm-bg-hibernando"
+            },
+            {
+                "f": 3,
+                "cluster": "Em Risco",
+                "clients": 28,
+                "rev": "R$ 86.000",
+                "cls": "rfm-bg-em-risco"
+            },
+            {
+                "f": 4,
+                "cluster": "Não Podemos Perder",
+                "clients": 20,
+                "rev": "R$ 57.000",
+                "cls": "rfm-bg-nao-perder"
+            },
+            {
+                "f": 5,
+                "cluster": "Não Podemos Perder",
+                "clients": 18,
+                "rev": "R$ 68.000",
+                "cls": "rfm-bg-nao-perder"
+            }
+        ]
     }
-  ];
+];
 
   let selectedClusterName = "Não Podemos Perder"; // Destaque inicial no cluster crítico de receita em risco
 

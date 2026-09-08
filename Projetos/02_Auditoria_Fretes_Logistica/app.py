@@ -1,4 +1,4 @@
-﻿"""
+"""
 Aplicação Streamlit: Cockpit de Auditoria Contratual de Fretes & Glosas
 =======================================================================
 Interface executiva para auditoria automática de CT-es, detecção de
@@ -89,7 +89,7 @@ st.sidebar.markdown("### ⚙️ Parâmetros de Auditoria")
 
 modo_dados = st.sidebar.radio(
     "Fonte de Dados:",
-    ["Base Simulada Realista (500 CT-es)", "Upload de Arquivo (CSV/Excel)"],
+    ["Base Calibrada do Caso (800 CT-es - 14 Transportadoras)", "Upload de Arquivo (CSV/Excel)"],
     index=0,
 )
 
@@ -110,9 +110,9 @@ if modo_dados == "Upload de Arquivo (CSV/Excel)":
             st.sidebar.error(f"Erro ao ler arquivo: {e}")
     else:
         st.sidebar.info("Carregue uma planilha ou utilize a base simulada.")
-        df_raw = gerar_base_sintetica_ctes(500)
+        df_raw = gerar_base_sintetica_ctes(800)
 else:
-    tamanho_amostra = st.sidebar.slider("Amostra de CT-es:", 100, 2000, 500, step=50)
+    tamanho_amostra = st.sidebar.slider("Amostra de CT-es:", 100, 2000, 800, step=50)
     df_raw = gerar_base_sintetica_ctes(tamanho_amostra)
 
 st.sidebar.markdown("---")

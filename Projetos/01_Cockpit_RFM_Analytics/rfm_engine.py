@@ -165,23 +165,24 @@ CLUSTER_METADATA: Dict[str, Dict[str, Any]] = {
 # GERAÇÃO DE DADOS SINTÉTICOS REALISTAS
 # ==============================================================================
 def generate_synthetic_transactions(
-    n_customers: int = 1000,
-    n_transactions: int = 7500,
+    n_customers: int = 800,
+    n_transactions: int = 6633,
     reference_end_date: Optional[datetime] = None,
     seed: int = 42,
 ) -> pd.DataFrame:
     """
-    Gera uma base de dados transacionais sintética e realista cobrindo os últimos 18 meses.
+    Gera uma base de dados transacionais sintética e realista cobrindo os últimos 18 meses,
+    calibrada para refletir o caso de negócio (800 clientes, ~R$ 1.95M em receita e R$ 485k em risco).
 
     Aplica:
     - Distribuição de Pareto/Lei de Potência na frequência de compra dos clientes.
     - Sazonalidade (aumento de transações no fim do ano - Black Friday/Natal - e início de mês).
-    - Variações de tíquete médio através de distribuição Log-Normal (R$ 30 a R$ 3.500+).
-    - Clientes de diferentes perfis (VIPs, recorrentes, novos e inativos).
+    - Variações de tíquete médio através de distribuição Log-Normal.
+    - Clientes de diferentes perfis (VIPs, recorrentes, novos e inativos em risco).
 
     Args:
-        n_customers: Quantidade de clientes únicos a simular.
-        n_transactions: Volume total de transações a gerar.
+        n_customers: Quantidade de clientes únicos a simular (padrão: 800).
+        n_transactions: Volume total de transações a gerar (padrão: 6633).
         reference_end_date: Data final do período (padrão: hoje).
         seed: Semente pseudo-aleatória para reprodutibilidade.
 
@@ -201,53 +202,94 @@ def generate_synthetic_transactions(
     # Criação dos IDs de clientes
     customer_ids = [f"CLI-{1000 + i}" for i in range(n_customers)]
 
-    # Probabilidade de cada cliente comprar (distribuição pareto/power law)
-    # 20% dos clientes são responsáveis pela maioria das transações
+    # Se n_customers for 800 (padrão do portfólio), calibra o cohort de risco histórico
+    if n_customers == 800:
+        risk_count = 142
+        risk_cids = customer_ids[:risk_count]
+        other_cids = customer_ids[risk_count:]
+        
+        # Alocação de receita: 485.200 para risco e 1.471.600 para os demais (Total 1.956.800)
+        raw_risk = np.random.uniform(1500.0, 5500.0, size=risk_count)
+        risk_spend = (raw_risk / raw_risk.sum()) * 485200.0
+        risk_spend = np.round(risk_spend, 2)
+        risk_spend[0] += round(485200.0 - risk_spend.sum(), 2)
+
+        raw_other = np.random.lognormal(mean=7.0, sigma=0.85, size=len(other_cids))
+        other_spend = (raw_other / raw_other.sum()) * 1471600.0
+        other_spend = np.round(other_spend, 2)
+        other_spend[0] += round(1471600.0 - other_spend.sum(), 2)
+
+        records = []
+        trx_id = 100000
+
+        # Clientes em risco (última compra entre 135 e 360 dias atrás)
+        for cid, tot_val in zip(risk_cids, risk_spend):
+            n_tx = int(np.random.randint(6, 18))
+            last_day = int(np.random.randint(135, 360))
+            tx_days = sorted(list(np.random.randint(last_day, 540, size=n_tx)), reverse=True)
+            tx_days[0] = last_day
+            raw_v = np.random.uniform(0.5, 1.5, size=n_tx)
+            v_parts = np.round((raw_v / raw_v.sum()) * tot_val, 2)
+            v_parts[0] += round(tot_val - v_parts.sum(), 2)
+            for d, v in zip(tx_days, v_parts):
+                trx_id += 1
+                records.append({
+                    "id_cliente": cid,
+                    "data_transacao": end_date - timedelta(days=int(d)),
+                    "id_transacao": f"TRX-{trx_id}",
+                    "valor_total": float(v)
+                })
+
+        # Demais clientes
+        for cid, tot_val in zip(other_cids, other_spend):
+            tier = np.random.choice(["champion", "loyal", "new", "other"], p=[0.25, 0.35, 0.20, 0.20])
+            if tier == "champion":
+                n_tx = int(np.random.randint(8, 26))
+                last_day = int(np.random.randint(1, 28))
+            elif tier == "loyal":
+                n_tx = int(np.random.randint(5, 15))
+                last_day = int(np.random.randint(15, 75))
+            elif tier == "new":
+                n_tx = int(np.random.randint(1, 3))
+                last_day = int(np.random.randint(1, 30))
+            else:
+                n_tx = int(np.random.randint(1, 4))
+                last_day = int(np.random.randint(60, 480))
+            tx_days = sorted(list(np.random.randint(last_day, 540, size=n_tx)), reverse=True)
+            tx_days[0] = last_day
+            raw_v = np.random.uniform(0.5, 1.5, size=n_tx)
+            v_parts = np.round((raw_v / raw_v.sum()) * tot_val, 2)
+            v_parts[0] += round(tot_val - v_parts.sum(), 2)
+            for d, v in zip(tx_days, v_parts):
+                trx_id += 1
+                records.append({
+                    "id_cliente": cid,
+                    "data_transacao": end_date - timedelta(days=int(d)),
+                    "id_transacao": f"TRX-{trx_id}",
+                    "valor_total": float(v)
+                })
+
+        df = pd.DataFrame(records)
+        df = df.sort_values(by="data_transacao").reset_index(drop=True)
+        return df
+
+    # Caso genérico para outros n_customers
+    first_customers = customer_ids.copy()
+    np.random.shuffle(first_customers)
+    remaining_count = max(0, n_transactions - n_customers)
     weights = np.random.pareto(a=1.8, size=n_customers) + 0.05
     customer_probs = weights / weights.sum()
+    chosen_customers = first_customers + list(np.random.choice(customer_ids, size=remaining_count, p=customer_probs))
 
-    # Sorteio dos clientes para as transações
-    chosen_customers = np.random.choice(customer_ids, size=n_transactions, p=customer_probs)
-
-    # Geração de datas com sazonalidade (pesos maiores para Nov/Dez e início de mês)
     all_dates = [start_date + timedelta(days=i) for i in range(total_days + 1)]
-    date_weights = []
-
-    for d in all_dates:
-        w = 1.0
-        # Sazonalidade de final de ano (Novembro e Dezembro)
-        if d.month in [11, 12]:
-            w *= 1.8
-        # Pico de início de mês (pagamento de salários - dias 1 a 10)
-        if 1 <= d.day <= 10:
-            w *= 1.3
-        # Ligeiro aumento nos fins de semana (compras de lazer)
-        if d.weekday() in [4, 5, 6]:  # Sex, Sáb, Dom
-            w *= 1.15
-        date_weights.append(w)
-
+    date_weights = [1.8 if d.month in [11, 12] else (1.3 if 1 <= d.day <= 10 else 1.0) for d in all_dates]
     date_probs = np.array(date_weights) / sum(date_weights)
-    date_indices = np.random.choice(len(all_dates), size=n_transactions, p=date_probs)
-    chosen_dates = [all_dates[idx] for idx in date_indices]
+    chosen_dates = [all_dates[idx] for idx in np.random.choice(len(all_dates), size=len(chosen_customers), p=date_probs)]
 
-    # Variação de tíquete médio por perfil de cliente:
-    # Atribui a cada cliente um multiplicador de poder de compra (VIP vs Padrão)
-    client_spend_affinity = {
-        cid: np.random.choice([0.6, 1.0, 1.8, 3.5], p=[0.40, 0.40, 0.15, 0.05])
-        for cid in customer_ids
-    }
-
-    # Gera valores transacionados com base em distribuição lognormal
-    raw_values = np.random.lognormal(mean=4.8, sigma=0.75, size=n_transactions)
-    adjusted_values = [
-        round(val * client_spend_affinity[cid], 2)
-        for val, cid in zip(raw_values, chosen_customers)
-    ]
-    # Garantir valor mínimo razoável (ex: R$ 25,00)
-    adjusted_values = [max(25.00, v) for v in adjusted_values]
-
-    # Criação dos IDs de transação
-    transaction_ids = [f"TRX-{100000 + i}" for i in range(n_transactions)]
+    client_spend_affinity = {cid: np.random.choice([0.6, 1.0, 1.8, 3.5], p=[0.40, 0.40, 0.15, 0.05]) for cid in customer_ids}
+    raw_values = np.random.lognormal(mean=4.8, sigma=0.75, size=len(chosen_customers))
+    adjusted_values = [max(25.00, round(val * client_spend_affinity[cid], 2)) for val, cid in zip(raw_values, chosen_customers)]
+    transaction_ids = [f"TRX-{100000 + i}" for i in range(len(chosen_customers))]
 
     df = pd.DataFrame(
         {
@@ -257,8 +299,6 @@ def generate_synthetic_transactions(
             "valor_total": adjusted_values,
         }
     )
-
-    # Ordenar cronologicamente
     df = df.sort_values(by="data_transacao").reset_index(drop=True)
     return df
 
