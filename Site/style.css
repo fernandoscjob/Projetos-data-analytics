@@ -463,6 +463,10 @@ body {
   position: relative;
   cursor: pointer;
   border: 1px solid transparent;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
 }
 
 .cohort-cell:hover {
@@ -477,8 +481,8 @@ body {
 .ret-80  { background: rgba(16, 185, 129, 0.32); color: #a7f3d0; font-weight: 600; border-color: rgba(16, 185, 129, 0.2); }
 .ret-70  { background: rgba(56, 189, 248, 0.30); color: #bae6fd; border-color: rgba(56, 189, 248, 0.2); }
 .ret-60  { background: rgba(99, 102, 241, 0.25); color: #c7d2fe; border-color: rgba(99, 102, 241, 0.15); }
-.ret-50  { background: rgba(99, 102, 241, 0.16); color: #94a3b8; border-color: rgba(255, 255, 255, 0.05); }
-.ret-low { background: rgba(255, 255, 255, 0.04); color: #64748b; border-color: rgba(255, 255, 255, 0.03); }
+.ret-50  { background: rgba(99, 102, 241, 0.28); color: #e2e8f0; font-weight: 600; border-color: rgba(99, 102, 241, 0.35); }
+.ret-low { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; font-weight: 600; border-color: rgba(255, 255, 255, 0.1); }
 
 /* Cores de Churn (Tons de Esmeralda baixo -> Âmbar -> Vermelho/Rosa) */
 .churn-0   { background: rgba(16, 185, 129, 0.20); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.15); }
@@ -512,12 +516,12 @@ body {
 }
 
 .rfm-table th {
-  padding: 0.6rem 0.5rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  padding: 0.75rem 0.5rem;
+  font-weight: 700;
+  color: #f1f5f9;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  font-size: 0.8125rem;
   text-align: center;
 }
 
@@ -557,7 +561,7 @@ body {
 .rfm-bg-em-risco      { background: rgba(239, 68, 68, 0.32); color: #fee2e2; font-weight: 700; border-color: rgba(239, 68, 68, 0.45); }
 .rfm-bg-nao-perder    { background: rgba(220, 38, 38, 0.42); color: #ffffff; font-weight: 800; border-color: rgba(239, 68, 68, 0.6); box-shadow: inset 0 0 10px rgba(220, 38, 38, 0.3); }
 .rfm-bg-hibernando    { background: rgba(100, 116, 139, 0.22); color: #cbd5e1; border-color: rgba(100, 116, 139, 0.3); }
-.rfm-bg-perdidos      { background: rgba(71, 85, 105, 0.25); color: #94a3b8; border-color: rgba(71, 85, 105, 0.25); }
+.rfm-bg-perdidos      { background: rgba(71, 85, 105, 0.35); color: #e2e8f0; font-weight: 600; border-color: rgba(71, 85, 105, 0.45); }
 
 /* Pílulas de Seleção de Clusters */
 .rfm-pill-btn {

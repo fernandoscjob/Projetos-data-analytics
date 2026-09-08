@@ -973,20 +973,23 @@ GROUP BY 1, 2;</code></pre>
         y: safras,
         type: 'heatmap',
         colorscale: [
-          [0, '#090a0f'],
-          [0.5, '#0e7490'],
-          [0.75, '#06b6d4'],
+          [0, '#0c1322'],
+          [0.35, '#0e7490'],
+          [0.6, '#0284c7'],
+          [0.8, '#06b6d4'],
           [1, '#10b981']
         ],
         text: zValues.map(row => row.map(v => v !== null ? v + '%' : '')),
         texttemplate: '%{text}',
+        textfont: { size: 13, color: '#ffffff', family: 'JetBrains Mono' },
         showscale: false
       }], {
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
-        margin: { t: 20, r: 20, b: 30, l: 60 },
-        font: { color: '#94a3b8', family: 'Plus Jakarta Sans' },
-        yaxis: { autorange: 'reversed' }
+        margin: { t: 20, r: 20, b: 35, l: 70 },
+        font: { color: '#f8fafc', family: 'Plus Jakarta Sans', size: 12 },
+        xaxis: { tickfont: { size: 13, color: '#ffffff', family: 'JetBrains Mono' } },
+        yaxis: { autorange: 'reversed', tickfont: { size: 13, color: '#ffffff', family: 'JetBrains Mono' } }
       }, { responsive: true, displayModeBar: false });
 
       Plotly.newPlot('chartSurvivalCurve', [
@@ -996,7 +999,8 @@ GROUP BY 1, 2;</code></pre>
           name: 'Safra Antiga (2024-01)',
           type: 'scatter',
           mode: 'lines+markers',
-          line: { color: '#ef4444', width: 2.5, dash: 'dot' }
+          line: { color: '#f43f5e', width: 3, dash: 'dot' },
+          marker: { size: 8, color: '#f43f5e', line: { color: '#ffffff', width: 1.5 } }
         },
         {
           x: ['M0', 'M1', 'M2', 'M3'],
@@ -1004,16 +1008,26 @@ GROUP BY 1, 2;</code></pre>
           name: 'Safra Otimizada (2024-04)',
           type: 'scatter',
           mode: 'lines+markers',
-          line: { color: '#10b981', width: 3 }
+          line: { color: '#10b981', width: 3.5 },
+          marker: { size: 8, color: '#10b981', line: { color: '#ffffff', width: 1.5 } }
         }
       ], {
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
-        margin: { t: 20, r: 20, b: 40, l: 40 },
-        font: { color: '#94a3b8', family: 'Plus Jakarta Sans' },
-        legend: { orientation: 'h', y: -0.2, font: { color: '#fff' } },
-        xaxis: { gridcolor: 'rgba(255,255,255,0.05)' },
-        yaxis: { gridcolor: 'rgba(255,255,255,0.05)', ticksuffix: '%' }
+        margin: { t: 20, r: 20, b: 45, l: 55 },
+        font: { color: '#f8fafc', family: 'Plus Jakarta Sans', size: 12 },
+        legend: { orientation: 'h', y: -0.2, font: { color: '#ffffff', size: 12 } },
+        xaxis: { 
+          title: { text: 'Meses de Vida (Cohort Index)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)'
+        },
+        yaxis: { 
+          title: { text: 'Taxa de Sobrevivência (%)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)',
+          ticksuffix: '%'
+        }
       }, { responsive: true, displayModeBar: false });
     }
 

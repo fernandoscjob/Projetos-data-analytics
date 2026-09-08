@@ -1514,7 +1514,7 @@ document.addEventListener('DOMContentLoaded', () => {
         margin: { t: 10, l: 10, r: 10, b: 10 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
-        font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc' }
+        font: { family: '"Plus Jakarta Sans", sans-serif', color: '#ffffff', size: 13 }
       };
 
       Plotly.newPlot(container, data, layout, { responsive: true, displayModeBar: false });
@@ -1553,25 +1553,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const layout = {
-          margin: { t: 20, l: 50, r: 20, b: 50 },
+          margin: { t: 25, l: 60, r: 20, b: 55 },
           paper_bgcolor: 'rgba(0,0,0,0)',
           plot_bgcolor: 'rgba(0,0,0,0)',
+          font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc', size: 12 },
           xaxis: {
-            title: 'Recência (Dias desde a última compra)',
-            color: '#94a3b8',
-            gridcolor: 'rgba(255,255,255,0.05)'
+            title: { text: 'Recência (Dias desde a última compra)', font: { size: 13, color: '#ffffff' } },
+            tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+            gridcolor: 'rgba(255,255,255,0.1)'
           },
           yaxis: {
-            title: 'Frequência (Nº de Compras)',
-            color: '#94a3b8',
-            gridcolor: 'rgba(255,255,255,0.05)'
+            title: { text: 'Frequência (Nº de Compras)', font: { size: 13, color: '#ffffff' } },
+            tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+            gridcolor: 'rgba(255,255,255,0.1)'
           },
           legend: {
             orientation: 'h',
-            y: 1.12,
-            font: { color: '#94a3b8', size: 10 }
-          },
-          font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc' }
+            y: 1.15,
+            font: { color: '#ffffff', size: 12 }
+          }
         };
 
         Plotly.newPlot(container, traces, layout, { responsive: true, displayModeBar: false });
@@ -1599,12 +1599,24 @@ document.addEventListener('DOMContentLoaded', () => {
           margin: { t: 10, l: 10, r: 10, b: 10 },
           paper_bgcolor: 'rgba(0,0,0,0)',
           scene: {
-            xaxis: { title: 'Recência (Dias)', color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.1)' },
-            yaxis: { title: 'Frequência', color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.1)' },
-            zaxis: { title: 'Monetário (R$)', color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.1)' }
+            xaxis: { 
+              title: { text: 'Recência (Dias)', font: { size: 12, color: '#ffffff' } },
+              tickfont: { size: 11, color: '#e2e8f0' },
+              gridcolor: 'rgba(255,255,255,0.15)'
+            },
+            yaxis: { 
+              title: { text: 'Frequência', font: { size: 12, color: '#ffffff' } },
+              tickfont: { size: 11, color: '#e2e8f0' },
+              gridcolor: 'rgba(255,255,255,0.15)'
+            },
+            zaxis: { 
+              title: { text: 'Monetário (R$)', font: { size: 12, color: '#ffffff' } },
+              tickfont: { size: 11, color: '#e2e8f0' },
+              gridcolor: 'rgba(255,255,255,0.15)'
+            }
           },
-          legend: { font: { color: '#94a3b8', size: 10 } },
-          font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc' }
+          legend: { font: { color: '#ffffff', size: 12 } },
+          font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc', size: 12 }
         };
 
         Plotly.newPlot(container, traces, layout, { responsive: true, displayModeBar: false });
@@ -1635,18 +1647,34 @@ document.addEventListener('DOMContentLoaded', () => {
         y: ['R5 (Recente)', 'R4', 'R3', 'R2', 'R1 (Antigo)'],
         text: textMatrix,
         texttemplate: '%{text}',
-        colorscale: 'Blues',
-        colorbar: { title: 'Clientes' },
+        textfont: { family: 'JetBrains Mono', size: 12, color: '#ffffff' },
+        colorscale: [
+          [0, '#0f172a'],
+          [0.2, '#1e3a8a'],
+          [0.5, '#2563eb'],
+          [0.75, '#38bdf8'],
+          [1, '#10b981']
+        ],
+        colorbar: { 
+          title: { text: 'Clientes', font: { color: '#ffffff', size: 12 } },
+          tickfont: { color: '#e2e8f0', size: 11, family: 'JetBrains Mono' }
+        },
         hoverongaps: false
       }];
 
       const layout = {
-        margin: { t: 20, l: 120, r: 20, b: 50 },
+        margin: { t: 20, l: 130, r: 20, b: 55 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
-        xaxis: { title: 'Frequência (F1 = Poucas Compras ➡️ F5 = Compra Frequentemente)', color: '#94a3b8' },
-        yaxis: { title: 'Recência', color: '#94a3b8' },
-        font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc' }
+        font: { family: '"Plus Jakarta Sans", sans-serif', color: '#f8fafc', size: 12 },
+        xaxis: { 
+          title: { text: 'Frequência (F1 = Poucas Compras ➡️ F5 = Compra Frequentemente)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' }
+        },
+        yaxis: { 
+          title: { text: 'Recência', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' }
+        }
       };
 
       Plotly.newPlot(container, data, layout, { responsive: true, displayModeBar: false });

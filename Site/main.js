@@ -715,8 +715,8 @@ function initInteractiveChart() {
           plugins: {
             legend: {
               labels: {
-                color: '#94a3b8',
-                font: { family: "'Plus Jakarta Sans', sans-serif", size: 12 }
+                color: '#f8fafc',
+                font: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '600' }
               }
             },
             tooltip: {
@@ -735,13 +735,17 @@ function initInteractiveChart() {
           },
           scales: {
             x: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#64748b' }
+              grid: { color: 'rgba(255, 255, 255, 0.08)' },
+              ticks: {
+                color: '#cbd5e1',
+                font: { family: "'JetBrains Mono', monospace", size: 12, weight: '600' }
+              }
             },
             y: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              grid: { color: 'rgba(255, 255, 255, 0.08)' },
               ticks: {
-                color: '#64748b',
+                color: '#cbd5e1',
+                font: { family: "'JetBrains Mono', monospace", size: 12, weight: '600' },
                 callback: value => `R$ ${value}k`
               }
             }
@@ -788,8 +792,8 @@ function initInteractiveChart() {
           plugins: {
             legend: {
               labels: {
-                color: '#94a3b8',
-                font: { family: "'Plus Jakarta Sans', sans-serif", size: 12 }
+                color: '#f8fafc',
+                font: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '600' }
               }
             },
             tooltip: {
@@ -803,14 +807,20 @@ function initInteractiveChart() {
           },
           scales: {
             x: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#64748b' }
+              grid: { color: 'rgba(255, 255, 255, 0.08)' },
+              ticks: {
+                color: '#cbd5e1',
+                font: { family: "'JetBrains Mono', monospace", size: 12, weight: '600' }
+              }
             },
             y: {
               type: 'linear',
               position: 'left',
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#64748b' }
+              grid: { color: 'rgba(255, 255, 255, 0.08)' },
+              ticks: {
+                color: '#cbd5e1',
+                font: { family: "'JetBrains Mono', monospace", size: 12, weight: '600' }
+              }
             },
             y1: {
               type: 'linear',
@@ -819,7 +829,8 @@ function initInteractiveChart() {
               max: 100,
               grid: { drawOnChartArea: false },
               ticks: {
-                color: '#10b981',
+                color: '#34d399',
+                font: { family: "'JetBrains Mono', monospace", size: 12, weight: '700' },
                 callback: value => `${value}%`
               }
             }

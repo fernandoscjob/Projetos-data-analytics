@@ -935,33 +935,52 @@ DIVIDE(_Receita - _CMV, _Receita, 0)</code></pre>
         x: ['Receita Bruta', 'Deduções/Impostos', 'CMV', 'Despesas Op.', 'Margem Líquida'],
         textposition: 'outside',
         text: ['R$ 14.5M', '-R$ 2.8M', '-R$ 6.2M', '-R$ 2.4M', 'R$ 3.1M'],
+        textfont: { size: 13, color: '#ffffff', family: 'JetBrains Mono' },
         y: [14.5, -2.8, -6.2, -2.4, 0],
-        connector: { line: { color: 'rgba(255,255,255,0.2)' } },
+        connector: { line: { color: 'rgba(255,255,255,0.3)', width: 2 } },
         increasing: { marker: { color: '#10b981' } },
-        decreasing: { marker: { color: '#ef4444' } },
+        decreasing: { marker: { color: '#f43f5e' } },
         totals: { marker: { color: '#38bdf8' } }
       }], {
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
-        margin: { t: 20, r: 20, b: 50, l: 40 },
-        font: { color: '#94a3b8', family: 'Plus Jakarta Sans' },
-        yaxis: { gridcolor: 'rgba(255,255,255,0.05)', ticksufix: 'M' }
+        margin: { t: 25, r: 20, b: 55, l: 60 },
+        font: { color: '#f8fafc', family: 'Plus Jakarta Sans', size: 12 },
+        xaxis: { tickfont: { size: 12, color: '#ffffff', family: 'Plus Jakarta Sans' } },
+        yaxis: { 
+          title: { text: 'Volume Financeiro (R$ Milhões)', font: { size: 13, color: '#ffffff' } },
+          gridcolor: 'rgba(255,255,255,0.1)',
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          ticksuffix: 'M'
+        }
       }, { responsive: true, displayModeBar: false });
 
       Plotly.newPlot('chartMargemEvolucao', [{
         x: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
         y: [18.2, 19.5, 17.8, 22.4, 23.8, 24.5],
         type: 'scatter',
-        mode: 'lines+markers',
-        line: { color: '#6366f1', width: 3 },
-        marker: { size: 8, color: '#38bdf8' }
+        mode: 'lines+markers+text',
+        text: ['18.2%', '19.5%', '17.8%', '22.4%', '23.8%', '24.5%'],
+        textposition: 'top center',
+        textfont: { size: 12, color: '#ffffff', family: 'JetBrains Mono' },
+        line: { color: '#818cf8', width: 3.5 },
+        marker: { size: 9, color: '#38bdf8', line: { color: '#ffffff', width: 2 } }
       }], {
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
-        margin: { t: 20, r: 20, b: 40, l: 40 },
-        font: { color: '#94a3b8', family: 'Plus Jakarta Sans' },
-        xaxis: { gridcolor: 'rgba(255,255,255,0.05)' },
-        yaxis: { gridcolor: 'rgba(255,255,255,0.05)', ticksuffix: '%' }
+        margin: { t: 25, r: 20, b: 45, l: 55 },
+        font: { color: '#f8fafc', family: 'Plus Jakarta Sans', size: 12 },
+        xaxis: { 
+          title: { text: 'Mês de Competência', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#ffffff', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)'
+        },
+        yaxis: { 
+          title: { text: 'Margem Líquida (%)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)',
+          ticksuffix: '%'
+        }
       }, { responsive: true, displayModeBar: false });
     }
 

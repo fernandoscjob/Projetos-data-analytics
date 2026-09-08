@@ -945,7 +945,7 @@ def detectar_anomalia_transacional(df_historico, limiar_zscore=2.5):
           type: 'scatter',
           mode: 'lines',
           fill: 'tonexty',
-          fillcolor: 'rgba(56, 189, 248, 0.08)',
+          fillcolor: 'rgba(56, 189, 248, 0.20)',
           line: { width: 0 },
           name: 'Banda de Confiança (&plusmn; 2.5 &sigma;)'
         },
@@ -954,7 +954,7 @@ def detectar_anomalia_transacional(df_historico, limiar_zscore=2.5):
           y: baseMedia,
           type: 'scatter',
           mode: 'lines',
-          line: { color: 'rgba(255,255,255,0.3)', dash: 'dash' },
+          line: { color: 'rgba(255,255,255,0.7)', dash: 'dash', width: 2 },
           name: 'Média Móvel Esperada'
         },
         {
@@ -962,21 +962,49 @@ def detectar_anomalia_transacional(df_historico, limiar_zscore=2.5):
           y: transacoesReais,
           type: 'scatter',
           mode: 'lines+markers',
-          line: { color: '#10b981', width: 2.5 },
+          line: { color: '#10b981', width: 3 },
           marker: {
-            size: transacoesReais.map((v, i) => i === 14 ? 12 : 5),
-            color: transacoesReais.map((v, i) => i === 14 ? '#ef4444' : '#10b981')
+            size: transacoesReais.map((v, i) => i === 14 ? 14 : 6),
+            color: transacoesReais.map((v, i) => i === 14 ? '#ef4444' : '#10b981'),
+            line: { color: '#ffffff', width: 2 }
           },
           name: 'Volume Observado'
         }
       ], {
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
-        margin: { t: 20, r: 20, b: 40, l: 40 },
-        font: { color: '#94a3b8', family: 'Plus Jakarta Sans' },
-        legend: { orientation: 'h', y: -0.2, font: { color: '#fff' } },
-        xaxis: { gridcolor: 'rgba(255,255,255,0.05)' },
-        yaxis: { gridcolor: 'rgba(255,255,255,0.05)' }
+        margin: { t: 30, r: 20, b: 45, l: 55 },
+        font: { color: '#f8fafc', family: 'Plus Jakarta Sans', size: 12 },
+        legend: { orientation: 'h', y: -0.2, font: { color: '#ffffff', size: 12 } },
+        xaxis: { 
+          title: { text: 'Horário do Dia (UTC-3)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)'
+        },
+        yaxis: { 
+          title: { text: 'Volume de Transações / min', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)'
+        },
+        annotations: [{
+          x: '14:00',
+          y: 60,
+          xref: 'x',
+          yref: 'y',
+          text: '🚨 Queda Anômala (Z-Score > 2.5)',
+          showarrow: true,
+          arrowhead: 2,
+          arrowcolor: '#ef4444',
+          arrowsize: 1.2,
+          arrowwidth: 2,
+          ax: 0,
+          ay: -45,
+          bgcolor: '#1e1b4b',
+          bordercolor: '#ef4444',
+          borderwidth: 1.5,
+          borderpad: 6,
+          font: { family: 'JetBrains Mono', size: 12, color: '#fecaca' }
+        }]
       }, { responsive: true, displayModeBar: false });
 
       Plotly.newPlot('chartWorkflowSLA', [{

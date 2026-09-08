@@ -101,18 +101,21 @@
       font-weight: 700;
     }
     .data-table th {
-      padding: 0.75rem 1rem;
-      font-size: 0.75rem;
+      padding: 0.85rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #94a3b8;
+      letter-spacing: 0.06em;
+      color: #f1f5f9;
+      background: rgba(255, 255, 255, 0.03);
       font-family: 'JetBrains Mono', monospace;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     }
     .data-table td {
-      padding: 0.75rem 1rem;
-      font-size: 0.825rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 0.85rem 1rem;
+      font-size: 0.875rem;
+      color: #f8fafc;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
     .data-table tr:hover td {
       background-color: rgba(255, 255, 255, 0.02);
@@ -1418,9 +1421,19 @@ document.addEventListener('DOMContentLoaded', () => {
         template: 'plotly_dark',
         plot_bgcolor: 'rgba(0,0,0,0)',
         paper_bgcolor: 'rgba(0,0,0,0)',
-        margin: { l: 40, r: 20, t: 20, b: 40 },
-        legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' },
-        xaxis: { tickfont: { size: 10 } }
+        font: { family: 'Plus Jakarta Sans, sans-serif', color: '#f8fafc', size: 12 },
+        margin: { l: 50, r: 20, t: 25, b: 45 },
+        legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center', font: { size: 12, color: '#ffffff' } },
+        xaxis: { 
+          title: { text: 'Transportadoras Parceiras', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'Plus Jakarta Sans' },
+          gridcolor: 'rgba(255,255,255,0.06)'
+        },
+        yaxis: { 
+          title: { text: 'Valor Acumulado (R$)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)'
+        }
       };
       Plotly.newPlot('chartBarTransp', [traceFat, traceDev, traceGlo], layoutBar, { responsive: true, displayModeBar: false });
 
@@ -1440,12 +1453,16 @@ document.addEventListener('DOMContentLoaded', () => {
         hole: 0.55,
         marker: { colors: ['#f43f5e', '#fbbf24', '#a855f7', '#38bdf8'] },
         textinfo: 'percent+label',
+        textfont: { size: 12, color: '#ffffff', family: 'JetBrains Mono' },
+        insidetextfont: { size: 13, color: '#ffffff', family: 'JetBrains Mono' },
+        outsidetextfont: { size: 12, color: '#f8fafc', family: 'Plus Jakarta Sans' },
         hoverinfo: 'label+value+percent'
       }];
       const layoutDonut = {
         template: 'plotly_dark',
         plot_bgcolor: 'rgba(0,0,0,0)',
         paper_bgcolor: 'rgba(0,0,0,0)',
+        font: { family: 'Plus Jakarta Sans, sans-serif', color: '#f8fafc', size: 12 },
         margin: { l: 20, r: 20, t: 20, b: 20 },
         showlegend: false
       };
@@ -1465,9 +1482,10 @@ document.addEventListener('DOMContentLoaded', () => {
         mode: 'markers',
         type: 'scatter',
         marker: {
-          size: data.map(c => Math.max(6, Math.min(20, Math.abs(c.divergencia) / 3))),
+          size: data.map(c => Math.max(7, Math.min(22, Math.abs(c.divergencia) / 3))),
           color: data.map(c => colorsMap[c.status] || '#38bdf8'),
-          opacity: 0.8
+          opacity: 0.9,
+          line: { color: '#ffffff', width: 1.5 }
         },
         name: 'CT-es'
       };
@@ -1477,7 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
         x: [0, maxP],
         y: [0, maxP],
         mode: 'lines',
-        line: { color: '#64748b', dash: 'dash', width: 1.5 },
+        line: { color: '#cbd5e1', dash: 'dash', width: 2 },
         name: 'Linha de Paridade (Real = Cubado)'
       };
 
@@ -1485,9 +1503,18 @@ document.addEventListener('DOMContentLoaded', () => {
         template: 'plotly_dark',
         plot_bgcolor: 'rgba(0,0,0,0)',
         paper_bgcolor: 'rgba(0,0,0,0)',
-        margin: { l: 40, r: 20, t: 20, b: 40 },
-        xaxis: { title: 'Peso Físico Real (kg)' },
-        yaxis: { title: 'Peso Cubado Contratual (kg)' },
+        font: { family: 'Plus Jakarta Sans, sans-serif', color: '#f8fafc', size: 12 },
+        margin: { l: 60, r: 20, t: 25, b: 50 },
+        xaxis: { 
+          title: { text: 'Peso Físico Real (kg)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)'
+        },
+        yaxis: { 
+          title: { text: 'Peso Cubado Contratual (kg)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)'
+        },
         showlegend: false
       };
       Plotly.newPlot('chartScatterCubagem', [traceScatter, traceDiag], layoutScatter, { responsive: true, displayModeBar: false });
@@ -1507,14 +1534,25 @@ document.addEventListener('DOMContentLoaded', () => {
         y: destLabels,
         type: 'bar',
         orientation: 'h',
-        marker: { color: '#fbbf24' }
+        marker: { color: '#fbbf24' },
+        text: destValues.map(v => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
+        textposition: 'outside',
+        textfont: { size: 12, color: '#ffffff', family: 'JetBrains Mono' }
       }];
       const layoutDest = {
         template: 'plotly_dark',
         plot_bgcolor: 'rgba(0,0,0,0)',
         paper_bgcolor: 'rgba(0,0,0,0)',
-        margin: { l: 120, r: 20, t: 20, b: 40 },
-        xaxis: { title: 'Total de Glosas (R$)' }
+        font: { family: 'Plus Jakarta Sans, sans-serif', color: '#f8fafc', size: 12 },
+        margin: { l: 130, r: 50, t: 25, b: 45 },
+        xaxis: { 
+          title: { text: 'Total de Glosas (R$)', font: { size: 13, color: '#ffffff' } },
+          tickfont: { size: 12, color: '#f1f5f9', family: 'JetBrains Mono' },
+          gridcolor: 'rgba(255,255,255,0.1)'
+        },
+        yaxis: {
+          tickfont: { size: 12, color: '#ffffff', family: 'Plus Jakarta Sans' }
+        }
       };
       Plotly.newPlot('chartBarDestino', traceDest, layoutDest, { responsive: true, displayModeBar: false });
     }
