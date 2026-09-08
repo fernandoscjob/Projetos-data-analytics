@@ -15,16 +15,18 @@ Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | 
 - **Barra de Métricas de Impacto (Quick Wins)**: Contadores animados via `IntersectionObserver` apresentando números de ROI, volume e automação.
 - **Pilares de Soluções & Geração de Valor (#solucoes)**: Grid consultivo de 4 frentes estratégicas (Auditoria & Otimização de Custos, Camada Semântica & SSOT, BI & Cockpits C-Level e Pipelines & Alertas Proativos).
 - **Stack Técnica Categorizada**: Badges interativos distribuídos em *Modelagem & Engenharia* (SQL Avançado, Kimball, Star Schema, SSOT, dbt), *BI & Camada Executiva* (Looker LookML, Power BI, DAX Avançado, Cockpits C-Level), *Automação & Pipelines* (Python, n8n, Alertas Proativos, Airflow) e *Negócio & Governança* (Auditoria Contratual, Cohort Analytics, BPMN Bizagi).
-- **4 Cases de Sucesso com Modal Aprofundado**:
+- **5 Cases de Sucesso com Modal Aprofundado**:
   1. **Auditoria Contratual de Fretes & Otimização de Custos** (SQL + Looker + Python).
   2. **Modelagem de Cohort, Retenção & Prevenção de Churn** (SQL Window Functions + dbt).
   3. **Camada Semântica & Cockpit Executivo de Planejamento** (Power BI + dbt + Kimball).
   4. **Orquestração de Pipelines e Alertas Proativos** (n8n + Python + Webhooks).
-  *Cada modal contém o desafio de negócio, arquitetura técnica, queries SQL reais e resultados de ROI mensuráveis.*
-- **Cockpit Analítico Interativo (Chart.js & Cohort Heatmap)**:
+  5. **Cockpit Analítico de Segmentação RFM & Prevenção de Churn** (Python + Streamlit + Plotly + Quantis).
+  *Cada modal contém o desafio de negócio, arquitetura técnica, queries SQL/código Python e resultados de ROI mensuráveis.*
+- **Cockpit Analítico Interativo (Chart.js, Cohort Heatmap & Cockpit RFM)**:
   - *Visão 1*: Custo Real vs Meta (Linha comparativa de inflexão).
   - *Visão 2*: Volume Operacional & Acurácia de SLA (Barras e Eixo Secundário).
-  - *Visão 3*: **Matriz Heatmap de Cohort & Churn** com alternância em tempo real entre *Taxa de Retenção (%)* e *Taxa de Churn (%)* com tooltips interativos por célula.
+  - *Visão 3*: **Matriz Heatmap de Cohort & Churn** com alternância em tempo real entre *Taxa de Retenção (%)* e *Taxa de Churn (%)*.
+  - *Visão 4*: **Cockpit RFM & CRM** com Matriz 5x5 interativa, cards de receita em risco (R$ 485k) e playbooks comerciais dinâmicos para 11 clusters.
 - **Trajetória Profissional & Formação Acadêmica**: Timeline corporativa estruturada com experiências como *Analista de Dados / Consultor de BI* e atuação na MEDGRUPO (Looker Studio, SQL, automações n8n), além de formação em Análise e Desenvolvimento de Sistemas.
 - **Formulário de Contato Integrado**: Pronto para o **Formspree** via envio assíncrono (AJAX/Fetch) com feedback via componente *Toast* sem recarregar a página.
 - **Links Reais & Download de CV**: Conexão direta com WhatsApp, LinkedIn, GitHub e download nativo do arquivo `curriculo-fernando.pdf`.
@@ -36,8 +38,12 @@ Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | 
 ```
 Portifólio em Dados/
 ├── index.html               # Estrutura HTML5 semântica e acessível
-├── style.css                # Design tokens, glassmorphism e animações
-├── main.js                  # Lógica interativa, Chart.js, Cohort e Formspree AJAX
+├── style.css                # Design tokens, glassmorphism, matrizes e animações
+├── main.js                  # Lógica interativa, Chart.js, Cohort, Cockpit RFM e Formspree AJAX
+├── app.py                   # Aplicação Web analítica completa em Streamlit
+├── rfm_engine.py            # Motor analítico RFM com quantis e 11 clusters de negócio
+├── requirements.txt         # Dependências do app (streamlit, pandas, numpy, plotly, openpyxl)
+├── .gitignore               # Ignora ambientes virtuais (.venv) e caches Python
 ├── profile.jpg              # Foto de perfil profissional em alta resolução
 ├── curriculo-fernando.pdf   # Arquivo de currículo para download direto
 └── README.md                # Documentação técnica do projeto
@@ -47,16 +53,27 @@ Portifólio em Dados/
 
 ## 🚀 Como Executar Localmente
 
-### Opção 1: Abrir diretamente no Navegador
+### Opção 1: Executar o Cockpit Analítico RFM em Python (Streamlit)
+Abra o terminal na pasta do projeto e execute:
+```bash
+streamlit run app.py
+```
+*Ou via ambiente virtual:*
+```bash
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
+Acesse no navegador: `http://localhost:8501` para interagir com o dashboard analítico completo com uploads e exportações.
+
+### Opção 2: Abrir o Portfólio Web diretamente no Navegador
 Basta dar dois cliques no arquivo `index.html` ou arrastá-lo para qualquer navegador moderno (Chrome, Edge, Firefox, Safari).
 
-### Opção 2: VS Code Live Server
+### Opção 3: VS Code Live Server
 1. Abra a pasta do projeto no **Visual Studio Code**.
 2. Instale a extensão **Live Server** (caso ainda não tenha).
 3. Clique com o botão direito em `index.html` e selecione **"Open with Live Server"**.
 4. O site abrirá automaticamente em `http://127.0.0.1:5500`.
 
-### Opção 3: Python HTTP Server
+### Opção 4: Python HTTP Server (Portfólio Web)
 Abra o terminal na pasta do projeto e execute:
 ```bash
 python -m http.server 3000

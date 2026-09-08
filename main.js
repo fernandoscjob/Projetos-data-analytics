@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCaseStudyModal();
   initInteractiveChart();
   initCohortAnalysis();
+  initRfmAnalysis();
   initContactActions();
 });
 
@@ -302,6 +303,50 @@ ORDER BY a.safra_mes, a.periodo_m;`,
       "Aumento de 18 pontos percentuais na taxa de retenção de M3 (de 58% para 76%) nas safras que utilizaram a nova jornada orientada a dados.",
       "Redução consolidada de 25% no Churn involuntário com automação de alertas proativos de risco.",
       "Preservação de aproximadamente R$ 640.000 em ARR anualizado na carteira de clientes."
+    ]
+  },
+  rfm: {
+    title: "Segmentação RFM & Prevenção de Churn em Vendas",
+    category: "CRM Analytics, Retenção & Machine Intelligence",
+    impact: "Mapeamento de R$ 485k em risco e +35% de retenção reativada",
+    tags: ["Python (Pandas/NumPy)", "Streamlit", "Plotly", "Quantis RFM (qcut)", "CRM Playbooks", "LTV Modeling"],
+    problem: `
+      A empresa operava com uma base ativa de mais de 800 clientes recorrentes, porém adotava uma abordagem comercial uniforme para toda a carteira. 
+      Clientes de altíssimo volume histórico (grandes contas) entravam em inatividade sem alertas prévios, enquanto clientes novos recebiam a mesma régua de comunicação 
+      que compradores esporádicos. Essa homogeneidade analítica gerava perda silenciosa de clientes VIPs e desgaste da equipe comercial com leads de baixo retorno.
+    `,
+    solution: `
+      1. <strong>Motor Analítico RFM em Python:</strong> Engenharia de features para cálculo de Recência (dias desde a última transação), Frequência (pedidos únicos) e Valor Monetário (soma faturada).<br>
+      2. <strong>Pontuação por Quantis com Desempate:</strong> Aplicação rigorosa de <code>pd.qcut</code> com <code>rank(method='first')</code> para eliminar distorções de empates em clientes de 1 única compra, ranqueando de 1 a 5 cada dimensão com rigor estatístico.<br>
+      3. <strong>Matriz de 11 Clusters Estratégicos:</strong> Classificação determinística em clusters de negócio (Campeões, Leais, Potenciais Leais, Novos, Promissores, Precisam de Atenção, Quase Hibernando, Em Risco, Não Podemos Perder, Hibernando, Perdidos).<br>
+      4. <strong>Cockpit Executivo em Streamlit & Exportação CRM:</strong> Interface com Treemap financeiro, dispersão 2D/3D interativa, visualização de receita em risco e download imediato de listas operacionais em CSV (<code>utf-8-sig</code>) com playbooks personalizados.
+    `,
+    codeSnippet: `# Motor de Cálculo e Pontuação por Quantis RFM
+import pandas as pd
+
+def calculate_rfm(df, ref_date):
+    # 1. Agregação dos pilares por cliente
+    rfm = df.groupby('id_cliente').agg({
+        'data_transacao': lambda x: (ref_date - x.max()).days,
+        'id_transacao': 'nunique',
+        'valor_total': 'sum'
+    }).rename(columns={'data_transacao': 'Recencia', 'id_transacao': 'Frequencia', 'valor_total': 'Valor'})
+
+    # 2. Atribuição de Scores de 1 a 5 via Quantis com desempate
+    rfm['R_Score'] = pd.qcut(rfm['Recencia'].rank(method='first'), q=5, labels=[5, 4, 3, 2, 1]).astype(int)
+    rfm['F_Score'] = pd.qcut(rfm['Frequencia'].rank(method='first'), q=5, labels=[1, 2, 3, 4, 5]).astype(int)
+    rfm['M_Score'] = pd.qcut(rfm['Valor'].rank(method='first'), q=5, labels=[1, 2, 3, 4, 5]).astype(int)
+
+    # 3. Código composto e classificação determinística dos 11 clusters
+    rfm['RFM_Score'] = rfm['R_Score'].astype(str) + rfm['F_Score'].astype(str) + rfm['M_Score'].astype(str)
+    rfm['Segmento'] = rfm.apply(lambda r: assign_segment(r['R_Score'], r['F_Score'], r['M_Score']), axis=1)
+    
+    return rfm`,
+    results: [
+      "Identificação imediata de R$ 485.200 (24.8% da receita global) concentrados nos clusters críticos 'Não Podemos Perder' e 'Em Risco'.",
+      "Priorização de 100% dos contatos dos gerentes de contas, focando exclusivamente nas contas de maior risco e alto LTV.",
+      "Aumento de 35% na taxa de sucesso de reativação após o envio de ofertas direcionadas por canal prioritário (WhatsApp Concierge e Ligação Executiva).",
+      "Redução do tempo de diagnóstico da carteira de 3 dias no Excel para execução automatizada em menos de 10 segundos no Streamlit."
     ]
   }
 };
@@ -605,14 +650,17 @@ function initInteractiveChart() {
   const btnCost = document.getElementById('chartViewCost');
   const btnVolume = document.getElementById('chartViewVolume');
   const btnCohort = document.getElementById('chartViewCohort');
+  const btnRfm = document.getElementById('chartViewRfm');
   const chartContainer = document.getElementById('chartContainer');
   const cohortContainer = document.getElementById('cohortContainer');
+  const rfmContainer = document.getElementById('rfmContainer');
   const periodFiltersWrapper = document.getElementById('periodFiltersWrapper');
   const periodBtns = document.querySelectorAll('[data-period]');
   const chipKpi1 = document.getElementById('chipKpi1');
   const chipKpi2 = document.getElementById('chipKpi2');
   const footerPipeline = document.getElementById('demoFooterPipeline');
   const footerNote = document.getElementById('demoFooterNote');
+  const cardTestRfmBtn = document.getElementById('cardTestRfmBtn');
 
   function updateKpiChips() {
     if (currentView === 'cost') {
@@ -630,12 +678,21 @@ function initInteractiveChart() {
       if (chipKpi2) chipKpi2.innerHTML = 'Queda Churn Precoce: <strong class="text-emerald-400 font-mono">-47.2% (Jan vs Jun)</strong>';
       if (footerPipeline) footerPipeline.innerHTML = '<span class="w-2 h-2 rounded-full bg-cyan-400"></span><span>Pipeline: First-Touch SQL + Modelagem Dimensional dbt + Matriz Heatmap</span>';
       if (footerNote) footerNote.textContent = 'Nova jornada de onboarding ativada em Março/24 refletindo nas safras seguintes';
+    } else if (currentView === 'rfm') {
+      if (chipKpi1) chipKpi1.innerHTML = 'Receita em Risco: <strong class="text-rose-400 font-mono">R$ 485.200 (24.8%)</strong>';
+      if (chipKpi2) chipKpi2.innerHTML = 'Segmentação: <strong class="text-emerald-400 font-mono">11 Clusters (100%)</strong>';
+      if (footerPipeline) footerPipeline.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Pipeline: Engine Python + Quantis RFM (qcut) + Streamlit App</span>';
+      if (footerNote) footerNote.textContent = 'Priorização automatizada de contas e ações táticas para CRM e Vendas';
     }
   }
 
   function setButtonInactive(btn) {
     if (!btn) return;
-    btn.classList.remove('bg-sky-500/20', 'text-sky-300', 'border-sky-500/40', 'bg-cyan-500/20', 'text-cyan-300', 'border-cyan-500/40');
+    btn.classList.remove(
+      'bg-sky-500/20', 'text-sky-300', 'border-sky-500/40',
+      'bg-cyan-500/20', 'text-cyan-300', 'border-cyan-500/40',
+      'bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40'
+    );
     btn.classList.add('text-neutral-400', 'border-transparent');
   }
 
@@ -646,9 +703,11 @@ function initInteractiveChart() {
       btnCost.classList.remove('text-neutral-400', 'border-transparent');
       setButtonInactive(btnVolume);
       setButtonInactive(btnCohort);
+      setButtonInactive(btnRfm);
 
       if (chartContainer) chartContainer.classList.remove('hidden');
       if (cohortContainer) cohortContainer.classList.add('hidden');
+      if (rfmContainer) rfmContainer.classList.add('hidden');
       if (periodFiltersWrapper) periodFiltersWrapper.classList.remove('hidden');
 
       chartInstance.destroy();
@@ -664,9 +723,11 @@ function initInteractiveChart() {
       btnVolume.classList.remove('text-neutral-400', 'border-transparent');
       setButtonInactive(btnCost);
       setButtonInactive(btnCohort);
+      setButtonInactive(btnRfm);
 
       if (chartContainer) chartContainer.classList.remove('hidden');
       if (cohortContainer) cohortContainer.classList.add('hidden');
+      if (rfmContainer) rfmContainer.classList.add('hidden');
       if (periodFiltersWrapper) periodFiltersWrapper.classList.remove('hidden');
 
       chartInstance.destroy();
@@ -682,12 +743,38 @@ function initInteractiveChart() {
       btnCohort.classList.remove('text-neutral-400', 'border-transparent');
       setButtonInactive(btnCost);
       setButtonInactive(btnVolume);
+      setButtonInactive(btnRfm);
 
       if (chartContainer) chartContainer.classList.add('hidden');
       if (cohortContainer) cohortContainer.classList.remove('hidden');
+      if (rfmContainer) rfmContainer.classList.add('hidden');
       if (periodFiltersWrapper) periodFiltersWrapper.classList.add('hidden');
 
       updateKpiChips();
+    });
+  }
+
+  if (btnRfm) {
+    btnRfm.addEventListener('click', () => {
+      currentView = 'rfm';
+      btnRfm.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
+      btnRfm.classList.remove('text-neutral-400', 'border-transparent');
+      setButtonInactive(btnCost);
+      setButtonInactive(btnVolume);
+      setButtonInactive(btnCohort);
+
+      if (chartContainer) chartContainer.classList.add('hidden');
+      if (cohortContainer) cohortContainer.classList.add('hidden');
+      if (rfmContainer) rfmContainer.classList.remove('hidden');
+      if (periodFiltersWrapper) periodFiltersWrapper.classList.add('hidden');
+
+      updateKpiChips();
+    });
+  }
+
+  if (cardTestRfmBtn) {
+    cardTestRfmBtn.addEventListener('click', () => {
+      if (btnRfm) btnRfm.click();
     });
   }
 
@@ -922,7 +1009,354 @@ function initCohortAnalysis() {
 }
 
 /* ==========================================================================
-   7. CONTATO, CÓPIA DE E-MAIL E ENVIO FORMSPREE
+   7. ANÁLISE DE SEGMENTAÇÃO RFM (COCKPIT INTERATIVO)
+   ========================================================================== */
+function initRfmAnalysis() {
+  const matrixBody = document.getElementById('rfmMatrixBody');
+  const clusterPills = document.getElementById('rfmClusterPills');
+  const playbookCard = document.getElementById('rfmPlaybookCard');
+  const copyCmdBtn = document.getElementById('copyStreamlitCmdBtn');
+
+  if (!matrixBody || !playbookCard) return;
+
+  // Dicionário com os 11 Clusters RFM
+  const rfmClusters = {
+    "Campeões": {
+      cor: "#10B981",
+      prioridade: "Alta",
+      descricao: "Compraram muito recentemente, compram com alta frequência e possuem os maiores volumes de faturamento.",
+      objetivo: "Fidelização máxima, retenção ativa e programas de evangelização da marca.",
+      plano: [
+        "Acesso antecipado a novos produtos e lançamentos VIP.",
+        "Atendimento com Gerente de Contas dedicado (Key Account).",
+        "Recompensas exclusivas por indicação de novos clientes corporativos.",
+        "Não enviar cupons de desconto agressivos (eles já compram pelo valor)."
+      ],
+      canais: "WhatsApp Concierge, Contato Telefônico Executivo, E-mail VIP"
+    },
+    "Leais": {
+      cor: "#3B82F6",
+      prioridade: "Alta",
+      descricao: "Compras consistentes, boa frequência e gastos acima da média da carteira.",
+      objetivo: "Aumentar o Lifetime Value (LTV) através de cross-selling e up-selling.",
+      plano: [
+        "Apresentar produtos complementares de tíquete superior.",
+        "Incentivar adesão a programas de benefícios com pontuação cumulativa.",
+        "Solicitar depoimentos e cases de sucesso para prova social."
+      ],
+      canais: "E-mail Segmentado, WhatsApp Comercial, Notificações Proativas"
+    },
+    "Potenciais Clientes Leais": {
+      cor: "#8B5CF6",
+      prioridade: "Média-Alta",
+      descricao: "Clientes recentes que já realizaram mais de 1 compra com engajamento promissor.",
+      objetivo: "Transformar compradores recorrentes em clientes leais e defensores da marca.",
+      plano: [
+        "Enviar réguas de nutrição com casos de uso e melhores práticas.",
+        "Ofertar incentivo na 3ª ou 4ª compra com validade curta (escassez).",
+        "Convidar para webinars ou comunidade exclusiva de clientes."
+      ],
+      canais: "E-mail Educativo, WhatsApp Comercial, Remarketing de Catálogo"
+    },
+    "Novos Clientes": {
+      cor: "#06B6D4",
+      prioridade: "Média",
+      descricao: "Compraram pela primeira vez muito recentemente. Alto potencial inicial.",
+      objetivo: "Garantir sucesso no onboarding e induzir a segunda compra o mais rápido possível.",
+      plano: [
+        "E-mail de boas-vindas acolhedor e pesquisa rápida pós-primeira compra.",
+        "Enviar tutorial passo a passo de aproveitamento do produto.",
+        "Disponibilizar cupom de incentivo para a 2ª compra válido por 30 dias."
+      ],
+      canais: "E-mail de Onboarding, SMS/WhatsApp com Boas-Vindas"
+    },
+    "Promissores": {
+      cor: "#14B8A6",
+      prioridade: "Média",
+      descricao: "Compradores recentes de primeira compra com tíquete moderado.",
+      objetivo: "Criar vínculo e percepção de valor para estimular a primeira recompra.",
+      plano: [
+        "Campanhas baseadas na categoria do primeiro item comprado.",
+        "Apresentar avaliações de outros compradores em categorias similares.",
+        "Ofertas de produtos 'best-sellers' com condições especiais de frete."
+      ],
+      canais: "E-mail Marketing, Remarketing de Catálogo"
+    },
+    "Precisam de Atenção": {
+      cor: "#F59E0B",
+      prioridade: "Alta",
+      descricao: "Recência e frequência moderadas. Risco iminente de esfriamento se não estimulados.",
+      objetivo: "Reativar o hábito de compra antes da entrada na zona de inatividade.",
+      plano: [
+        "Campanhas de incentivo com tempo limitado (ofertas 'flash' de 48h).",
+        "Ofertar combos ou kits de reposição com desconto no pacote.",
+        "Apresentar novidades do portfólio adicionadas desde a última compra."
+      ],
+      canais: "E-mail de Oportunidade, Remarketing Display, WhatsApp Comercial"
+    },
+    "Quase Hibernando": {
+      cor: "#F97316",
+      prioridade: "Média",
+      descricao: "Baixa recência e pouca frequência. Clientes prestes a se tornarem inativos.",
+      objetivo: "Evitar o churn definitivo com comunicação de reengajamento assertiva.",
+      plano: [
+        "Campanha 'Sentimos sua falta' com benefício direto e expressivo na volta.",
+        "Apresentar produtos populares com condições facilitadas de pagamento.",
+        "Questionar de forma breve se o produto anterior atendeu às expectativas."
+      ],
+      canais: "E-mail de Reativação, Anúncios Segmentados de Custom Audience"
+    },
+    "Não Podemos Perder": {
+      cor: "#DC2626",
+      prioridade: "Crítica",
+      descricao: "Clientes históricos de altíssima frequência e valor que deixaram de comprar há muito tempo.",
+      objetivo: "Reconquista urgente e investigação de atrito/insatisfação. Risco financeiro crítico.",
+      plano: [
+        "Contato direto e pessoal de SDR/Gerente de Contas via ligação executiva.",
+        "Investigar se houve insatisfação com suporte, qualidade ou migração para concorrente.",
+        "Ofertar plano de renovação sob medida com condições especiais irrecusáveis.",
+        "Envolver liderança comercial para resgate do relacionamento institucional."
+      ],
+      canais: "Ligação Telefônica Direta, Reunião Presencial/Online, WhatsApp Executivo"
+    },
+    "Em Risco": {
+      cor: "#EF4444",
+      prioridade: "Crítica",
+      descricao: "Histórico sólido de compras que deixaram de comprar no período recente.",
+      objetivo: "Interromper o processo de churn e recapturar a atenção do cliente.",
+      plano: [
+        "Pesquisa de satisfação para entender motivos de afastamento.",
+        "Cupons substanciais de reativação para a volta.",
+        "Apresentar lançamentos e melhorias recentes que o cliente não conheceu."
+      ],
+      canais: "E-mail de Reconquista, WhatsApp de Relacionamento, Retargeting"
+    },
+    "Hibernando": {
+      cor: "#64748B",
+      prioridade: "Baixa",
+      descricao: "Frequência muito baixa e última compra realizada há muitos meses.",
+      objetivo: "Reativação de baixo custo ou higienização da base de contatos.",
+      plano: [
+        "Campanhas de queima de estoque ou promoções sazonais agressivas (ex: Black Friday).",
+        "Opção simples de opt-out para manter reputação de entregabilidade do domínio."
+      ],
+      canais: "E-mail Marketing Automatizado de Baixo Custo"
+    },
+    "Perdidos": {
+      cor: "#475569",
+      prioridade: "Baixa",
+      descricao: "Compraram uma única vez no passado distante e nunca mais retornaram.",
+      objetivo: "Última tentativa de contato de baixo custo ou desativação de envios.",
+      plano: [
+        "Disparo de régua única 'Sentimos sua falta: cupom especial de retorno'.",
+        "Se não houver clique após 30 dias, pausar envios de marketing para cortar custos."
+      ],
+      canais: "E-mail de Despedida / Limpeza de Base"
+    }
+  };
+
+  // Matriz 5x5: [R5, R4, R3, R2, R1] cruzando com [F1, F2, F3, F4, F5]
+  const rfmMatrixData = [
+    {
+      rowScore: 5,
+      rowLabel: "R5 (Mais Recente)",
+      cells: [
+        { f: 1, cluster: "Novos Clientes", clients: 68, rev: "R$ 42.100", cls: "rfm-bg-novos" },
+        { f: 2, cluster: "Potenciais Clientes Leais", clients: 54, rev: "R$ 68.300", cls: "rfm-bg-potenciais" },
+        { f: 3, cluster: "Leais", clients: 38, rev: "R$ 94.200", cls: "rfm-bg-leais" },
+        { f: 4, cluster: "Campeões", clients: 42, rev: "R$ 158.400", cls: "rfm-bg-campeoes" },
+        { f: 5, cluster: "Campeões", clients: 46, rev: "R$ 214.600", cls: "rfm-bg-campeoes" }
+      ]
+    },
+    {
+      rowScore: 4,
+      rowLabel: "R4 (Recente)",
+      cells: [
+        { f: 1, cluster: "Novos Clientes", clients: 58, rev: "R$ 36.500", cls: "rfm-bg-novos" },
+        { f: 2, cluster: "Potenciais Clientes Leais", clients: 48, rev: "R$ 59.800", cls: "rfm-bg-potenciais" },
+        { f: 3, cluster: "Leais", clients: 36, rev: "R$ 88.700", cls: "rfm-bg-leais" },
+        { f: 4, cluster: "Campeões", clients: 34, rev: "R$ 126.900", cls: "rfm-bg-campeoes" },
+        { f: 5, cluster: "Campeões", clients: 30, rev: "R$ 142.100", cls: "rfm-bg-campeoes" }
+      ]
+    },
+    {
+      rowScore: 3,
+      rowLabel: "R3 (Médio)",
+      cells: [
+        { f: 1, cluster: "Promissores", clients: 52, rev: "R$ 31.400", cls: "rfm-bg-promissores" },
+        { f: 2, cluster: "Precisam de Atenção", clients: 44, rev: "R$ 52.600", cls: "rfm-bg-atencao" },
+        { f: 3, cluster: "Precisam de Atenção", clients: 32, rev: "R$ 64.100", cls: "rfm-bg-atencao" },
+        { f: 4, cluster: "Leais", clients: 26, rev: "R$ 78.500", cls: "rfm-bg-leais" },
+        { f: 5, cluster: "Leais", clients: 22, rev: "R$ 96.300", cls: "rfm-bg-leais" }
+      ]
+    },
+    {
+      rowScore: 2,
+      rowLabel: "R2 (Em Risco)",
+      cells: [
+        { f: 1, cluster: "Quase Hibernando", clients: 48, rev: "R$ 27.200", cls: "rfm-bg-quase-dormindo" },
+        { f: 2, cluster: "Quase Hibernando", clients: 38, rev: "R$ 41.800", cls: "rfm-bg-quase-dormindo" },
+        { f: 3, cluster: "Em Risco", clients: 28, rev: "R$ 62.400", cls: "rfm-bg-em-risco" },
+        { f: 4, cluster: "Não Podemos Perder", clients: 24, rev: "R$ 98.700", cls: "rfm-bg-nao-perder" },
+        { f: 5, cluster: "Não Podemos Perder", clients: 20, rev: "R$ 124.500", cls: "rfm-bg-nao-perder" }
+      ]
+    },
+    {
+      rowScore: 1,
+      rowLabel: "R1 (Mais Antigo)",
+      cells: [
+        { f: 1, cluster: "Perdidos", clients: 64, rev: "R$ 29.800", cls: "rfm-bg-perdidos" },
+        { f: 2, cluster: "Hibernando", clients: 42, rev: "R$ 38.200", cls: "rfm-bg-hibernando" },
+        { f: 3, cluster: "Em Risco", clients: 30, rev: "R$ 61.200", cls: "rfm-bg-em-risco" },
+        { f: 4, cluster: "Não Podemos Perder", clients: 22, rev: "R$ 84.600", cls: "rfm-bg-nao-perder" },
+        { f: 5, cluster: "Não Podemos Perder", clients: 18, rev: "R$ 115.000", cls: "rfm-bg-nao-perder" }
+      ]
+    }
+  ];
+
+  let selectedClusterName = "Não Podemos Perder"; // Destaque inicial no cluster crítico de receita em risco
+
+  // 1. Renderiza a Matriz 5x5
+  function renderMatrix() {
+    matrixBody.innerHTML = '';
+
+    rfmMatrixData.forEach(row => {
+      const tr = document.createElement('tr');
+      let trHtml = `<td class="text-left font-semibold text-neutral-400 whitespace-nowrap pr-2">${row.rowLabel}</td>`;
+
+      row.cells.forEach(cell => {
+        const isClusterMatch = cell.cluster === selectedClusterName;
+        trHtml += `
+          <td class="rfm-cell ${cell.cls} ${isClusterMatch ? 'active-cell' : ''}" 
+              data-cluster="${cell.cluster}" 
+              data-r="R${row.rowScore}" 
+              data-f="F${cell.f}" 
+              data-clients="${cell.clients}" 
+              data-rev="${cell.rev}">
+            <div class="font-bold leading-tight">${cell.cluster}</div>
+            <div class="text-[10px] opacity-80 mt-0.5">${cell.clients} cli • ${cell.rev}</div>
+          </td>
+        `;
+      });
+
+      tr.innerHTML = trHtml;
+      matrixBody.appendChild(tr);
+    });
+
+    // Adiciona listener de clique nas células da matriz
+    const cells = matrixBody.querySelectorAll('.rfm-cell');
+    cells.forEach(cell => {
+      cell.addEventListener('click', () => {
+        const cluster = cell.getAttribute('data-cluster');
+        selectCluster(cluster);
+      });
+    });
+  }
+
+  // 2. Renderiza as Pílulas dos Clusters
+  function renderPills() {
+    if (!clusterPills) return;
+    clusterPills.innerHTML = '';
+
+    Object.keys(rfmClusters).forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = `rfm-pill-btn ${name === selectedClusterName ? 'active' : ''}`;
+      btn.textContent = name;
+      btn.addEventListener('click', () => {
+        selectCluster(name);
+      });
+      clusterPills.appendChild(btn);
+    });
+  }
+
+  // 3. Renderiza o Card de Playbook Tático
+  function renderPlaybook() {
+    const meta = rfmClusters[selectedClusterName];
+    if (!meta) return;
+
+    const prioColor = 
+      meta.prioridade === 'Crítica' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' :
+      meta.prioridade === 'Alta' ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' :
+      'text-sky-400 bg-sky-500/10 border-sky-500/30';
+
+    playbookCard.style.borderLeftColor = meta.cor;
+    playbookCard.style.borderLeftWidth = '4px';
+
+    playbookCard.innerHTML = `
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-neutral-800">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full" style="background-color: ${meta.cor};"></span>
+          <h4 class="text-sm font-bold text-white uppercase tracking-wider font-mono">
+            Playbook Comercial: ${selectedClusterName}
+          </h4>
+        </div>
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border uppercase self-start sm:self-auto ${prioColor}">
+          Prioridade: ${meta.prioridade}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+        <div class="space-y-2">
+          <div>
+            <span class="text-neutral-400 font-mono text-[10px] uppercase block">Perfil & Diagnóstico:</span>
+            <p class="text-neutral-300 leading-relaxed">${meta.descricao}</p>
+          </div>
+          <div>
+            <span class="text-neutral-400 font-mono text-[10px] uppercase block">Objetivo de Negócio:</span>
+            <p class="text-emerald-400 font-medium">${meta.objetivo}</p>
+          </div>
+          <div>
+            <span class="text-neutral-400 font-mono text-[10px] uppercase block">Canais Recomendados:</span>
+            <code class="px-2 py-1 rounded bg-neutral-800 text-sky-300 font-mono text-[11px] block mt-1">${meta.canais}</code>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <span class="text-neutral-400 font-mono text-[10px] uppercase block">Plano de Ação Tático para CRM/Vendas:</span>
+          <ul class="space-y-1.5 bg-neutral-950/60 p-3 rounded-xl border border-neutral-800/80">
+            ${meta.plano.map(item => `
+              <li class="flex items-start gap-2 text-neutral-300">
+                <span class="text-sky-400 mt-0.5 font-bold">›</span>
+                <span>${item}</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  function selectCluster(name) {
+    selectedClusterName = name;
+    renderMatrix();
+    renderPills();
+    renderPlaybook();
+  }
+
+  // Ação de copiar comando Streamlit
+  if (copyCmdBtn) {
+    copyCmdBtn.addEventListener('click', () => {
+      const cmd = "streamlit run app.py";
+      navigator.clipboard.writeText(cmd).then(() => {
+        if (typeof window.showToast === 'function') {
+          window.showToast("Comando copiado: " + cmd, "success");
+        } else {
+          alert("Comando copiado: " + cmd);
+        }
+      }).catch(() => {
+        if (typeof window.showToast === 'function') {
+          window.showToast("Execute no terminal: " + cmd, "info");
+        }
+      });
+    });
+  }
+
+  // Inicialização do cockpit RFM
+  selectCluster(selectedClusterName);
+}
+
+/* ==========================================================================
+   8. CONTATO, CÓPIA DE E-MAIL E ENVIO FORMSPREE
    ========================================================================== */
 function initContactActions() {
   const copyBtn = document.getElementById('copyEmailBtn');
@@ -966,6 +1400,9 @@ function initContactActions() {
       toast.classList.remove('show');
     }, 4000);
   }
+
+  // Expor globalmente para uso pelo cockpit RFM
+  window.showToast = showToast;
 
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {

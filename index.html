@@ -534,6 +534,7 @@
               <div class="flex flex-wrap gap-2 content-start">
                 <span class="tech-badge">Looker (LookML) & Looker Studio</span>
                 <span class="tech-badge">Power BI (DAX Avançado, Modelagem e Power Query)</span>
+                <span class="tech-badge">Streamlit & Plotly (Data Apps Analíticos)</span>
                 <span class="tech-badge">Dashboards C-Level & Data Storytelling</span>
                 <span class="tech-badge">Cockpits de KPIs & OKRs</span>
                 <span class="tech-badge">Metabase</span>
@@ -572,6 +573,7 @@
               </div>
               <div class="flex flex-wrap gap-2 content-start">
                 <span class="tech-badge">Auditoria Contratual & Conciliação Financeira</span>
+                <span class="tech-badge">Segmentação RFM & Prevenção de Churn</span>
                 <span class="tech-badge">Cohort Analytics, Retenção/Churn & BPMN (Bizagi)</span>
                 <span class="tech-badge">Governança de Dados & SSOT</span>
                 <span class="tech-badge">Data Quality & Testes Automatizados</span>
@@ -606,6 +608,7 @@
         <!-- Filtros de Categoria -->
         <div class="flex flex-wrap justify-center gap-2 mb-12">
           <button class="filter-btn active" data-filter="all">Todos</button>
+          <button class="filter-btn" data-filter="rfm">CRM & RFM</button>
           <button class="filter-btn" data-filter="cohort">Cohort & Churn</button>
           <button class="filter-btn" data-filter="custo">Otimização de Custos</button>
           <button class="filter-btn" data-filter="bi">BI & Governança</button>
@@ -815,6 +818,58 @@
             </div>
           </article>
 
+          <!-- Card 5: Segmentação RFM & Prevenção de Churn (NOVO) -->
+          <article class="project-card glass-panel card-glow rounded-2xl overflow-hidden flex flex-col justify-between border border-neutral-800 h-full md:col-span-2 lg:col-span-1" data-category="rfm">
+            <div class="flex flex-col flex-1">
+              <div class="p-6 pb-4 border-b border-neutral-800/60 flex items-center justify-between min-h-[4.25rem]">
+                <span class="text-xs font-mono text-emerald-400 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">CRM & Machine Analytics</span>
+                <span class="text-xs font-mono text-rose-400 flex items-center gap-1 font-bold">
+                  <span>🚨 R$ 485k em Risco</span>
+                </span>
+              </div>
+
+              <div class="p-6 flex flex-col flex-1 space-y-4">
+                <h3 class="text-xl font-bold text-white hover:text-emerald-400 transition-colors min-h-[3.5rem] flex items-center">
+                  Cockpit Analítico RFM & Prevenção de Churn em Vendas
+                </h3>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Problema de Negócio:</span>
+                  <p class="text-xs text-neutral-300 leading-relaxed min-h-[2.75rem] flex items-center">
+                    Carteira de clientes com abordagem homogênea, gerando evasão silenciosa de clientes VIPs e falta de priorização para os times de CS e Vendas.
+                  </p>
+                </div>
+
+                <div class="space-y-1">
+                  <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Metodologia / Stack:</span>
+                  <div class="flex flex-wrap gap-1.5 pt-1 min-h-[2rem] items-center">
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Python</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Streamlit</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Plotly</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Quantis RFM (qcut)</span>
+                    <span class="tech-badge text-[11px] !py-0.5 !px-2">Playbooks CRM</span>
+                  </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 mt-auto min-h-[4.75rem] flex flex-col justify-center">
+                  <span class="text-[11px] font-mono text-emerald-400 uppercase tracking-wider font-semibold block mb-0.5">Resultado Obtido:</span>
+                  <p class="text-xs text-emerald-200 font-medium">
+                    Mapeamento de 24.8% de receita em risco imediato, 11 clusters táticos com automação e aumento de 35% na taxa de retenção de clientes reativados.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 pt-0 flex items-center gap-3">
+              <button class="btn-primary flex-1 text-xs !py-2.5" data-case-study="rfm">
+                Ver Estudo de Caso
+              </button>
+              <a href="#demo" id="cardTestRfmBtn" class="btn-secondary text-xs !py-2.5 !px-3" title="Testar Cockpit Interativo RFM">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </a>
+            </div>
+          </article>
+
         </div>
 
       </div>
@@ -856,6 +911,10 @@
               <button id="chartViewCohort" class="px-3.5 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white border border-transparent transition-all flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
                 <span>Análise Cohort & Churn</span>
+              </button>
+              <button id="chartViewRfm" class="px-3.5 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white border border-transparent transition-all flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Cockpit RFM & CRM</span>
               </button>
             </div>
 
@@ -940,6 +999,102 @@
               </div>
               <div id="cohortActiveMetric" class="font-mono text-cyan-400 text-sm font-bold sm:text-right">
                 Passe o mouse
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Container do Cockpit de Segmentação RFM (NOVO) -->
+          <div id="rfmContainer" class="hidden w-full space-y-6">
+            
+            <!-- Linha Superior de Métricas Executivas do Cockpit RFM -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div class="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800">
+                <span class="text-[11px] font-mono text-neutral-400 uppercase tracking-wider block mb-1">Receita Mapeada</span>
+                <span class="text-xl font-bold text-white font-mono">R$ 1.954.230</span>
+                <span class="text-[11px] text-neutral-500 block mt-1">Base de 18 meses analisada</span>
+              </div>
+              <div class="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800">
+                <span class="text-[11px] font-mono text-neutral-400 uppercase tracking-wider block mb-1">Clientes Únicos</span>
+                <span class="text-xl font-bold text-white font-mono">800</span>
+                <span class="text-[11px] text-sky-400 block mt-1">100% segmentados em 11 clusters</span>
+              </div>
+              <div class="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800">
+                <span class="text-[11px] font-mono text-neutral-400 uppercase tracking-wider block mb-1">Ticket Médio Geral</span>
+                <span class="text-xl font-bold text-white font-mono">R$ 295,40</span>
+                <span class="text-[11px] text-neutral-500 block mt-1">Média ponderada por pedido</span>
+              </div>
+              <div class="p-4 rounded-xl bg-rose-950/20 border border-rose-500/40 rfm-alert-pulse">
+                <span class="text-[11px] font-mono text-rose-400 uppercase tracking-wider font-bold block mb-1">🚨 Receita em Risco</span>
+                <span class="text-xl font-bold text-rose-400 font-mono">R$ 485.200</span>
+                <span class="text-[11px] text-rose-300/80 block mt-1 font-medium"><b>24.8%</b> da base global (142 clientes)</span>
+              </div>
+            </div>
+
+            <!-- Divisor e Título da Matriz -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-neutral-800/60 text-xs">
+              <div>
+                <span class="font-bold text-white text-sm">Matriz de Concentração RFM (5x5)</span>
+                <span class="text-neutral-400 block text-[11px]">Cruzamento do Score de Recência (Y) com Frequência (X). Clique em qualquer célula para carregar o playbook comercial.</span>
+              </div>
+              <div class="flex items-center gap-2 text-[11px] font-mono text-neutral-400 self-start sm:self-auto">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span><span>Campeões / Leais</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 ml-2"></span><span>Em Risco / Crítico</span>
+              </div>
+            </div>
+
+            <!-- Tabela da Matriz 5x5 -->
+            <div class="rfm-matrix-container">
+              <table class="rfm-table" id="rfmMatrixTable">
+                <thead>
+                  <tr>
+                    <th class="text-left w-24">Recência \ Freq</th>
+                    <th>F1 (1 compra)</th>
+                    <th>F2 (2 compras)</th>
+                    <th>F3 (3 compras)</th>
+                    <th>F4 (4-5 compras)</th>
+                    <th>F5 (6+ compras)</th>
+                  </tr>
+                </thead>
+                <tbody id="rfmMatrixBody">
+                  <!-- Gerado dinamicamente no main.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Seletor Rápido de Clusters (Pills) -->
+            <div>
+              <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-2">Navegar por Segmento de Negócio:</span>
+              <div class="flex flex-wrap gap-1.5" id="rfmClusterPills">
+                <!-- Botões gerados dinamicamente no main.js -->
+              </div>
+            </div>
+
+            <!-- Painel de Playbook Tático do Cluster Selecionado -->
+            <div id="rfmPlaybookCard" class="p-5 rounded-2xl bg-neutral-900/90 border border-neutral-800 text-xs space-y-3 transition-all duration-300">
+              <!-- Conteúdo dinâmico do playbook -->
+            </div>
+
+            <!-- Barra de Conexão com Aplicação Streamlit -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-emerald-500/10 border border-sky-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 flex-shrink-0 font-mono font-bold text-lg">
+                  ⚡
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-white">Aplicação Completa em Streamlit & Plotly</h4>
+                  <p class="text-xs text-neutral-400">Inclui upload de bases reais (CSV/Excel), gráficos 3D interativos, filtros dinâmicos e exportação CSV para CRM.</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <button id="copyStreamlitCmdBtn" class="btn-secondary text-xs !py-2 !px-3.5 flex items-center gap-1.5 whitespace-nowrap">
+                  <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  <span>Copiar: <code>streamlit run app.py</code></span>
+                </button>
+                <a href="http://localhost:8501" target="_blank" rel="noopener noreferrer" class="btn-primary text-xs !py-2 !px-4 flex items-center gap-1.5 whitespace-nowrap">
+                  <span>Abrir App Local</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
               </div>
             </div>
 
