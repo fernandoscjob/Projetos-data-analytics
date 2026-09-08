@@ -148,6 +148,55 @@
       transform: translateY(0);
       opacity: 1;
     }
+  
+    /* ABAS DE ETAPAS METODOLÓGICAS */
+    .stage-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .stage-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .stage-tab-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+    .code-box {
+      background: #090c15;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .stage-card {
+      background: rgba(15, 18, 29, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+    .stage-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
   </style>
 </head>
 
@@ -193,7 +242,39 @@
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- HEADER DO DASHBOARD -->
+    <!-- NAVEGAÇÃO DE ETAPAS / PÁGINAS DO PROJETO -->
+    <div class="border-b border-neutral-800 pb-3 mb-6">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <nav class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none" id="stageTabsNav">
+          <button class="stage-tab-btn active" data-target="tab-cockpit">
+            <span>📊</span> <span>Cockpit Analítico</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-problema">
+            <span>🎯</span> <span>1. TLDR & Problema</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-crispdm">
+            <span>🔬</span> <span>2. Metodologia CRISP-DM & Código</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-resultados">
+            <span>📈</span> <span>3. Resultados & Insights</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-governanca">
+            <span>🛠️</span> <span>4. Governança & Adoção</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-decisoes">
+            <span>❓</span> <span>5. Perguntas Estratégicas</span>
+          </button>
+        </nav>
+        <a href="https://github.com/fernandoscjob/Projetos-data-analytics/tree/main/Projetos/01_Cockpit_RFM_Analytics" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-neutral-400 hover:text-white transition-colors">
+          <svg class="w-3.5 h-3.5 fill-currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span>Repositório GitHub</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- COCKPIT ANALÍTICO INTERATIVO -->
+    <div id="tab-cockpit" class="stage-view-content space-y-8">
+<!-- HEADER DO DASHBOARD -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-neutral-800">
       <div>
         <div class="flex items-center gap-2 mb-1">
@@ -360,8 +441,172 @@
         </a>
       </div>
     </section>
+    </div>
 
-  </main>
+    <!-- ETAPA 1: TLDR & PROBLEMA DE NEGÓCIO -->
+    <div id="tab-problema" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Etapa 1 • Business Understanding & TLDR</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Visão Executiva, Cenário de Mercado e Custo da Inação</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="stage-card border-l-4 border-l-sky-500">
+          <span class="text-xs font-mono text-sky-400 uppercase tracking-wider block mb-1">🎯 Objetivo</span>
+          <p class="text-xs text-neutral-300 leading-relaxed font-medium">Segmentar 800 contas corporativas, isolar receita em risco e criar réguas preditivas de retenção.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-emerald-500">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-wider block mb-1">💰 Retorno / ROI</span>
+          <p class="text-xs text-emerald-300 font-mono font-medium leading-relaxed">R$ 485.200,00 (24,8% da receita) mapeados em risco crítico; taxa de recuperação estimada em 18% a 22%.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-indigo-500">
+          <span class="text-xs font-mono text-indigo-400 uppercase tracking-wider block mb-1">📊 Métricas Chave</span>
+          <p class="text-xs text-indigo-300 font-mono font-medium leading-relaxed">100% da base classificada em 11 clusters RFM determinísticos via quantis ordinais.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-purple-500">
+          <span class="text-xs font-mono text-purple-400 uppercase tracking-wider block mb-1">⚡ Performance</span>
+          <p class="text-xs text-purple-300 font-mono font-medium leading-relaxed">Execução do pipeline e geração dos gráficos espaciais em &lt; 1,2s no Streamlit.</p>
+        </div>
+      </div>
+
+      <div class="stage-card space-y-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>💼 Contexto Corporativo &amp; Dor Operacional</span>
+        </h3>
+        <p class="text-sm text-neutral-300 leading-relaxed">
+          A empresa geria uma base ativa de <strong>800 clientes</strong> com faturamento histórico acumulado de <strong>R$ 1.956.800,00</strong> e ticket médio de <strong>R$ 295,00</strong>. 
+          No entanto, o tratamento comercial homogêneo aplicava a mesma política de incentivos para clientes de primeira compra e grandes contas corporativas recorrentes.
+        </p>
+        <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 leading-relaxed">
+          <strong>🚨 Custo da Inação:</strong> 142 clientes de altíssimo valor histórico estavam há mais de 90 dias sem realizar compras. Sem uma ação imediata, a evasão provocaria uma perda líquida irreversível de quase meio milhão de reais, exigindo orçamentos desproporcionais de marketing (CAC) para reposição.
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 2: METODOLOGIA CRISP-DM & CÓDIGO -->
+    <div id="tab-crispdm" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-indigo-400">Etapa 2 • CRISP-DM &amp; Engenharia de Dados</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Metodologia Científica &amp; Desempate Ordinal de Quantis</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-sky-400 font-bold">1. Data Understanding &amp; Data Prep</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">
+            Ingestão de 18 meses de registros transacionais no grão de pedido. Fixação da data de corte dinâmica ($T_{	ext{corte}} = \max(	ext{data}) + 1	ext{ dia}$) para evitar viés em transações recentes. Agregação por cliente para extração dos três pilares: Recência, Frequência e Valor.
+          </p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-emerald-400 font-bold">2. Modelagem com Desempate de Quantis</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">
+            Empates massivos de frequência única ($F=1$) quebram a partição padrão de quantis. Aplicou-se o método ordinal <code>rank(method='first')</code> para garantir rigor estatístico e partição uniforme de 20% em cada quintil (scores 1 a 5).
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-neutral-400 uppercase tracking-wider">Snippet Técnico em Produção (rfm_engine.py):</span>
+          <span class="text-[11px] font-mono text-sky-400">Python 3.10 • Pandas</span>
+        </div>
+        <pre class="code-box"><code># rfm_engine.py: Atribuição de Scores por Quantis com Desempate Ordinal
+rfm['R_Score'] = pd.qcut(
+    rfm['Recencia'].rank(method='first', ascending=True), 
+    q=5, 
+    labels=[5, 4, 3, 2, 1]
+).astype(int)
+
+rfm['F_Score'] = pd.qcut(
+    rfm['Frequencia'].rank(method='first', ascending=True), 
+    q=5, 
+    labels=[1, 2, 3, 4, 5]
+).astype(int)
+
+rfm['M_Score'] = pd.qcut(
+    rfm['Valor'].rank(method='first', ascending=True), 
+    q=5, 
+    labels=[1, 2, 3, 4, 5]
+).astype(int)
+
+# Classificação determinística nos 11 clusters
+rfm['Segmento'] = rfm.apply(lambda r: assign_segment(r['R_Score'], r['F_Score'], r['M_Score']), axis=1)</code></pre>
+      </div>
+    </div>
+
+    <!-- ETAPA 3: RESULTADOS E INSIGHTS -->
+    <div id="tab-resultados" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400">Etapa 3 • Descobertas &amp; Evidências</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Resultados Quantificáveis &amp; Diagnóstico de Carteira</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="stage-card space-y-2">
+          <span class="text-2xl font-extrabold font-mono text-emerald-400">54,2%</span>
+          <h4 class="text-sm font-bold text-white">Concentração Pareto</h4>
+          <p class="text-xs text-neutral-400 leading-relaxed">285 clientes nos clusters Campeões e Leais concentram mais da metade de todo o faturamento histórico da empresa.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-2xl font-extrabold font-mono text-rose-400">142</span>
+          <h4 class="text-sm font-bold text-white">Contas em Risco Iminente</h4>
+          <p class="text-xs text-neutral-400 leading-relaxed">Clientes com ticket superior a R$ 1.500 e alta frequência anterior que cessaram compras nos últimos 90-120 dias.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-2xl font-extrabold font-mono text-sky-400">+35%</span>
+          <h4 class="text-sm font-bold text-white">Taxa de Reativação</h4>
+          <p class="text-xs text-neutral-400 leading-relaxed">Eficiência comercial com o envio de playbooks customizados por canal prioritário (WhatsApp Concierge e Ligação Executiva).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 4: GOVERNANÇA & ADOÇÃO -->
+    <div id="tab-governanca" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-amber-400">Etapa 4 • Arquitetura &amp; BPMN</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Matriz de Adoção Operacional e Plano de Implementação</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-amber-400 font-bold uppercase">Diretoria Comercial (CCO)</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Uso em reuniões semanais de forecast para definir metas de retenção vs. novos clientes com base no Treemap de receita.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-sky-400 font-bold uppercase">CS / Key Accounts</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Monitoramento diário do cluster "Não Podemos Perder" com rotinas ativas de contato direto para reverter inatividade.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-purple-400 font-bold uppercase">Growth CRM</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Exportação semanal da lista segmentada em CSV/Excel para disparo de campanhas com ofertas dedicadas por pilar RFM.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 5: DECISÕES ESTRATÉGICAS -->
+    <div id="tab-decisoes" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-cyan-400">Etapa 5 • Strategic Decision Making</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Perguntas de Negócio Respondidas em &lt; 5 Segundos</h2>
+      </div>
+
+      <div class="space-y-3">
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ Quanto da receita total está em risco imediato de perda?</span>
+          <span class="text-xs font-mono font-bold text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">👉 R$ 485.200,00 (24,8%) no card de alerta</span>
+        </div>
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ Quais clientes VIPs históricos devem receber ligação do diretor hoje?</span>
+          <span class="text-xs font-mono font-bold text-sky-400 bg-sky-500/10 px-3 py-1.5 rounded-lg border border-sky-500/20">👉 Filtro "Não Podemos Perder" na lista de CRM</span>
+        </div>
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ Qual cluster apresenta maior potencial de upsell para virar Campeão?</span>
+          <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">👉 Segmento "Potenciais Leais" no Treemap</span>
+        </div>
+      </div>
+    </div>
+    
+</main>
 
   <!-- RODAPÉ -->
   <footer class="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-500">
@@ -383,7 +628,56 @@
     let searchQuery = '';
 
     // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
+    
+  // CONTROLE DE NAVEGAÇÃO POR ABAS / ETAPAS
+  function initStageTabs() {
+    const tabs = document.querySelectorAll('.stage-tab-btn');
+    const views = document.querySelectorAll('.stage-view-content');
+
+    function switchTab(targetId) {
+      tabs.forEach(btn => {
+        const isActive = btn.getAttribute('data-target') === targetId;
+        btn.classList.toggle('active', isActive);
+      });
+
+      views.forEach(view => {
+        if (view.id === targetId) {
+          view.classList.remove('hidden');
+        } else {
+          view.classList.add('hidden');
+        }
+      });
+
+      if (targetId === 'tab-cockpit') {
+        setTimeout(() => {
+          if (window.Plotly) {
+            document.querySelectorAll('.plotly-graph-div').forEach(el => {
+              Plotly.Plots.resize(el);
+            });
+            const plotDiv = document.getElementById('plotlyChart');
+            if (plotDiv) Plotly.Plots.resize(plotDiv);
+          }
+        }, 50);
+      }
+    }
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        window.location.hash = targetId.replace('tab-', '');
+        switchTab(targetId);
+      });
+    });
+
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(`tab-${hash}`)) {
+      switchTab(`tab-${hash}`);
+    }
+  }
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initStageTabs();
       initFilterDropdown();
       initClusterPills();
       initTabControls();

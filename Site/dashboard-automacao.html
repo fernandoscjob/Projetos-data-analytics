@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Monitoramento, Orquestração & Alertas | Fernando Cavalcante</title>
+  <meta name="description" content="Monitoramento autônomo de transações em tempo real com n8n, Python Z-Score e alertas no Slack.">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23090a0f%22/><text y=%2265%22 x=%2250%22 text-anchor=%22middle%22 font-size=%2250%22 font-family=%22monospace%22 font-weight=%22bold%22 fill=%22%2338bdf8%22>&lt;DATA/&gt;</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              dark: '#090a0f',
+              surface: '#0f121d',
+              card: '#121520',
+              accent: '#38bdf8',
+              emerald: '#10b981',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Plotly.js CDN -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <style>
+    body {
+      background-color: #090a0f;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(15, 18, 29, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .metric-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .stage-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .stage-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .stage-tab-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+    .code-box {
+      background: #090c15;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .stage-card {
+      background: rgba(15, 18, 29, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+    .stage-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .data-table th {
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .data-table td {
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-sky-500/30 selection:text-sky-200">
+
+  <!-- NAVBAR DO COCKPIT -->
+  <header class="sticky top-0 z-50 glass-panel border-b border-neutral-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="index.html#projetos" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-medium text-neutral-300 hover:text-white hover:border-neutral-700 transition-colors">
+          <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Voltar ao Portfólio</span>
+        </a>
+        <div class="hidden sm:block h-5 w-px bg-neutral-800"></div>
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-sm">
+            ⚙️
+          </div>
+          <div>
+            <span class="font-bold text-sm text-white block leading-tight">Orquestração &amp; Alertas de Anomalias</span>
+            <span class="text-[11px] font-mono text-neutral-400">Fernando Cavalcante • Analista de Dados &amp; BI</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-medium text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Monitoramento Ativo (15 min)</span>
+        </div>
+        <a href="https://github.com/fernandoscjob/Projetos-data-analytics/tree/main/Projetos/05_Orquestracao_Alertas_Anomalias" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-semibold text-neutral-300 hover:text-white transition-all flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 fill-currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- NAVEGAÇÃO DE ETAPAS / PÁGINAS DO PROJETO -->
+    <div class="border-b border-neutral-800 pb-3 mb-6">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <nav class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none" id="stageTabsNav">
+          <button class="stage-tab-btn active" data-target="tab-cockpit">
+            <span>📊</span> <span>Cockpit Analítico</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-problema">
+            <span>🎯</span> <span>1. TLDR &amp; Problema</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-crispdm">
+            <span>🔬</span> <span>2. Metodologia CRISP-DM &amp; Código</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-resultados">
+            <span>📈</span> <span>3. Resultados &amp; Insights</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-governanca">
+            <span>🛠️</span> <span>4. Governança &amp; Adoção</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-decisoes">
+            <span>❓</span> <span>5. Perguntas Estratégicas</span>
+          </button>
+        </nav>
+        <span class="text-xs font-mono text-neutral-500">n8n • Python Z-Score</span>
+      </div>
+    </div>
+
+    <!-- ABA 0: COCKPIT ANALÍTICO -->
+    <div id="tab-cockpit" class="stage-view-content space-y-8">
+      <div class="pb-2 border-b border-neutral-800">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400">DataOps &amp; Automação Inteligente</span>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Telemetria em Tempo Real &amp; Detecção Estatística de Anomalias</h1>
+        <p class="text-xs sm:text-sm text-neutral-400 max-w-2xl mt-1 leading-relaxed">
+          Monitoramento contínuo com triggers a cada 15 minutos, detecção vetorial de desvio (|Z| &ge; 2.5) e disparo contextual via Slack Block Kit.
+        </p>
+      </div>
+
+      <!-- CARDS KPIS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="metric-card">
+          <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Tempo de Detecção (MTTD)</span>
+          <div class="text-2xl font-extrabold text-emerald-400 font-mono">&lt; 5 Minutos</div>
+          <span class="text-[11px] text-emerald-400/80 block mt-1">Reduzido de 14 horas</span>
+        </div>
+        <div class="metric-card">
+          <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Horas Manuais Poupadas</span>
+          <div class="text-2xl font-extrabold text-sky-400 font-mono">18h / Semana</div>
+          <span class="text-[11px] text-sky-300 block mt-1">100% relatórios automatizados</span>
+        </div>
+        <div class="metric-card">
+          <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Taxa de Falso Positivo</span>
+          <div class="text-2xl font-extrabold text-white font-mono">&lt; 3,2%</div>
+          <span class="text-[11px] text-neutral-500 block mt-1">Janela móvel de 24 horas</span>
+        </div>
+        <div class="metric-card">
+          <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Perdas Evitadas / Ano</span>
+          <div class="text-2xl font-extrabold text-emerald-400 font-mono">R$ 95.000</div>
+          <span class="text-[11px] text-emerald-300 block mt-1">Prevenção de checkout offline</span>
+        </div>
+      </div>
+
+      <!-- GRÁFICOS PLOTLY -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-panel p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+            <h3 class="text-sm font-bold text-white">Stream de Transações &amp; Bandas de Bollinger (Z-Score)</h3>
+            <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">&plusmn; 2.5 &sigma;</span>
+          </div>
+          <div id="chartAnomalyStream" class="h-80 w-full"></div>
+        </div>
+
+        <div class="glass-panel p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+            <h3 class="text-sm font-bold text-white">Taxa de Sucesso dos Workflows n8n (Últimas 24h)</h3>
+            <span class="text-xs font-mono text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded">99.8% SLA</span>
+          </div>
+          <div id="chartWorkflowSLA" class="h-80 w-full"></div>
+        </div>
+      </div>
+
+      <!-- SIMULADOR DE ALERTA SLACK EM TEMPO REAL -->
+      <div class="glass-panel rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-bold text-white">Feed de Alertas Proativos Disparados (Slack Webhook)</h3>
+          <span class="text-xs font-mono text-emerald-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Canal #alertas-transacoes</span>
+        </div>
+        <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 font-mono text-xs text-neutral-300 space-y-2">
+          <div class="flex items-center gap-2 text-rose-400 font-bold">
+            <span>🚨 [ALERTA CRÍTICO - Z-SCORE = -2.87]</span>
+            <span class="text-neutral-500 text-[10px]">Hoje às 14:15</span>
+          </div>
+          <p class="text-neutral-300">Queda brusca de conversão no Gateway Principal (Checkout Web). Volume esperado: 240 req/min | Observado: 58 req/min.</p>
+          <div class="flex items-center gap-3 pt-2">
+            <span class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-300 text-[11px] font-bold">Ação Automática: Rota de Contingência Ativada</span>
+            <span class="text-neutral-500 text-[11px]">Tempo de resposta do incidente: 3 min 12s</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 1: TLDR & PROBLEMA -->
+    <div id="tab-problema" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400">Etapa 1 • Business Understanding &amp; TLDR</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Monitoramento Autônomo e Custo do Retrabalho Manual</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="stage-card border-l-4 border-l-emerald-500">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-wider block mb-1">🎯 Objetivo</span>
+          <p class="text-xs text-neutral-300 leading-relaxed font-medium">Automatizar fluxos de dados ponta a ponta e detectar incidentes transacionais em tempo real.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-sky-500">
+          <span class="text-xs font-mono text-sky-400 uppercase tracking-wider block mb-1">💰 Retorno / ROI</span>
+          <p class="text-xs text-sky-300 font-mono font-medium leading-relaxed">R$ 95.000/ano em prevenção de perdas com checkouts inoperantes e 18h/semana salvas.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-indigo-500">
+          <span class="text-xs font-mono text-indigo-400 uppercase tracking-wider block mb-1">📊 Métricas Chave</span>
+          <p class="text-xs text-indigo-300 font-mono font-medium leading-relaxed">Tempo de detecção reduzido de 14 horas para menos de 5 minutos; falso positivo &lt; 3,2%.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-purple-500">
+          <span class="text-xs font-mono text-purple-400 uppercase tracking-wider block mb-1">⚡ Performance</span>
+          <p class="text-xs text-purple-300 font-mono font-medium leading-relaxed">Ciclo de checagem a cada 15 minutos com latência de disparo inferior a 30 segundos.</p>
+        </div>
+      </div>
+
+      <div class="stage-card space-y-4">
+        <h3 class="text-lg font-bold text-white">💼 Gargalo Operacional e Falhas Descobertas Tardiamente</h3>
+        <p class="text-sm text-neutral-300 leading-relaxed">
+          A equipe de analistas despendia entre 3 e 4 horas diárias baixando arquivos de múltiplos portais de parceiros, fazendo PROCV no Excel e consolidando status manualmente. 
+          Falhas em gateways ou atrasos logísticos só eram descobertos após dezenas de reclamações de clientes finais no atendimento.
+        </p>
+      </div>
+    </div>
+
+    <!-- ABA 2: METODOLOGIA CRISP-DM & CÓDIGO -->
+    <div id="tab-crispdm" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Etapa 2 • CRISP-DM &amp; Algoritmo Estatístico</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Z-Score Adaptativo em Janelas Móveis e Orquestração n8n</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-emerald-400 font-bold">1. Limites Dinâmicos com Rolling Window</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Cálculo contínuo de média móvel e desvio padrão em janela móvel de 24 horas para acomodar a sazonalidade horária natural do e-commerce.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-sky-400 font-bold">2. Gatilho de Alerta e Persistência</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Classificação de anomalia crítica quando |Z| &ge; 2.5 persistente em 2 intervalos consecutivos para eliminar ruídos transitórios.</p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-neutral-400 uppercase tracking-wider">Motor Estatístico Python (anomaly_detector.py):</span>
+          <span class="text-[11px] font-mono text-emerald-400">Python 3.10 • NumPy</span>
+        </div>
+        <pre class="code-box"><code># anomaly_detector.py: Detecção Vetorial de Z-Score
+import numpy as np
+import pandas as pd
+
+def detectar_anomalia_transacional(df_historico, limiar_zscore=2.5):
+    df_historico['media_movel'] = df_historico['pedidos'].rolling(window=24, min_periods=6).mean()
+    df_historico['std_movel'] = df_historico['pedidos'].rolling(window=24, min_periods=6).std()
+    
+    df_historico['z_score'] = (
+        (df_historico['pedidos'] - df_historico['media_movel']) / 
+        df_historico['std_movel'].replace(0, np.nan)
+    ).fillna(0)
+    
+    df_historico['is_anomaly'] = df_historico['z_score'].abs() >= limiar_zscore
+    return df_historico[df_historico['is_anomaly']]</code></pre>
+      </div>
+    </div>
+
+    <!-- ABA 3: RESULTADOS E INSIGHTS -->
+    <div id="tab-resultados" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400">Etapa 3 • Descobertas &amp; Evidências</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Redução de Ruído e Tempo de Resolução</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="stage-card space-y-2">
+          <span class="text-2xl font-extrabold font-mono text-emerald-400">&lt; 5 Min</span>
+          <h4 class="text-sm font-bold text-white">Detecção Proativa</h4>
+          <p class="text-xs text-neutral-400">Engenharia atua antes que o cliente perceba o travamento de pedidos.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-2xl font-extrabold font-mono text-sky-400">18 Horas</span>
+          <h4 class="text-sm font-bold text-white">Tempo Semanal Poupado</h4>
+          <p class="text-xs text-neutral-400">Eliminação total do trabalho manual repetitivo de consolidação de planilhas.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-2xl font-extrabold font-mono text-purple-400">99,8%</span>
+          <h4 class="text-sm font-bold text-white">SLA Operacional</h4>
+          <p class="text-xs text-neutral-400">Estabilidade ininterrupta de dados garantida pela orquestração no n8n.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 4: GOVERNANÇA & ADOÇÃO -->
+    <div id="tab-governanca" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-amber-400">Etapa 4 • Arquitetura &amp; BPMN</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Matriz de Adoção Operacional e Notificações</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-emerald-400 font-bold uppercase">Time de Engenharia / SRE</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Recebimento de cards acionáveis com links diretos para logs e triggers de failover.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-sky-400 font-bold uppercase">Operações Comerciais</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Relatório diário 100% automatizado enviado às 08h00 com resumo consolidado.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-purple-400 font-bold uppercase">Liderança de Produto</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Acompanhamento da taxa de disponibilidade e estabilidade dos gateways parceiros.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 5: DECISÕES ESTRATÉGICAS -->
+    <div id="tab-decisoes" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-cyan-400">Etapa 5 • Decisões de Negócio</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Perguntas Respondidas em &lt; 5 Segundos</h2>
+      </div>
+
+      <div class="space-y-3">
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ O gateway de pagamentos está operando normalmente agora?</span>
+          <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">👉 Status Operação Normal (&plusmn; 1.1 &sigma;)</span>
+        </div>
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ Qual a causa da última anomalia detectada?</span>
+          <span class="text-xs font-mono font-bold text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">👉 Timeout de API no checkout móvel às 14:15</span>
+        </div>
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ Qual a taxa de sucesso dos pipelines automáticos hoje?</span>
+          <span class="text-xs font-mono font-bold text-sky-400 bg-sky-500/10 px-3 py-1.5 rounded-lg border border-sky-500/20">👉 99.8% de execuções bem-sucedidas no n8n</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-500">
+    <p>Painel de Orquestração &amp; Alertas • Desenvolvido por <strong>Fernando Cavalcante</strong> • Analista de Dados &amp; BI</p>
+  </footer>
+
+  <script>
+    function initAutomacaoCharts() {
+      const horas = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
+      const baseMedia = [80, 50, 30, 20, 25, 45, 90, 140, 210, 250, 270, 290, 280, 270, 260, 280, 310, 340, 350, 330, 300, 260, 200, 130];
+      const bandaSuperior = baseMedia.map(v => v + 50);
+      const bandaInferior = baseMedia.map(v => Math.max(10, v - 50));
+      const transacoesReais = [...baseMedia];
+      transacoesReais[14] = 60; // Anomalia forçada às 14h00
+
+      Plotly.newPlot('chartAnomalyStream', [
+        {
+          x: horas,
+          y: bandaSuperior,
+          type: 'scatter',
+          mode: 'lines',
+          line: { width: 0 },
+          showlegend: false,
+          hoverinfo: 'none'
+        },
+        {
+          x: horas,
+          y: bandaInferior,
+          type: 'scatter',
+          mode: 'lines',
+          fill: 'tonexty',
+          fillcolor: 'rgba(56, 189, 248, 0.08)',
+          line: { width: 0 },
+          name: 'Banda de Confiança (&plusmn; 2.5 &sigma;)'
+        },
+        {
+          x: horas,
+          y: baseMedia,
+          type: 'scatter',
+          mode: 'lines',
+          line: { color: 'rgba(255,255,255,0.3)', dash: 'dash' },
+          name: 'Média Móvel Esperada'
+        },
+        {
+          x: horas,
+          y: transacoesReais,
+          type: 'scatter',
+          mode: 'lines+markers',
+          line: { color: '#10b981', width: 2.5 },
+          marker: {
+            size: transacoesReais.map((v, i) => i === 14 ? 12 : 5),
+            color: transacoesReais.map((v, i) => i === 14 ? '#ef4444' : '#10b981')
+          },
+          name: 'Volume Observado'
+        }
+      ], {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 20, r: 20, b: 40, l: 40 },
+        font: { color: '#94a3b8', family: 'Plus Jakarta Sans' },
+        legend: { orientation: 'h', y: -0.2, font: { color: '#fff' } },
+        xaxis: { gridcolor: 'rgba(255,255,255,0.05)' },
+        yaxis: { gridcolor: 'rgba(255,255,255,0.05)' }
+      }, { responsive: true, displayModeBar: false });
+
+      Plotly.newPlot('chartWorkflowSLA', [{
+        x: ['Ingestão APIs', 'Validação Schema', 'Detector Z-Score', 'Notificador Slack', 'Carga PostgreSQL'],
+        y: [99.9, 100, 99.8, 100, 99.7],
+        type: 'bar',
+        marker: { color: ['#38bdf8', '#10b981', '#6366f1', '#a855f7', '#06b6d4'] }
+      }], {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 20, r: 20, b: 60, l: 40 },
+        font: { color: '#94a3b8', family: 'Plus Jakarta Sans' },
+        xaxis: { gridcolor: 'rgba(255,255,255,0.05)' },
+        yaxis: { range: [98, 100.5], ticksuffix: '%', gridcolor: 'rgba(255,255,255,0.05)' }
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    
+  // CONTROLE DE NAVEGAÇÃO POR ABAS / ETAPAS
+  function initStageTabs() {
+    const tabs = document.querySelectorAll('.stage-tab-btn');
+    const views = document.querySelectorAll('.stage-view-content');
+
+    function switchTab(targetId) {
+      tabs.forEach(btn => {
+        const isActive = btn.getAttribute('data-target') === targetId;
+        btn.classList.toggle('active', isActive);
+      });
+
+      views.forEach(view => {
+        if (view.id === targetId) {
+          view.classList.remove('hidden');
+        } else {
+          view.classList.add('hidden');
+        }
+      });
+
+      if (targetId === 'tab-cockpit') {
+        setTimeout(() => {
+          if (window.Plotly) {
+            document.querySelectorAll('.plotly-graph-div').forEach(el => {
+              Plotly.Plots.resize(el);
+            });
+            const plotDiv = document.getElementById('plotlyChart');
+            if (plotDiv) Plotly.Plots.resize(plotDiv);
+          }
+        }, 50);
+      }
+    }
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        window.location.hash = targetId.replace('tab-', '');
+        switchTab(targetId);
+      });
+    });
+
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(`tab-${hash}`)) {
+      switchTab(`tab-${hash}`);
+    }
+  }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initAutomacaoCharts();
+      initStageTabs();
+    });
+  </script>
+</body>
+</html>

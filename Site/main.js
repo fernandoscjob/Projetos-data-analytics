@@ -135,6 +135,7 @@ const caseStudiesData = {
     tags: ["SQL Avançado", "Python (Streamlit/Pandas)", "Plotly", "BigQuery", "Data Governance", "Auditoria de Glosas"],
     actionUrl: "dashboard-fretes.html",
     actionText: "Acessar Cockpit de Fretes Interativo",
+    githubUrl: "https://github.com/fernandoscjob/Projetos-data-analytics/tree/main/Projetos/02_Auditoria_Fretes_Logistica",
     tldr: {
       objetivo: "Automatizar a conciliação de mais de 80.000 CT-es/mês em 14 transportadoras parceiras contra tabelas tarifárias contratuais, eliminando sobretaxas indevidas.",
       metricas: "100% de assertividade na reconciliação de tarifas, cubagem volumétrica e taxas acessórias em lote de 800 CT-es auditados.",
@@ -221,8 +222,9 @@ ORDER BY valor_glosa DESC;`
     category: "Analytics de Vendas & SaaS",
     impact: "Aumento de 18 p.p. na retenção e R$ 640k em ARR recuperado",
     tags: ["SQL Window Functions", "dbt", "Python (Cohort Heatmap)", "Power BI", "LTV/CAC Modeling"],
-    actionUrl: "#demo",
-    actionText: "Ver Heatmap de Cohort Interativo",
+    actionUrl: "dashboard-cohort.html",
+    actionText: "Acessar Painel de Cohort Interativo",
+    githubUrl: "https://github.com/fernandoscjob/Projetos-data-analytics/tree/main/Projetos/03_Cohort_Retencao_Churn",
     tldr: {
       objetivo: "Construir uma matriz longitudinal de safras (cohort analysis) para rastrear o comportamento de retenção de clientes ao longo do tempo e erradicar o churn precoce nos primeiros 60 dias.",
       metricas: "Elevação de 18 pontos percentuais na retenção de M3 (de 58% para 76%) e queda de 25% no churn involuntário.",
@@ -381,8 +383,9 @@ RETURN
     category: "Engenharia de Dados & Automação",
     impact: "18 horas/semana economizadas e detecção de incidentes em < 5 min",
     tags: ["n8n", "Python", "Webhooks", "PostgreSQL", "Slack API", "Data Quality"],
-    actionUrl: "#contato",
-    actionText: "Ver Arquitetura de Workflows",
+    actionUrl: "dashboard-automacao.html",
+    actionText: "Acessar Painel de Monitoramento & Alertas",
+    githubUrl: "https://github.com/fernandoscjob/Projetos-data-analytics/tree/main/Projetos/05_Orquestracao_Alertas_Anomalias",
     tldr: {
       objetivo: "Automatizar a ingestão contínua de pedidos e arquivos de múltiplos portais de parceiros, aplicando detecção estatística de anomalias com alertas inteligentes em tempo real.",
       metricas: "100% dos processos diários de ingestão automatizados sem falhas; tempo de resposta a incidentes reduzido de 14 horas para menos de 5 minutos.",
@@ -449,6 +452,7 @@ def detectar_anomalia_volume(df_pedidos):
     tags: ["Python (Pandas/NumPy)", "Streamlit", "Plotly", "Quantis RFM (qcut)", "CRM Playbooks", "LTV Modeling"],
     actionUrl: "dashboard-rfm.html",
     actionText: "Acessar Cockpit RFM Interativo",
+    githubUrl: "https://github.com/fernandoscjob/Projetos-data-analytics/tree/main/Projetos/01_Cockpit_RFM_Analytics",
     tldr: {
       objetivo: "Diagnosticar e segmentar uma carteira ativa de mais de 800 clientes recorrentes por Recência, Frequência e Valor Monetário, eliminando a abordagem comercial homogênea e recuperando receita em risco de evasão.",
       metricas: "100% da base categorizada em 11 clusters determinísticos via quantis com desempate ordinal (rank(method='first')).",
@@ -530,166 +534,67 @@ function initCaseStudyModal() {
     if (!data) return;
 
     modalBody.innerHTML = `
-      <!-- HEADER DO ESTUDO DE CASO -->
-      <div class="border-b border-neutral-800 pb-5 mb-6">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-          <span class="text-xs font-mono px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">${data.category}</span>
+      <!-- HEADER DO RESUMO BÁSICO DO PROJETO -->
+      <div class="border-b border-neutral-800 pb-5 mb-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <span class="text-xs font-mono px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-medium">${data.category}</span>
           <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5 font-mono">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ${data.impact}
           </span>
         </div>
-        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-3 tracking-tight">${data.title}</h3>
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex flex-wrap gap-1.5">
-            ${data.tags.map(tag => `<span class="tech-badge text-xs">${tag}</span>`).join('')}
-          </div>
-          ${data.actionUrl ? `
-            <a href="${data.actionUrl}" ${data.actionUrl.startsWith('http') || data.actionUrl.endsWith('.html') ? 'target="_blank"' : ''} class="px-3.5 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-xs font-bold transition-all flex items-center gap-1.5">
-              <span>${data.actionText || 'Ver Solução'}</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            </a>
-          ` : ''}
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-2 tracking-tight">${data.title}</h3>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          ${data.tags.map(tag => `<span class="tech-badge text-xs">${tag}</span>`).join('')}
         </div>
       </div>
 
-      <div class="space-y-8 text-sm text-neutral-300">
+      <!-- CORPO DO RESUMO BÁSICO -->
+      <div class="space-y-6 text-sm text-neutral-300">
         
-        <!-- 🚀 SEÇÃO 1: TLDR (RESUMO EXECUTIVO) -->
-        <div>
-          <div class="case-section-title text-sky-400">
-            <span>🚀 1. TLDR (Too Long; Didn't Read) - Resumo Executivo</span>
-          </div>
-          <div class="case-tldr-grid">
-            <div class="case-tldr-item">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">🎯 Objetivo do Projeto</span>
-              <p class="text-xs text-white leading-relaxed font-medium">${data.tldr.objetivo}</p>
-            </div>
-            <div class="case-tldr-item">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">📊 Métricas Principais</span>
-              <p class="text-xs text-sky-300 leading-relaxed font-medium font-mono">${data.tldr.metricas}</p>
-            </div>
-            <div class="case-tldr-item">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 block mb-1">💰 Retorno / Eficiência (ROI)</span>
-              <p class="text-xs text-emerald-300 leading-relaxed font-medium font-mono">${data.tldr.roi}</p>
-            </div>
-            <div class="case-tldr-item">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-indigo-400 block mb-1">⚡ Tempo de Execução</span>
-              <p class="text-xs text-indigo-300 leading-relaxed font-medium font-mono">${data.tldr.tempo}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 💼 SEÇÃO 2: O PROBLEMA DE NEGÓCIO -->
-        <div>
-          <div class="case-section-title text-rose-400">
-            <span>💼 2. O Problema de Negócio (Business Understanding)</span>
-          </div>
-          <div class="p-4 rounded-xl bg-neutral-900/70 border border-neutral-800 leading-relaxed text-xs sm:text-sm text-neutral-300">
-            ${data.problem}
-          </div>
-        </div>
-
-        <!-- 🔬 SEÇÃO 3: METODOLOGIA CIENTÍFICA E TÉCNICA (CRISP-DM) -->
-        <div>
-          <div class="case-section-title text-indigo-400">
-            <span>🔬 3. Metodologia Científica e Técnica (CRISP-DM)</span>
-          </div>
-          
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-            <div class="case-crisp-block">
-              <span class="text-xs font-mono text-cyan-400 font-bold block mb-1">1. Entendimento & Avaliação de Dados</span>
-              <p class="text-xs text-neutral-300 leading-relaxed">${data.crispDm.dataUnderstanding}</p>
-            </div>
-            <div class="case-crisp-block">
-              <span class="text-xs font-mono text-indigo-400 font-bold block mb-1">2. Preparação & Engenharia de Dados</span>
-              <p class="text-xs text-neutral-300 leading-relaxed">${data.crispDm.dataPreparation}</p>
-            </div>
-            <div class="case-crisp-block">
-              <span class="text-xs font-mono text-emerald-400 font-bold block mb-1">3. Modelagem Analítica & Negócio</span>
-              <p class="text-xs text-neutral-300 leading-relaxed">${data.crispDm.modeling}</p>
-            </div>
-            <div class="case-crisp-block">
-              <span class="text-xs font-mono text-amber-400 font-bold block mb-1">4. Avaliação & Garantia de Qualidade (QA)</span>
-              <p class="text-xs text-neutral-300 leading-relaxed">${data.crispDm.qa}</p>
-            </div>
-          </div>
-
-          <!-- Code Snippet -->
+        <!-- Objetivo & Desafio de Negócio -->
+        <div class="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800 space-y-3">
           <div>
-            <span class="text-[11px] font-mono text-neutral-400 block mb-1.5">Implementação Técnica em Destaque:</span>
-            <pre class="code-block text-xs font-mono overflow-x-auto"><code>${data.crispDm.codeSnippet}</code></pre>
+            <span class="text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold block mb-1">🎯 Objetivo do Projeto</span>
+            <p class="text-xs sm:text-sm text-neutral-200 leading-relaxed">${data.tldr.objetivo}</p>
+          </div>
+          <div class="pt-3 border-t border-neutral-800/80">
+            <span class="text-[11px] font-mono uppercase tracking-wider text-rose-400 font-bold block mb-1">💼 Cenário & Desafio de Negócio</span>
+            <p class="text-xs sm:text-sm text-neutral-300 leading-relaxed">${data.problem.trim()}</p>
           </div>
         </div>
 
-        <!-- 📈 SEÇÃO 4: RESULTADOS E INSIGHTS GERADOS -->
-        <div>
-          <div class="case-section-title text-emerald-400">
-            <span>📈 4. Resultados e Insights Gerados</span>
+        <!-- Grade Resumida de Métricas & Retorno Financeiro -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="case-tldr-item">
+            <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 block mb-1">💰 Retorno / ROI</span>
+            <p class="text-xs text-emerald-300 font-mono font-medium leading-relaxed">${data.tldr.roi}</p>
           </div>
-          
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
-            ${data.resultsInsights.kpis.map(k => `
-              <div class="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-center">
-                <span class="text-lg sm:text-xl font-extrabold text-emerald-300 font-mono block">${k.val}</span>
-                <span class="text-[11px] font-bold text-white block mt-0.5">${k.label}</span>
-                <span class="text-[10px] text-neutral-400 block mt-0.5">${k.desc}</span>
-              </div>
-            `).join('')}
+          <div class="case-tldr-item">
+            <span class="text-[10px] font-mono uppercase tracking-wider text-sky-400 block mb-1">📊 Métricas Principais</span>
+            <p class="text-xs text-sky-300 font-mono font-medium leading-relaxed">${data.tldr.metricas}</p>
           </div>
-
-          <ul class="space-y-2 p-4 rounded-xl bg-neutral-900/70 border border-neutral-800 text-xs sm:text-sm">
-            ${data.resultsInsights.insights.map(res => `
-              <li class="flex items-start gap-2.5">
-                <span class="text-emerald-400 font-bold mt-0.5">✔</span>
-                <span class="leading-relaxed">${res}</span>
-              </li>
-            `).join('')}
-          </ul>
-        </div>
-
-        <!-- 🛠️ SEÇÃO 5: IMPLEMENTAÇÃO, GOVERNANÇA E PRÓXIMOS PASSOS -->
-        <div>
-          <div class="case-section-title text-amber-400">
-            <span>🛠️ 5. Plano de Implementação, Governança e Próximos Passos</span>
-          </div>
-          
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="p-3.5 rounded-xl bg-neutral-900/70 border border-neutral-800">
-              <span class="text-xs font-mono text-amber-300 font-bold block mb-1">🚀 Estratégia de Deploy</span>
-              <p class="text-xs text-neutral-300 leading-relaxed">${data.governance.deploy}</p>
-            </div>
-            <div class="p-3.5 rounded-xl bg-neutral-900/70 border border-neutral-800">
-              <span class="text-xs font-mono text-sky-300 font-bold block mb-1">👥 Matriz de Adoção</span>
-              <p class="text-xs text-neutral-300 leading-relaxed">${data.governance.adoption}</p>
-            </div>
-            <div class="p-3.5 rounded-xl bg-neutral-900/70 border border-neutral-800">
-              <span class="text-xs font-mono text-purple-300 font-bold block mb-1">🔮 Próximas Recomendações</span>
-              <p class="text-xs text-neutral-300 leading-relaxed">${data.governance.nextSteps}</p>
-            </div>
+          <div class="case-tldr-item">
+            <span class="text-[10px] font-mono uppercase tracking-wider text-indigo-400 block mb-1">⚡ Tempo de Resposta</span>
+            <p class="text-xs text-indigo-300 font-mono font-medium leading-relaxed">${data.tldr.tempo}</p>
           </div>
         </div>
 
-        <!-- 📊 SEÇÃO 6: DESIGN DO DASHBOARD E PERGUNTAS-CHAVE -->
-        <div>
-          <div class="case-section-title text-cyan-400">
-            <span>📊 6. Design do Dashboard de Suporte e Perguntas-Chave</span>
+        <!-- LINK EM DESTAQUE PARA ACESSAR O PAINEL DE ANÁLISE COMPLETO COM TODAS AS ETAPAS -->
+        <div class="p-5 rounded-2xl bg-gradient-to-r from-sky-500/15 via-indigo-500/10 to-emerald-500/10 border border-sky-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-sky-950/30">
+          <div>
+            <span class="text-sm font-bold text-white block">Acessar Painel de Análise & Etapas Metodológicas</span>
+            <span class="text-xs text-neutral-400 block mt-0.5">Explore o dashboard interativo, métricas em tempo real e todas as etapas técnicas (CRISP-DM, Código, Resultados, Governança) nas abas da página.</span>
           </div>
-
-          <div class="p-4 rounded-xl bg-neutral-900/70 border border-neutral-800 space-y-3 text-xs">
-            <div>
-              <span class="text-neutral-400 font-mono text-[11px] uppercase block mb-1">🎯 Audiência Específica:</span>
-              <p class="text-white font-medium">${data.dashboardDesign.audience}</p>
-            </div>
-
-            <div class="space-y-1.5 pt-2 border-t border-neutral-800/80">
-              <span class="text-neutral-400 font-mono text-[11px] uppercase block mb-1.5">⚡ Decisões de Negócios Respondidas pelo Painel:</span>
-              ${data.dashboardDesign.decisions.map(d => `
-                <div class="case-decision-row">
-                  <span class="text-neutral-200 font-medium">❓ ${d.question}</span>
-                  <span class="text-sky-400 font-mono text-[11px] font-semibold">👉 ${d.metric}</span>
-                </div>
-              `).join('')}
-            </div>
+          <div class="flex items-center gap-2.5 w-full sm:w-auto">
+            <a href="${data.actionUrl}" target="_blank" class="btn-primary flex-1 sm:flex-initial text-xs !py-2.5 !px-5 whitespace-nowrap !bg-sky-500 hover:!bg-sky-400 !text-slate-950 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(56,189,248,0.3)]">
+              <span>${data.actionText || 'Acessar Painel de Análise'}</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+            ${data.githubUrl ? `
+              <a href="${data.githubUrl}" target="_blank" rel="noopener noreferrer" class="btn-secondary text-xs !py-2.5 !px-3.5 whitespace-nowrap" title="Ver Código no GitHub">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              </a>
+            ` : ''}
           </div>
         </div>
 

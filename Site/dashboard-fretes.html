@@ -138,6 +138,55 @@
       transform: translateY(0);
       opacity: 1;
     }
+  
+    /* ABAS DE ETAPAS METODOLÓGICAS */
+    .stage-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .stage-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .stage-tab-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+    .code-box {
+      background: #090c15;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .stage-card {
+      background: rgba(15, 18, 29, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+    .stage-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
   </style>
 </head>
 
@@ -183,7 +232,39 @@
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- HERO SECTION / APRESENTAÇÃO -->
+    <!-- NAVEGAÇÃO DE ETAPAS / PÁGINAS DO PROJETO -->
+    <div class="border-b border-neutral-800 pb-3 mb-6">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <nav class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none" id="stageTabsNav">
+          <button class="stage-tab-btn active" data-target="tab-cockpit">
+            <span>📊</span> <span>Cockpit Analítico</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-problema">
+            <span>🎯</span> <span>1. TLDR & Problema</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-crispdm">
+            <span>🔬</span> <span>2. Metodologia CRISP-DM & Código</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-resultados">
+            <span>📈</span> <span>3. Resultados & Insights</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-governanca">
+            <span>🛠️</span> <span>4. Governança & Adoção</span>
+          </button>
+          <button class="stage-tab-btn" data-target="tab-decisoes">
+            <span>❓</span> <span>5. Perguntas Estratégicas</span>
+          </button>
+        </nav>
+        <a href="https://github.com/fernandoscjob/Projetos-data-analytics/tree/main/Projetos/02_Auditoria_Fretes_Logistica" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-neutral-400 hover:text-white transition-colors">
+          <svg class="w-3.5 h-3.5 fill-currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span>Repositório GitHub</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- COCKPIT ANALÍTICO INTERATIVO -->
+    <div id="tab-cockpit" class="stage-view-content space-y-8">
+<!-- HERO SECTION / APRESENTAÇÃO -->
     <section class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-neutral-800">
       <div>
         <div class="flex items-center gap-2.5 mb-1.5">
@@ -403,8 +484,186 @@
         </a>
       </div>
     </section>
+    </div>
 
-  </main>
+    <!-- ETAPA 1: TLDR & PROBLEMA DE NEGÓCIO -->
+    <div id="tab-problema" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Etapa 1 • Business Understanding & TLDR</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Visão Executiva, Auditoria Contratual e Custo da Inação</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="stage-card border-l-4 border-l-sky-500">
+          <span class="text-xs font-mono text-sky-400 uppercase tracking-wider block mb-1">🎯 Objetivo</span>
+          <p class="text-xs text-neutral-300 leading-relaxed font-medium">Auditar 100% dos CT-es de 14 transportadoras homologadas contra regras contratuais.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-emerald-500">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-wider block mb-1">💰 Retorno / ROI</span>
+          <p class="text-xs text-emerald-300 font-mono font-medium leading-relaxed">R$ 1.200.000,00 em glosas contestadas (14,8% do faturado) e -40% em sobretaxas acessórias.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-indigo-500">
+          <span class="text-xs font-mono text-indigo-400 uppercase tracking-wider block mb-1">📊 Métricas Chave</span>
+          <p class="text-xs text-indigo-300 font-mono font-medium leading-relaxed">800 CT-es auditados: R$ 8.12M faturados vs R$ 6.92M devidos contratualmente.</p>
+        </div>
+        <div class="stage-card border-l-4 border-l-purple-500">
+          <span class="text-xs font-mono text-purple-400 uppercase tracking-wider block mb-1">⚡ Performance</span>
+          <p class="text-xs text-purple-300 font-mono font-medium leading-relaxed">Redução do ciclo de conferência de 12 dias úteis para &lt; 2 horas (D-0).</p>
+        </div>
+      </div>
+
+      <div class="stage-card space-y-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>💼 Cenário Corporativo &amp; Vulnerabilidade Contratual</span>
+        </h3>
+        <p class="text-sm text-neutral-300 leading-relaxed">
+          A operação expedita movimentava milhares de toneladas com 14 transportadoras. Na ausência de conciliação fiscal automatizada, faturas eram aprovadas por amostragem manual (&lt; 5%), 
+          permitindo cobranças indevidas sistemáticas de cubagem volumétrica e tarifas acessórias.
+        </p>
+        <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 leading-relaxed">
+          <strong>🚨 Custo da Inação:</strong> Perda invisível superior a R$ 1 milhão a cada fechamento contábil, corroendo as margens brutas da empresa sem qualquer auditoria técnica.
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 2: METODOLOGIA CRISP-DM & CÓDIGO -->
+    <div id="tab-crispdm" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-indigo-400">Etapa 2 • Metodologia CRISP-DM &amp; Regras Fiscais</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Engenharia de Dados e Algoritmo de Conciliação em SQL</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-sky-400 font-bold">1. Ingestão e Modelo de Cubagem</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">
+            Cruzamento entre chaves de CT-e e matriz tarifária vigente. O peso faturável é calculado pela regra matemática: 
+            <code>Peso Tarifado = MAX(Peso Real, Volume m³ × 300 kg/m³)</code>.
+          </p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-emerald-400 font-bold">2. Classificação Automática de Glosas</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">
+            Divergências superiores à margem de tolerância (&gt; R$ 10,00) disparam rejeição imediata, categorização da causa-raiz e geração da carta de contestação formal.
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-neutral-400 uppercase tracking-wider">Pipeline SQL com Common Table Expressions (CTEs):</span>
+          <span class="text-[11px] font-mono text-sky-400">PostgreSQL / BigQuery</span>
+        </div>
+        <pre class="code-box"><code>-- queries_auditoria.sql: Conciliação Contratual de Fretes e Detecção de Glosas
+WITH cte_contrato AS (
+    SELECT 
+        c.cte_id,
+        c.transportadora,
+        c.valor_cobrado,
+        c.peso_real_kg,
+        c.volume_m3,
+        GREATEST(c.peso_real_kg, c.volume_m3 * t.fator_cubagem) AS peso_tarifado,
+        (t.tarifa_base + 
+         (GREATEST(c.peso_real_kg, c.volume_m3 * t.fator_cubagem) * t.tarifa_excedente_kg) +
+         (c.valor_nf * t.aliquota_gris) +
+         (CEIL(c.peso_real_kg / 100.0) * t.valor_pedagio_fracao)
+        ) AS valor_devido
+    FROM tb_cte_faturado c
+    INNER JOIN tb_tabela_frete t 
+        ON c.transportadora_id = t.transportadora_id AND c.uf_destino = t.uf_destino
+)
+SELECT 
+    cte_id,
+    transportadora,
+    valor_cobrado,
+    ROUND(valor_devido, 2) AS valor_devido,
+    ROUND(valor_cobrado - valor_devido, 2) AS valor_glosa,
+    CASE 
+        WHEN (valor_cobrado - valor_devido) > 10.00 THEN 'CONTESTAR / GLOSA'
+        ELSE 'APROVADO'
+    END AS status_auditoria
+FROM cte_contrato;</code></pre>
+      </div>
+    </div>
+
+    <!-- ETAPA 3: RESULTADOS E INSIGHTS -->
+    <div id="tab-resultados" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400">Etapa 3 • Descobertas &amp; Evidências</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Causas-Raiz e Concentração das Glosas</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="stage-card space-y-1">
+          <span class="text-2xl font-extrabold font-mono text-rose-400">45,0%</span>
+          <h4 class="text-xs font-bold text-white">Cubagem Volumétrica</h4>
+          <p class="text-[11px] text-neutral-400">R$ 540.000 em cubômetros e balanças descalibradas.</p>
+        </div>
+        <div class="stage-card space-y-1">
+          <span class="text-2xl font-extrabold font-mono text-amber-400">32,0%</span>
+          <h4 class="text-xs font-bold text-white">Taxas Acessórias</h4>
+          <p class="text-[11px] text-neutral-400">R$ 384.000 em reentregas e diárias sem comprovação de insucesso.</p>
+        </div>
+        <div class="stage-card space-y-1">
+          <span class="text-2xl font-extrabold font-mono text-sky-400">16,0%</span>
+          <h4 class="text-xs font-bold text-white">Tarifa por kg Acima</h4>
+          <p class="text-[11px] text-neutral-400">R$ 192.000 cobrados em desconformidade com a tabela negociada.</p>
+        </div>
+        <div class="stage-card space-y-1">
+          <span class="text-2xl font-extrabold font-mono text-purple-400">7,0%</span>
+          <h4 class="text-xs font-bold text-white">Pedágio &amp; GRIS</h4>
+          <p class="text-[11px] text-neutral-400">R$ 84.000 em alíquotas aplicadas indevidamente.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 4: GOVERNANÇA & ADOÇÃO -->
+    <div id="tab-governanca" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-amber-400">Etapa 4 • Arquitetura &amp; BPMN</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Fluxo Operacional de Liberação e Adoção</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-sky-400 font-bold uppercase">Gerente de Logística</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Ranqueamento de operadores com maior índice de divergência para renegociação contratual e SLA.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-rose-400 font-bold uppercase">Contas a Pagar</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Retenção imediata de faturas com divergência &gt; R$ 10,00 e liberação das faturas conformes em D-0.</p>
+        </div>
+        <div class="stage-card space-y-2">
+          <span class="text-xs font-mono text-emerald-400 font-bold uppercase">Auditor Fiscal</span>
+          <p class="text-xs text-neutral-300 leading-relaxed">Exportação com 1 clique da minuta de contestação formal anexando as evidências de cálculo.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 5: DECISÕES ESTRATÉGICAS -->
+    <div id="tab-decisoes" class="stage-view-content hidden space-y-8">
+      <div class="border-b border-neutral-800 pb-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-cyan-400">Etapa 5 • Decisões de Negócio</span>
+        <h2 class="text-2xl font-extrabold text-white mt-1">Perguntas Respondidas em &lt; 5 Segundos</h2>
+      </div>
+
+      <div class="space-y-3">
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ Qual é o montante financeiro total retido para contestação?</span>
+          <span class="text-xs font-mono font-bold text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">👉 R$ 1.200.000,00 no card de Glosas</span>
+        </div>
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ Quais transportadoras geram a maior parte dos erros contratuais?</span>
+          <span class="text-xs font-mono font-bold text-sky-400 bg-sky-500/10 px-3 py-1.5 rounded-lg border border-sky-500/20">👉 Gráfico de barras horizontais por operador</span>
+        </div>
+        <div class="stage-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span class="text-sm font-medium text-white">❓ Qual é a principal causa de sobretaxa no lote auditado?</span>
+          <span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20">👉 Donut chart: 45% cubagem volumétrica</span>
+        </div>
+      </div>
+    </div>
+    
+</main>
 
   <!-- TOAST DE NOTIFICAÇÃO -->
   <div id="toast"></div>
@@ -417,7 +676,56 @@
     let selectedStatus = 'TODOS';
     let searchQuery = '';
 
-    document.addEventListener('DOMContentLoaded', () => {
+    
+  // CONTROLE DE NAVEGAÇÃO POR ABAS / ETAPAS
+  function initStageTabs() {
+    const tabs = document.querySelectorAll('.stage-tab-btn');
+    const views = document.querySelectorAll('.stage-view-content');
+
+    function switchTab(targetId) {
+      tabs.forEach(btn => {
+        const isActive = btn.getAttribute('data-target') === targetId;
+        btn.classList.toggle('active', isActive);
+      });
+
+      views.forEach(view => {
+        if (view.id === targetId) {
+          view.classList.remove('hidden');
+        } else {
+          view.classList.add('hidden');
+        }
+      });
+
+      if (targetId === 'tab-cockpit') {
+        setTimeout(() => {
+          if (window.Plotly) {
+            document.querySelectorAll('.plotly-graph-div').forEach(el => {
+              Plotly.Plots.resize(el);
+            });
+            const plotDiv = document.getElementById('plotlyChart');
+            if (plotDiv) Plotly.Plots.resize(plotDiv);
+          }
+        }, 50);
+      }
+    }
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        window.location.hash = targetId.replace('tab-', '');
+        switchTab(targetId);
+      });
+    });
+
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(`tab-${hash}`)) {
+      switchTab(`tab-${hash}`);
+    }
+  }
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initStageTabs();
       initTranspPills();
       initEvents();
       updateDashboard();
