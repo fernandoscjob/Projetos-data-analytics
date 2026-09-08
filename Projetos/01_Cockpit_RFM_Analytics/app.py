@@ -10,6 +10,14 @@ Para executar localmente:
 
 from datetime import datetime
 import io
+import os
+import sys
+
+# Garante que o módulo rfm_engine seja importado mesmo quando executado da raiz do repositório
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+if CURRENT_DIR not in sys.path:
+    sys.path.insert(0, CURRENT_DIR)
+
 import pandas as pd
 import numpy as np
 import plotly.express as px

@@ -33,52 +33,60 @@ Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | 
 
 ---
 
-## 📁 Estrutura de Arquivos
+## 📁 Estrutura de Arquivos Isolada
+
+O repositório é organizado de forma modular e isolada, separando a camada do **Site de Portfólio** dos **Projetos de Dados**:
 
 ```
 Portifólio em Dados/
-├── index.html               # Estrutura HTML5 semântica e acessível
-├── style.css                # Design tokens, glassmorphism, matrizes e animações
-├── main.js                  # Lógica interativa, Chart.js, Cohort, Cockpit RFM e Formspree AJAX
-├── app.py                   # Aplicação Web analítica completa em Streamlit
-├── rfm_engine.py            # Motor analítico RFM com quantis e 11 clusters de negócio
-├── requirements.txt         # Dependências do app (streamlit, pandas, numpy, plotly, openpyxl)
-├── .gitignore               # Ignora ambientes virtuais (.venv) e caches Python
-├── profile.jpg              # Foto de perfil profissional em alta resolução
-├── curriculo-fernando.pdf   # Arquivo de currículo para download direto
-└── README.md                # Documentação técnica do projeto
+│
+├── 🌐 Site/                                 # ARQUIVOS DO SITE DE PORTFÓLIO (FRONTEND)
+│   ├── index.html                          # Aplicação web completa do portfólio
+│   ├── dashboard-rfm.html                  # Cockpit Analítico RFM Standalone (Plotly.js)
+│   ├── style.css                           # Design tokens, glassmorphism e animações
+│   ├── main.js                             # Lógica interativa, Chart.js, Cohort e AJAX
+│   ├── profile.jpg                         # Foto de perfil profissional em alta resolução
+│   ├── curriculo-fernando.pdf              # Arquivo de currículo para download direto
+│   └── video_dashboard.mp4                 # Vídeo demonstrativo dos dashboards
+│
+├── 📊 Projetos/                             # PROJETOS ANALÍTICOS E ENGENHARIA DE DADOS
+│   └── 01_Cockpit_RFM_Analytics/           # Projeto 01: Segmentação RFM & Prevenção de Churn
+│       ├── app.py                          # Aplicação Web analítica executiva em Streamlit
+│       ├── rfm_engine.py                   # Motor de cálculo RFM por quantis e 11 clusters
+│       ├── requirements.txt                # Dependências (streamlit, pandas, numpy, plotly)
+│       └── README.md                       # Documentação técnica detalhada do projeto
+│
+├── index.html                              # Redirecionamento instantâneo para Site/index.html (compatibilidade GitHub Pages)
+├── .gitignore                              # Ignora ambientes virtuais (.venv) e caches
+└── README.md                               # Documentação geral do repositório
 ```
 
 ---
 
 ## 🚀 Como Executar Localmente
 
-### Opção 1: Executar o Cockpit Analítico RFM em Python (Streamlit)
-Abra o terminal na pasta do projeto e execute:
-```bash
-streamlit run app.py
-```
-*Ou via ambiente virtual:*
-```bash
-.\.venv\Scripts\python.exe -m streamlit run app.py
-```
-Acesse no navegador: `http://localhost:8501` para interagir com o dashboard analítico completo com uploads e exportações.
+### Opção 1: Abrir o Portfólio Web (Pasta `Site/`)
+- **Direto pelo Navegador**: Dê dois cliques em [`Site/index.html`](Site/index.html) ou no [`index.html`](index.html) da raiz (que redireciona automaticamente para o site).
+- **Via VS Code Live Server**: Abra a pasta `Site/` ou a raiz no VS Code e inicie com o Live Server.
+- **Via Servidor Local Python**:
+  ```bash
+  python -m http.server 3000
+  ```
+  Acesse no navegador: `http://localhost:3000/Site/index.html`.
 
-### Opção 2: Abrir o Portfólio Web diretamente no Navegador
-Basta dar dois cliques no arquivo `index.html` ou arrastá-lo para qualquer navegador moderno (Chrome, Edge, Firefox, Safari).
-
-### Opção 3: VS Code Live Server
-1. Abra a pasta do projeto no **Visual Studio Code**.
-2. Instale a extensão **Live Server** (caso ainda não tenha).
-3. Clique com o botão direito em `index.html` e selecione **"Open with Live Server"**.
-4. O site abrirá automaticamente em `http://127.0.0.1:5500`.
-
-### Opção 4: Python HTTP Server (Portfólio Web)
-Abra o terminal na pasta do projeto e execute:
+### Opção 2: Executar o Projeto de Dados RFM (Streamlit)
+No terminal da raiz do repositório:
 ```bash
-python -m http.server 3000
+streamlit run Projetos/01_Cockpit_RFM_Analytics/app.py
 ```
-Acesse no navegador: `http://localhost:3000`.
+*Ou via ambiente virtual Python:*
+```powershell
+.\.venv\Scripts\python.exe -m streamlit run Projetos/01_Cockpit_RFM_Analytics/app.py
+```
+Acesse no navegador: `http://localhost:8501`.
+
+### Opção 3: Visualizar o Dashboard RFM Standalone (Navegador)
+Dê dois cliques no arquivo [`Site/dashboard-rfm.html`](Site/dashboard-rfm.html). Ele funciona diretamente no navegador sem exigir servidor Python em execução.
 
 ---
 

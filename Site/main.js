@@ -1336,7 +1336,7 @@ function initRfmAnalysis() {
   // Ação de copiar comando Streamlit
   if (copyCmdBtn) {
     copyCmdBtn.addEventListener('click', () => {
-      const cmd = "streamlit run app.py";
+      const cmd = "streamlit run Projetos/01_Cockpit_RFM_Analytics/app.py";
       navigator.clipboard.writeText(cmd).then(() => {
         if (typeof window.showToast === 'function') {
           window.showToast("Comando copiado: " + cmd, "success");
