@@ -628,3 +628,81 @@ body {
   border-color: rgba(56, 189, 248, 0.4);
   box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
 }
+
+/* ==========================================================================
+   REGRAS COMPLETAS DE EXPORTAÇÃO E IMPRESSÃO DE RELATÓRIOS (@media print)
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+
+  /* Ocultar elementos de navegação, controles interativos e fundos pesados */
+  header,
+  footer,
+  nav,
+  video,
+  #mobileMenu,
+  #mobileMenuBtn,
+  #periodFiltersWrapper,
+  .modal-backdrop,
+  #toast,
+  button,
+  .btn-primary,
+  .btn-secondary {
+    display: none !important;
+  }
+
+  /* Destravar rolagens que causam corte em relatórios e dashboards */
+  html,
+  body,
+  main,
+  section,
+  .dashboard-wrapper,
+  .report-container,
+  .cohort-container,
+  .rfm-matrix-container {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* Evitar fatiamento no meio de cards, tabelas analíticas e gráficos */
+  .glass-panel,
+  .project-card,
+  article,
+  canvas,
+  table,
+  tr,
+  figure,
+  .rfm-table,
+  .cohort-table {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* Ajuste de tipografia para alto contraste e nitidez de impressão */
+  h1, h2, h3, h4, p, span, strong, td, th {
+    color: #0f172a !important;
+    text-shadow: none !important;
+  }
+
+  /* Responsividade das tabelas em relatórios gerados em Python */
+  table {
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  th, td {
+    word-break: break-word !important;
+    font-size: 10px !important;
+    padding: 4px 6px !important;
+  }
+}
