@@ -706,3 +706,48 @@ body {
     padding: 4px 6px !important;
   }
 }
+
+/* ==========================================================================
+   VISUALIZADOR EXECUTIVO DECK MODE (16:9 FULLSCREEN)
+   ========================================================================== */
+#deckViewerModal {
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+#deckViewerModal.active {
+  display: flex !important;
+}
+
+.deck-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.deck-dot:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.deck-dot.active {
+  width: 24px;
+  background: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+}
+
+@keyframes deckSlideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.deck-slide-animated {
+  animation: deckSlideFadeIn 0.25s ease-out forwards;
+}
