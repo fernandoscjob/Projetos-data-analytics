@@ -225,8 +225,8 @@
        REGRAS AVANÇADAS DE IMPRESSÃO / EXPORTAÇÃO EM PDF (ZERO CORTES)
        ========================================================================= */
     @page {
-      size: A4 portrait;
-      margin: 12mm 10mm 15mm 10mm;
+      size: A4 landscape;
+      margin: 8mm;
     }
 
     @media print {
@@ -354,10 +354,10 @@
         margin-bottom: 1.25rem !important;
       }
 
-      /* Cards de métricas podem ficar em 2 por linha se houver espaço */
+      /* Cards de métricas alinhados no formato paisagem (4 por linha) */
       .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
         display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: repeat(4, 1fr) !important;
         gap: 0.75rem !important;
       }
 
