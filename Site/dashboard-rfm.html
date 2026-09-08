@@ -311,7 +311,7 @@
       }
 
       /* A primeira etapa (Cockpit) fica logo abaixo do cabeçalho de impressão sem quebra antes */
-      #tab-cockpit {
+      #tab-problema {
         page-break-before: avoid !important;
         break-before: avoid !important;
       }
@@ -445,20 +445,12 @@
       <!-- Menu Informativo de Navegação Vertical -->
       <div>
         <span class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 font-bold block mb-2 px-1">Menu Informativo &amp; Etapas</span>
-        <nav class="space-y-1.5" id="stageTabsNav">
-          <button class="stage-tab-btn active" data-target="tab-cockpit">
-            <span class="text-base flex-shrink-0">📊</span>
-            <div class="flex-1 min-w-0">
-              <span class="tab-title block text-white font-semibold leading-tight">Cockpit Analítico</span>
-              <span class="text-[10px] text-neutral-400 block mt-0.5">Gráficos &amp; Filtros Interativos</span>
-            </div>
-          </button>
-
-          <button class="stage-tab-btn" data-target="tab-problema">
+                <nav class="space-y-1.5" id="stageTabsNav">
+          <button class="stage-tab-btn active" data-target="tab-problema">
             <span class="text-base flex-shrink-0">🎯</span>
             <div class="flex-1 min-w-0">
-              <span class="tab-title block text-neutral-300 font-semibold leading-tight">1. TLDR &amp; Problema</span>
-              <span class="text-[10px] text-neutral-500 block mt-0.5">Cenário &amp; Custo da Inação</span>
+              <span class="tab-title block text-white font-semibold leading-tight">1. TLDR &amp; Problema</span>
+              <span class="text-[10px] text-neutral-400 block mt-0.5">Cenário &amp; Custo da Inação</span>
             </div>
           </button>
 
@@ -500,6 +492,14 @@
             <div class="flex-1 min-w-0">
               <span class="tab-title block text-neutral-300 font-semibold leading-tight">6. Decisões Estratégicas</span>
               <span class="text-[10px] text-neutral-500 block mt-0.5">C-Level &amp; Decisões &lt; 5s</span>
+            </div>
+          </button>
+
+          <button class="stage-tab-btn" data-target="tab-cockpit">
+            <span class="text-base flex-shrink-0">📊</span>
+            <div class="flex-1 min-w-0">
+              <span class="tab-title block text-neutral-300 font-semibold leading-tight">7. Cockpit Analítico</span>
+              <span class="text-[10px] text-neutral-500 block mt-0.5">Gráficos &amp; Filtros Interativos</span>
             </div>
           </button>
         </nav>
@@ -570,193 +570,18 @@
             <span>Exportar CRM (CSV)</span>
           </button>
         
-        <button onclick="exportFullReportPdf()" class="btn-export-pdf px-3.5 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(56,189,248,0.3)] cursor-pointer">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          <span>Exportar Relatório (PDF)</span>
+        <button class="open-deck-btn px-3.5 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs shadow-[0_0_15px_rgba(56,189,248,0.3)] transition-all flex items-center gap-1.5 cursor-pointer" data-deck="rfm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+          <span>Modo Apresentação (16:9)</span>
         </button>
       </div>
     </div>
     
 
     
-
-    <!-- COCKPIT ANALÍTICO INTERATIVO -->
-    <div id="tab-cockpit" class="stage-view-content space-y-8">
-
-
-<!-- HEADER DO DASHBOARD -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-neutral-800">
-      <div>
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Customer Analytics & Retenção</span>
-          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-500/10 text-sky-400 border border-sky-500/20">Machine Intelligence</span>
-        </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Diagnóstico de Carteira & Prevenção de Churn
-        </h1>
-        <p class="text-xs sm:text-sm text-neutral-400 max-w-2xl mt-1 leading-relaxed">
-          Segmentação multidimensional por <strong>Recência</strong> (dias sem comprar), <strong>Frequência</strong> (pedidos) e <strong>Valor Monetário</strong> (faturamento total) com scores quantílicos determinísticos e playbooks comerciais acionáveis.
-        </p>
-      </div>
-
-      <!-- Barra de Filtro Rápido -->
-      <div class="flex flex-wrap items-center gap-3 glass-panel p-3 rounded-xl border border-neutral-800 self-start lg:self-auto">
-        <div>
-          <label class="text-[10px] font-mono uppercase text-neutral-400 block mb-1">Filtro de Segmento:</label>
-          <select id="segmentFilterSelect" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-white focus:outline-none focus:border-sky-500 transition-colors">
-            <option value="all">Todos os Segmentos (11 clusters)</option>
-          </select>
-        </div>
-        <div class="self-end">
-          <button id="resetFiltersBtn" class="px-3 py-1.5 rounded-lg bg-neutral-800 text-neutral-300 hover:text-white text-xs font-medium transition-colors">
-            Resetar
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- CARDS DE KPIS EXECUTIVOS -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-      <div class="metric-card">
-        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Receita Filtrada</span>
-        <div class="text-2xl font-extrabold text-white font-mono" id="kpiRevenue">R$ 0,00</div>
-        <span class="text-[11px] text-neutral-500 block mt-1.5" id="kpiRevenueSub">Volume faturado no período</span>
-      </div>
-
-      <div class="metric-card">
-        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Clientes Únicos</span>
-        <div class="text-2xl font-extrabold text-white font-mono" id="kpiCustomers">0</div>
-        <span class="text-[11px] text-sky-400 block mt-1.5" id="kpiCustomersSub">100% categorizados</span>
-      </div>
-
-      <div class="metric-card">
-        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Ticket Médio Geral</span>
-        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTicket">R$ 0,00</div>
-        <span class="text-[11px] text-neutral-500 block mt-1.5">Média por transação concluída</span>
-      </div>
-
-      <div class="metric-card metric-alert alert-pulse">
-        <span class="text-xs font-mono uppercase tracking-wider text-rose-400 font-bold block mb-1">🚨 Receita em Risco</span>
-        <div class="text-2xl font-extrabold text-rose-400 font-mono" id="kpiRiskRevenue">R$ 0,00</div>
-        <span class="text-[11px] text-rose-300/80 block mt-1.5 font-medium" id="kpiRiskShare">0.0% da receita global</span>
-      </div>
-
-    </section>
-
-    <!-- NAVEGAÇÃO RÁPIDA POR CLUSTERS (PÍLULAS) -->
-    <section class="space-y-2">
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Navegar por Cluster Estratégico:</span>
-        <span class="text-[11px] text-neutral-500">Clique em qualquer segmento para filtrar os gráficos e a lista operacional</span>
-      </div>
-      <div class="flex flex-wrap gap-2" id="clusterPillsContainer">
-        <!-- Injetado dinamicamente -->
-      </div>
-    </section>
-
-    <!-- VISUALIZAÇÕES ANALÍTICAS (PLOTLY) -->
-    <section class="glass-panel rounded-2xl p-6 border border-neutral-800 space-y-6">
-      
-      <!-- Controles das Abas de Gráficos -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-neutral-800/80">
-        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-900 border border-neutral-800">
-          <button class="tab-btn active" data-tab="treemap">🌳 Treemap (Mix & Volume)</button>
-          <button class="tab-btn" data-tab="scatter">🪐 Dispersão 2D / 3D</button>
-          <button class="tab-btn" data-tab="heatmap">🔥 Matriz de Concentração 5x5</button>
-        </div>
-
-        <div id="treemapMetricToggle" class="flex items-center gap-2 text-xs">
-          <span class="text-neutral-400">Dimensão:</span>
-          <button id="metricRevenueBtn" class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium">Receita (R$)</button>
-          <button id="metricCountBtn" class="px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium">Qtd Clientes</button>
-        </div>
-
-        <div id="scatterDimToggle" class="hidden flex items-center gap-2 text-xs">
-          <span class="text-neutral-400">Visão:</span>
-          <button id="scatter2dBtn" class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium">2D (Recência x Freq)</button>
-          <button id="scatter3dBtn" class="px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium">3D Espacial</button>
-        </div>
-      </div>
-
-      <!-- Container dos Gráficos Plotly -->
-      <div class="relative w-full min-h-[460px]">
-        <div id="plotlyChart" class="w-full h-[460px]"></div>
-      </div>
-
-    </section>
-
-    <!-- PLAYBOOK COMERCIAL DO CLUSTER EM FOCO -->
-    <section id="playbookCardContainer" class="glass-panel p-6 rounded-2xl border border-neutral-800 space-y-4">
-      <!-- Injetado dinamicamente -->
-    </section>
-
-    <!-- TABELA OPERACIONAL DE AÇÃO & CLIENTES -->
-    <section class="glass-panel rounded-2xl p-6 border border-neutral-800 space-y-5">
-      
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h3 class="text-lg font-bold text-white">Lista Operacional para CRM & Vendas</h3>
-          <p class="text-xs text-neutral-400">Clientes elegíveis para abordagem imediata com base nos scores calculados.</p>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" id="tableSearchInput" placeholder="🔍 Buscar ID de cliente..." class="px-3.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors w-48 sm:w-64">
-          <span id="tableCountBadge" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300">
-            0 clientes
-          </span>
-        </div>
-      </div>
-
-      <!-- Tabela com Scroll -->
-      <div class="overflow-x-auto rounded-xl border border-neutral-800/80 max-h-[420px]">
-        <table class="data-table w-full text-left">
-          <thead class="sticky top-0 bg-neutral-950 z-10">
-            <tr>
-              <th>ID Cliente</th>
-              <th>Segmento RFM</th>
-              <th>Prioridade</th>
-              <th>Recência (Dias)</th>
-              <th>Frequência</th>
-              <th>Valor Total</th>
-              <th>Ticket Médio</th>
-              <th>R-F-M</th>
-            </tr>
-          </thead>
-          <tbody id="customersTableBody">
-            <!-- Linhas dinâmicas -->
-          </tbody>
-        </table>
-      </div>
-
-    </section>
-
-    <!-- BANNER DE EXECUÇÃO STREAMLIT (BACKEND PYTHON) -->
-    <section class="p-5 rounded-2xl bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-emerald-500/10 border border-sky-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <div class="flex items-center gap-3.5">
-        <div class="w-11 h-11 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl flex-shrink-0">
-          ⚡
-        </div>
-        <div>
-          <h4 class="text-sm font-bold text-white">Prefere rodar com sua própria base transacional?</h4>
-          <p class="text-xs text-neutral-400">A aplicação completa em Streamlit permite upload de planilhas CSV/Excel reais, mapeamento dinâmico de colunas e reclassificação em tempo real.</p>
-        </div>
-      </div>
-      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-        <button id="copyCmdBtn" class="px-3.5 py-2 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-mono text-neutral-300 hover:text-white transition-colors flex items-center gap-1.5 whitespace-nowrap">
-          <span>Copiar: <code>streamlit run Projetos/01_Cockpit_RFM_Analytics/app.py</code></span>
-        </button>
-        <a href="http://localhost:8501" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs hover:bg-emerald-400 transition-all flex items-center gap-1.5 whitespace-nowrap shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-          <span>Abrir Streamlit Local</span>
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-        </a>
-      </div>
-    </section>
-    
-    
-    </div>
 
     <!-- ETAPA 1: TLDR & PROBLEMA DE NEGÓCIO -->
-    <div id="tab-problema" class="stage-view-content hidden space-y-8">
+    <div id="tab-problema" class="stage-view-content space-y-8">
       <div class="border-b border-neutral-800 pb-4">
         <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Etapa 1 • Business Understanding & TLDR</span>
         <h2 class="text-2xl font-extrabold text-white mt-1">Visão Executiva, Cenário de Mercado e Custo da Inação</h2>
@@ -1072,6 +897,182 @@ rfm['Segmento'] = rfm.apply(lambda r: assign_segment(r['R_Score'], r['F_Score'],
     </div>
 
   
+    
+    <!-- COCKPIT ANALÍTICO INTERATIVO -->
+    <div id="tab-cockpit" class="stage-view-content space-y-8 hidden">
+
+
+<!-- HEADER DO DASHBOARD -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-neutral-800">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xs font-mono uppercase tracking-widest text-sky-400">Customer Analytics & Retenção</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-500/10 text-sky-400 border border-sky-500/20">Machine Intelligence</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          Diagnóstico de Carteira & Prevenção de Churn
+        </h1>
+        <p class="text-xs sm:text-sm text-neutral-400 max-w-2xl mt-1 leading-relaxed">
+          Segmentação multidimensional por <strong>Recência</strong> (dias sem comprar), <strong>Frequência</strong> (pedidos) e <strong>Valor Monetário</strong> (faturamento total) com scores quantílicos determinísticos e playbooks comerciais acionáveis.
+        </p>
+      </div>
+
+      <!-- Barra de Filtro Rápido -->
+      <div class="flex flex-wrap items-center gap-3 glass-panel p-3 rounded-xl border border-neutral-800 self-start lg:self-auto">
+        <div>
+          <label class="text-[10px] font-mono uppercase text-neutral-400 block mb-1">Filtro de Segmento:</label>
+          <select id="segmentFilterSelect" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-white focus:outline-none focus:border-sky-500 transition-colors">
+            <option value="all">Todos os Segmentos (11 clusters)</option>
+          </select>
+        </div>
+        <div class="self-end">
+          <button id="resetFiltersBtn" class="px-3 py-1.5 rounded-lg bg-neutral-800 text-neutral-300 hover:text-white text-xs font-medium transition-colors">
+            Resetar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDS DE KPIS EXECUTIVOS -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <div class="metric-card">
+        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Receita Filtrada</span>
+        <div class="text-2xl font-extrabold text-white font-mono" id="kpiRevenue">R$ 0,00</div>
+        <span class="text-[11px] text-neutral-500 block mt-1.5" id="kpiRevenueSub">Volume faturado no período</span>
+      </div>
+
+      <div class="metric-card">
+        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Clientes Únicos</span>
+        <div class="text-2xl font-extrabold text-white font-mono" id="kpiCustomers">0</div>
+        <span class="text-[11px] text-sky-400 block mt-1.5" id="kpiCustomersSub">100% categorizados</span>
+      </div>
+
+      <div class="metric-card">
+        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-1">Ticket Médio Geral</span>
+        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTicket">R$ 0,00</div>
+        <span class="text-[11px] text-neutral-500 block mt-1.5">Média por transação concluída</span>
+      </div>
+
+      <div class="metric-card metric-alert alert-pulse">
+        <span class="text-xs font-mono uppercase tracking-wider text-rose-400 font-bold block mb-1">🚨 Receita em Risco</span>
+        <div class="text-2xl font-extrabold text-rose-400 font-mono" id="kpiRiskRevenue">R$ 0,00</div>
+        <span class="text-[11px] text-rose-300/80 block mt-1.5 font-medium" id="kpiRiskShare">0.0% da receita global</span>
+      </div>
+
+    </section>
+
+    <!-- NAVEGAÇÃO RÁPIDA POR CLUSTERS (PÍLULAS) -->
+    <section class="space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-mono uppercase tracking-wider text-neutral-400">Navegar por Cluster Estratégico:</span>
+        <span class="text-[11px] text-neutral-500">Clique em qualquer segmento para filtrar os gráficos e a lista operacional</span>
+      </div>
+      <div class="flex flex-wrap gap-2" id="clusterPillsContainer">
+        <!-- Injetado dinamicamente -->
+      </div>
+    </section>
+
+    <!-- VISUALIZAÇÕES ANALÍTICAS (PLOTLY) -->
+    <section class="glass-panel rounded-2xl p-6 border border-neutral-800 space-y-6">
+      
+      <!-- Controles das Abas de Gráficos -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-neutral-800/80">
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-900 border border-neutral-800">
+          <button class="tab-btn active" data-tab="treemap">🌳 Treemap (Mix & Volume)</button>
+          <button class="tab-btn" data-tab="scatter">🪐 Dispersão 2D / 3D</button>
+          <button class="tab-btn" data-tab="heatmap">🔥 Matriz de Concentração 5x5</button>
+        </div>
+
+        <div id="treemapMetricToggle" class="flex items-center gap-2 text-xs">
+          <span class="text-neutral-400">Dimensão:</span>
+          <button id="metricRevenueBtn" class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium">Receita (R$)</button>
+          <button id="metricCountBtn" class="px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium">Qtd Clientes</button>
+        </div>
+
+        <div id="scatterDimToggle" class="hidden flex items-center gap-2 text-xs">
+          <span class="text-neutral-400">Visão:</span>
+          <button id="scatter2dBtn" class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-medium">2D (Recência x Freq)</button>
+          <button id="scatter3dBtn" class="px-2.5 py-1 rounded text-neutral-400 hover:text-white font-medium">3D Espacial</button>
+        </div>
+      </div>
+
+      <!-- Container dos Gráficos Plotly -->
+      <div class="relative w-full min-h-[460px]">
+        <div id="plotlyChart" class="w-full h-[460px]"></div>
+      </div>
+
+    </section>
+
+    <!-- PLAYBOOK COMERCIAL DO CLUSTER EM FOCO -->
+    <section id="playbookCardContainer" class="glass-panel p-6 rounded-2xl border border-neutral-800 space-y-4">
+      <!-- Injetado dinamicamente -->
+    </section>
+
+    <!-- TABELA OPERACIONAL DE AÇÃO & CLIENTES -->
+    <section class="glass-panel rounded-2xl p-6 border border-neutral-800 space-y-5">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-white">Lista Operacional para CRM & Vendas</h3>
+          <p class="text-xs text-neutral-400">Clientes elegíveis para abordagem imediata com base nos scores calculados.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" id="tableSearchInput" placeholder="🔍 Buscar ID de cliente..." class="px-3.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500 transition-colors w-48 sm:w-64">
+          <span id="tableCountBadge" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300">
+            0 clientes
+          </span>
+        </div>
+      </div>
+
+      <!-- Tabela com Scroll -->
+      <div class="overflow-x-auto rounded-xl border border-neutral-800/80 max-h-[420px]">
+        <table class="data-table w-full text-left">
+          <thead class="sticky top-0 bg-neutral-950 z-10">
+            <tr>
+              <th>ID Cliente</th>
+              <th>Segmento RFM</th>
+              <th>Prioridade</th>
+              <th>Recência (Dias)</th>
+              <th>Frequência</th>
+              <th>Valor Total</th>
+              <th>Ticket Médio</th>
+              <th>R-F-M</th>
+            </tr>
+          </thead>
+          <tbody id="customersTableBody">
+            <!-- Linhas dinâmicas -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- BANNER DE EXECUÇÃO STREAMLIT (BACKEND PYTHON) -->
+    <section class="p-5 rounded-2xl bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-emerald-500/10 border border-sky-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl flex-shrink-0">
+          ⚡
+        </div>
+        <div>
+          <h4 class="text-sm font-bold text-white">Prefere rodar com sua própria base transacional?</h4>
+          <p class="text-xs text-neutral-400">A aplicação completa em Streamlit permite upload de planilhas CSV/Excel reais, mapeamento dinâmico de colunas e reclassificação em tempo real.</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <button id="copyCmdBtn" class="px-3.5 py-2 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-mono text-neutral-300 hover:text-white transition-colors flex items-center gap-1.5 whitespace-nowrap">
+          <span>Copiar: <code>streamlit run Projetos/01_Cockpit_RFM_Analytics/app.py</code></span>
+        </button>
+        <a href="http://localhost:8501" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs hover:bg-emerald-400 transition-all flex items-center gap-1.5 whitespace-nowrap shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+          <span>Abrir Streamlit Local</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    </section>
+    
+    
+    </div>
+
     </main>
 
     <!-- FOOTER CENTRALIZADO DENTRO DO CANVAS PRINCIPAL -->
@@ -1215,6 +1216,9 @@ rfm['Segmento'] = rfm.apply(lambda r: assign_segment(r['R_Score'], r['F_Score'],
       if (targetId === 'tab-cockpit') {
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'));
+          if (typeof updateDashboard === 'function') {
+            try { updateDashboard(); } catch(e) {}
+          }
           if (window.Plotly) {
             document.querySelectorAll('.plotly-graph-div').forEach(gd => {
               try { Plotly.Plots.resize(gd); } catch(e) {}
@@ -1234,7 +1238,8 @@ rfm['Segmento'] = rfm.apply(lambda r: assign_segment(r['R_Score'], r['F_Score'],
     });
 
     if (window.location.hash) {
-      const hashTarget = 'tab-' + window.location.hash.replace('#', '');
+      const cleanHash = window.location.hash.replace('#', '');
+      const hashTarget = cleanHash.startsWith('tab-') ? cleanHash : 'tab-' + cleanHash;
       if (document.getElementById(hashTarget)) {
         activateTab(hashTarget);
       }
@@ -1743,5 +1748,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   </script>
 
+  <!-- Script do Visualizador Executivo (16:9) -->
+  <script src="deck-viewer.js"></script>
 </body>
 </html>
