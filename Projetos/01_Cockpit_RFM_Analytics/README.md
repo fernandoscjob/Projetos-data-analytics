@@ -1,5 +1,6 @@
 # 🎯 Cockpit Analítico RFM & Prevenção de Churn em Vendas
 
+[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-fernandocavalcante.vercel.app-38bdf8?style=for-the-badge&logo=vercel)](https://fernandocavalcante.vercel.app/dashboard-rfm.html)
 ![Status](https://img.shields.io/badge/Status-Produção-emerald?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-FF4B4B?style=for-the-badge&logo=streamlit)

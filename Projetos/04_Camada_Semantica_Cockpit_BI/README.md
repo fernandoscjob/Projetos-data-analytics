@@ -1,5 +1,6 @@
 # 🏛️ Camada Semântica Corporativa, Modelagem Dimensional & Cockpit Executivo
 
+[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-fernandocavalcante.vercel.app-38bdf8?style=for-the-badge&logo=vercel)](https://fernandocavalcante.vercel.app/dashboard-bi.html)
 ![Status](https://img.shields.io/badge/Status-Produção-emerald?style=for-the-badge)
 ![dbt](https://img.shields.io/badge/Modeling-dbt_Core-FF694B?style=for-the-badge&logo=dbt)
 ![Power BI](https://img.shields.io/badge/BI-Power_BI_(DAX)-F2C811?style=for-the-badge&logo=powerbi)

@@ -1,5 +1,6 @@
 # 📊 Portfólio Profissional | Analista de Dados & Especialista em BI
 
+[![Website](https://img.shields.io/badge/Portfólio_Online-fernandocavalcante.vercel.app-38bdf8?style=for-the-badge&logo=vercel)](https://fernandocavalcante.vercel.app)
 ![Status](https://img.shields.io/badge/Status-Produção-emerald?style=for-the-badge)
 ![Tema](https://img.shields.io/badge/Tema-Dark_Modern_(Linear/Vercel)-090a0f?style=for-the-badge)
 ![Tech](https://img.shields.io/badge/Stack-HTML5_•_TailwindCSS_•_Chart.js_•_Vanilla_JS-sky?style=for-the-badge)
@@ -37,8 +38,9 @@ Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | 
 
 O repositório é dedicado exclusivamente aos **5 Projetos Técnicos de Engenharia, Analytics & BI**, além de documentações e modelos dimensionais:
 
-> [!NOTE]
-> Os arquivos do frontend do site (HTML, CSS, JS e dashboards standalone) foram desacoplados e mantidos em repositório privado dedicado ([`portfolio-site`](https://github.com/fernandoscjob/portfolio-site)).
+> [!TIP]
+> 🌐 **Portfólio Online Oficial**: Acesse a versão interativa em produção em [**https://fernandocavalcante.vercel.app**](https://fernandocavalcante.vercel.app).  
+> Os arquivos do frontend do site (HTML, CSS, JS, vídeos e dashboards standalone) foram desacoplados e mantidos em repositório privado dedicado ([`portfolio-site`](https://github.com/fernandoscjob/portfolio-site)).
 
 ```
 Projetos-data-analytics/
@@ -152,32 +154,19 @@ Para atualizar o currículo baixado pelos visitantes:
 
 ---
 
-## 🌐 Instruções de Publicação (Deploy)
-
-### Deploy no GitHub Pages (Gratuito)
-1. Crie um repositório no seu GitHub com o nome `portfolio` ou `portfolio-data-analytics`.
-2. No terminal da pasta, inicialize o git e suba os arquivos:
-   ```bash
-   git init
-   git add .
-   git commit -m "feat: portfolio pronto para producao"
-   git branch -M main
-   git remote add origin https://github.com/fernandoscjob/Projetos-data-analytics.git # ou seu repositorio especifico
-   git push -u origin main
-   ```
-3. No GitHub, acesse **Settings** > **Pages**.
-4. Em **Source**, selecione `Deploy from a branch`, escolha a branch `main` e a pasta `/ (root)`.
-5. Salve. Seu portfólio estará online em `https://fernandoscjob.github.io/...` com HTTPS ativo.
-
-### Deploy na Vercel (Recomendado para SPA/Estático)
-1. Acesse [vercel.com](https://vercel.com) e conecte com seu GitHub.
-2. Clique em **"Add New Project"** e selecione o repositório do portfólio.
-3. Clique em **Deploy**. O site será publicado instantaneamente com CDN global de altíssima velocidade.
+## 🌐 Publicação & Ambiente de Produção
+ 
+O portfólio está publicado oficialmente com domínio próprio e deploy contínuo (CI/CD):
+- 🔗 **URL Oficial de Produção**: [**https://fernandocavalcante.vercel.app**](https://fernandocavalcante.vercel.app)
+- **Hospedagem**: Vercel Edge Network (CDN Global, SSL/HTTPS automático)
+- **Repositório do Frontend**: [`portfolio-site`](https://github.com/fernandoscjob/portfolio-site) (Privado)
+- **Repositório dos Projetos**: [`Projetos-data-analytics`](https://github.com/fernandoscjob/Projetos-data-analytics) (Público)
 
 ---
 
 ## 📬 Contatos & Redes Profissionais
 
+- **Website / Portfólio**: [fernandocavalcante.vercel.app](https://fernandocavalcante.vercel.app)
 - **LinkedIn**: [fernando-cavalcante-a478191b1](https://www.linkedin.com/in/fernando-cavalcante-a478191b1/)
 - **GitHub**: [fernandoscjob](https://github.com/fernandoscjob/Projetos-data-analytics)
 - **WhatsApp**: [+55 (21) 96924-1760](https://wa.me/5521969241760?text=Ol%C3%A1%20Fernando,%20vi%20seu%20portf%C3%B3lio.)

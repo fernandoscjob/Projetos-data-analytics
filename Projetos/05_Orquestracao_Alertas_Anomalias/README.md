@@ -1,5 +1,6 @@
 # ⚙️ Orquestração de Pipelines e Alertas Proativos de Anomalias
 
+[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-fernandocavalcante.vercel.app-38bdf8?style=for-the-badge&logo=vercel)](https://fernandocavalcante.vercel.app/dashboard-automacao.html)
 ![Status](https://img.shields.io/badge/Status-Produção-emerald?style=for-the-badge)
 ![n8n](https://img.shields.io/badge/Orchestration-n8n_Workflows-EA4B71?style=for-the-badge&logo=n8n)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)

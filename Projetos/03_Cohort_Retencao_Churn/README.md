@@ -1,5 +1,6 @@
 # 📈 Modelagem de Cohort, Retenção & Prevenção de Churn
 
+[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-fernandocavalcante.vercel.app-38bdf8?style=for-the-badge&logo=vercel)](https://fernandocavalcante.vercel.app/dashboard-cohort.html)
 ![Status](https://img.shields.io/badge/Status-Produção-emerald?style=for-the-badge)
 ![SQL](https://img.shields.io/badge/SQL-dbt_•_BigQuery_•_Postgres-00758F?style=for-the-badge&logo=dbt)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)

@@ -1,5 +1,6 @@
 # 🚚 Auditoria Contratual de Fretes & Otimização de Custos de Transporte
 
+[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-fernandocavalcante.vercel.app-38bdf8?style=for-the-badge&logo=vercel)](https://fernandocavalcante.vercel.app/dashboard-fretes.html)
 ![Status](https://img.shields.io/badge/Status-Produção-emerald?style=for-the-badge)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-FF4B4B?style=for-the-badge&logo=streamlit)
 ![Plotly](https://img.shields.io/badge/Plotly-5.18%2B-3F4F75?style=for-the-badge&logo=plotly)
