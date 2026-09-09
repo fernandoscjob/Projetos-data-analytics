@@ -33,22 +33,15 @@ Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | 
 
 ---
 
-## 📁 Estrutura de Arquivos Isolada
+## 📁 Estrutura de Arquivos
 
-O repositório é organizado de forma modular e isolada, separando a camada do **Site de Portfólio** dos **5 Projetos de Dados**:
+O repositório é dedicado exclusivamente aos **5 Projetos Técnicos de Engenharia, Analytics & BI**, além de documentações e modelos dimensionais:
+
+> [!NOTE]
+> Os arquivos do frontend do site (HTML, CSS, JS e dashboards standalone) foram desacoplados e mantidos em repositório privado dedicado ([`portfolio-site`](https://github.com/fernandoscjob/portfolio-site)).
 
 ```
-Portifólio em Dados/
-│
-├── 🌐 Site/                                 # ARQUIVOS DO SITE DE PORTFÓLIO (FRONTEND)
-│   ├── index.html                          # Aplicação web completa do portfólio
-│   ├── dashboard-rfm.html                  # Cockpit Analítico RFM Standalone (Plotly.js)
-│   ├── dashboard-fretes.html               # Cockpit de Auditoria de Fretes Standalone (Plotly.js)
-│   ├── style.css                           # Design tokens, glassmorphism e animações
-│   ├── main.js                             # Lógica interativa, Chart.js, Cohort e AJAX
-│   ├── profile.jpg                         # Foto de perfil profissional em alta resolução
-│   ├── curriculo-fernando.pdf              # Arquivo de currículo para download direto
-│   └── video_dashboard.mp4                 # Vídeo demonstrativo dos dashboards
+Projetos-data-analytics/
 │
 ├── 📊 Projetos/                             # PROJETOS DE ENGENHARIA, ANALYTICS E BI
 │   │
@@ -82,7 +75,9 @@ Portifólio em Dados/
 │       ├── requirements.txt                # Dependências (pandas, numpy, requests)
 │       └── README.md                       # Guia de integração n8n e webhooks Slack
 │
-├── index.html                              # Redirecionamento instantâneo para Site/index.html (compatibilidade GitHub Pages)
+├── 📑 docs/                                 # DOCUMENTAÇÃO E PADRÕES TÉCNICOS
+│   └── PADRAO_CASE_STUDIES.md              # Padrão consultivo de documentação de cases
+│
 ├── .gitignore                              # Ignora ambientes virtuais (.venv) e caches
 └── README.md                               # Documentação geral do repositório
 ```
