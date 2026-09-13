@@ -16,12 +16,13 @@ Portfólio técnico de **Fernando da Silva Cavalcante** — Analista de Dados | 
 - **Barra de Métricas de Impacto (Quick Wins)**: Contadores animados via `IntersectionObserver` apresentando números de ROI, volume e automação.
 - **Pilares de Soluções & Geração de Valor (#solucoes)**: Grid consultivo de 4 frentes estratégicas (Auditoria & Otimização de Custos, Camada Semântica & SSOT, BI & Cockpits C-Level e Pipelines & Alertas Proativos).
 - **Stack Técnica Categorizada**: Badges interativos distribuídos em *Modelagem & Engenharia* (SQL Avançado, Kimball, Star Schema, SSOT, dbt), *BI & Camada Executiva* (Looker LookML, Power BI, DAX Avançado, Cockpits C-Level), *Automação & Pipelines* (Python, n8n, Alertas Proativos, Airflow) e *Negócio & Governança* (Auditoria Contratual, Cohort Analytics, BPMN Bizagi).
-- **5 Cases de Sucesso com Modal Aprofundado**:
+- **6 Cases de Sucesso com Modal Aprofundado**:
   1. **Auditoria Contratual de Fretes & Otimização de Custos** (SQL + Looker + Python).
   2. **Modelagem de Cohort, Retenção & Prevenção de Churn** (SQL Window Functions + dbt).
   3. **Camada Semântica & Cockpit Executivo de Planejamento** (Power BI + dbt + Kimball).
   4. **Orquestração de Pipelines e Alertas Proativos** (n8n + Python + Webhooks).
   5. **Cockpit Analítico de Segmentação RFM & Prevenção de Churn** (Python + Streamlit + Plotly + Quantis).
+  6. **Motor Preditivo de Risco de Crédito End-to-End** (Supabase + BigQuery + dbt + XGBoost + Streamlit).
   *Cada modal contém o desafio de negócio, arquitetura técnica, queries SQL/código Python e resultados de ROI mensuráveis.*
 - **Cockpit Analítico Interativo (Chart.js, Cohort Heatmap & Cockpit RFM)**:
   - *Visão 1*: Custo Real vs Meta (Linha comparativa de inflexão).
@@ -71,11 +72,18 @@ Projetos-data-analytics/
 │   │   ├── medidas_dax_corporativas.dax    # Catálogo com 14 métricas corporativas DAX
 │   │   └── README.md                       # Documentação de SSOT e governança dimensional
 │   │
-│   └── 05_Orquestracao_Alertas_Anomalias/  # Projeto 05: Orquestração de Pipelines e Alertas
-│       ├── anomaly_detector.py             # Motor estatístico de cálculo de Z-Score (> 2.5)
-│       ├── n8n_workflow_alertas.json       # Workflow n8n exportado com webhooks
-│       ├── requirements.txt                # Dependências (pandas, numpy, requests)
-│       └── README.md                       # Guia de integração n8n e webhooks Slack
+│   ├── 05_Orquestracao_Alertas_Anomalias/  # Projeto 05: Orquestração de Pipelines e Alertas
+│   │   ├── anomaly_detector.py             # Motor estatístico de cálculo de Z-Score (> 2.5)
+│   │   ├── n8n_workflow_alertas.json       # Workflow n8n exportado com webhooks
+│   │   ├── requirements.txt                # Dependências (pandas, numpy, requests)
+│   │   └── README.md                       # Guia de integração n8n e webhooks Slack
+│   │
+│   └── 06_Risco_Credito_Fintech_ML/        # Projeto 06: Machine Learning de Risco de Crédito
+│       ├── 01_data_ingestion/              # ELT via Supabase (PostgreSQL) para BigQuery
+│       ├── 02_dbt_transform/               # Modelagem na camada semântica com dbt
+│       ├── 03_machine_learning/            # Classificador XGBoost balanceado (scale_pos_weight)
+│       ├── 04_dashboard/                   # App interativo Streamlit + Plotly
+│       └── README.md                       # Case consultivo com ROI e avaliação CRISP-DM
 │
 ├── 📑 docs/                                 # DOCUMENTAÇÃO E PADRÕES TÉCNICOS
 │   └── PADRAO_CASE_STUDIES.md              # Padrão consultivo de documentação de cases
@@ -126,6 +134,11 @@ Projetos-data-analytics/
    ```bash
    python Projetos/05_Orquestracao_Alertas_Anomalias/anomaly_detector.py
    ```
+6. **Projeto 06 - Motor Preditivo de Risco de Crédito End-to-End:**
+   ```bash
+   streamlit run Projetos/06_Risco_Credito_Fintech_ML/04_dashboard/app.py
+   ```
+   *Acesse a aplicação (Simulador + BI) no navegador em `http://localhost:8501`.*
 
 ### ⚡ Dashboard RFM Standalone Direto no Navegador (Sem Python)
 Dê dois cliques no arquivo [`Site/dashboard-rfm.html`](Site/dashboard-rfm.html). Ele funciona diretamente no navegador sem exigir servidor Python em execução.
