@@ -1,0 +1,12 @@
+risco_credito:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: risco-credito-fintech
+      dataset: analytics_dev
+      threads: 4
+      keyfile: ../gcp_key.json
+      location: US
+      priority: interactive

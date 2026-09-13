@@ -1,0 +1,16 @@
+﻿# Data files
+data/
+*.csv
+*.parquet
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# dbt
+02_dbt_transform/target/
+02_dbt_transform/dbt_packages/
+02_dbt_transform/logs/
